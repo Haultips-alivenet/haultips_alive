@@ -7,9 +7,9 @@ namespace Composer\Autoload;
 class ComposerStaticInit9df7efa49b843b908d9b392fd6df8211
 {
     public static $files = array (
+        '1d1b89d124cc9cb8219922c9d5569199' => __DIR__ . '/..' . '/hamcrest/hamcrest-php/hamcrest/Hamcrest.php',
         '0e6d7bf4a5811bfa5cf40c5ccd6fae6a' => __DIR__ . '/..' . '/symfony/polyfill-mbstring/bootstrap.php',
         '667aeda72477189d0494fecd327c3641' => __DIR__ . '/..' . '/symfony/var-dumper/Resources/functions/dump.php',
-        '1d1b89d124cc9cb8219922c9d5569199' => __DIR__ . '/..' . '/hamcrest/hamcrest-php/hamcrest/Hamcrest.php',
         '2c102faa651ef8ea5874edb585946bce' => __DIR__ . '/..' . '/swiftmailer/swiftmailer/lib/swift_required.php',
         'bd9634f2d41831496de0d3dfe4c94881' => __DIR__ . '/..' . '/symfony/polyfill-php56/bootstrap.php',
         'e7223560d890eab89cda23685e711e2c' => __DIR__ . '/..' . '/psy/psysh/src/Psy/functions.php',
@@ -17,6 +17,7 @@ class ComposerStaticInit9df7efa49b843b908d9b392fd6df8211
         '65fec9ebcfbb3cbb4fd0d519687aea01' => __DIR__ . '/..' . '/danielstjules/stringy/src/Create.php',
         'f0906e6318348a765ffb6eb24e0d0938' => __DIR__ . '/..' . '/laravel/framework/src/Illuminate/Foundation/helpers.php',
         '58571171fd5812e6e447dce228f52f4d' => __DIR__ . '/..' . '/laravel/framework/src/Illuminate/Support/helpers.php',
+        '752af1c2bdb339e8474c3c31b22b7d54' => __DIR__ . '/..' . '/illuminate/html/helpers.php',
     );
 
     public static $prefixLengthsPsr4 = array (
@@ -69,6 +70,7 @@ class ComposerStaticInit9df7efa49b843b908d9b392fd6df8211
         ),
         'I' => 
         array (
+            'Illuminate\\Html\\' => 16,
             'Illuminate\\' => 11,
         ),
         'F' => 
@@ -197,6 +199,10 @@ class ComposerStaticInit9df7efa49b843b908d9b392fd6df8211
         'League\\Flysystem\\' => 
         array (
             0 => __DIR__ . '/..' . '/league/flysystem/src',
+        ),
+        'Illuminate\\Html\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/illuminate/html',
         ),
         'Illuminate\\' => 
         array (
@@ -1134,6 +1140,11 @@ class ComposerStaticInit9df7efa49b843b908d9b392fd6df8211
         'Illuminate\\Foundation\\Validation\\ValidatesRequests' => __DIR__ . '/..' . '/laravel/framework/src/Illuminate/Foundation/Validation/ValidatesRequests.php',
         'Illuminate\\Hashing\\BcryptHasher' => __DIR__ . '/..' . '/laravel/framework/src/Illuminate/Hashing/BcryptHasher.php',
         'Illuminate\\Hashing\\HashServiceProvider' => __DIR__ . '/..' . '/laravel/framework/src/Illuminate/Hashing/HashServiceProvider.php',
+        'Illuminate\\Html\\FormBuilder' => __DIR__ . '/..' . '/illuminate/html/FormBuilder.php',
+        'Illuminate\\Html\\FormFacade' => __DIR__ . '/..' . '/illuminate/html/FormFacade.php',
+        'Illuminate\\Html\\HtmlBuilder' => __DIR__ . '/..' . '/illuminate/html/HtmlBuilder.php',
+        'Illuminate\\Html\\HtmlFacade' => __DIR__ . '/..' . '/illuminate/html/HtmlFacade.php',
+        'Illuminate\\Html\\HtmlServiceProvider' => __DIR__ . '/..' . '/illuminate/html/HtmlServiceProvider.php',
         'Illuminate\\Http\\Exception\\HttpResponseException' => __DIR__ . '/..' . '/laravel/framework/src/Illuminate/Http/Exception/HttpResponseException.php',
         'Illuminate\\Http\\Exception\\PostTooLargeException' => __DIR__ . '/..' . '/laravel/framework/src/Illuminate/Http/Exception/PostTooLargeException.php',
         'Illuminate\\Http\\JsonResponse' => __DIR__ . '/..' . '/laravel/framework/src/Illuminate/Http/JsonResponse.php',

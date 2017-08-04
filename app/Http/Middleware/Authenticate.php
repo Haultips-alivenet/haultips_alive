@@ -33,12 +33,12 @@ class Authenticate
      * @return mixed
      */
     public function handle($request, Closure $next)
-    {
+    { 
         if ($this->auth->guest()) {
             if ($request->ajax()) {
                 return response('Unauthorized.', 401);
             } else {
-                return redirect()->guest('auth/login');
+                return redirect()->guest('admin/login');
             }
         }
 
