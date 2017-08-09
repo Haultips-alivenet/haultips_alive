@@ -27,10 +27,9 @@ Route::get('auth/logout', 'Auth\AuthController@getLogout');
 Route::get('admin/dashboard', 'DashboardController@index');
 
 # Admin Panel Routes
+Route::post('admin/store', 'RegistrationController@store');
 Route::get('admin/userList', 'RegistrationController@index');
-Route::get('admin/newuser', 'RegistrationController@create');
 
+Route::get('admin/users/{id}/delete', 'RegistrationController@destroy');
+Route::resource('admin/users', 'RegistrationController');
 
-// Registration routes...
-Route::get('auth/register', 'Auth\AuthController@getRegister');
-Route::post('auth/register', 'Auth\AuthController@postRegister');

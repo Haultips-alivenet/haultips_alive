@@ -3,6 +3,7 @@
     Admin Panel | Haultips
 @endsection
 
+@section('body')
 <div id="page-wrapper">
                 <div class="graphs">
                         <div class="col_3">
@@ -115,4 +116,4 @@
 </div>
 			 <!--body wrapper end-->
 		
-  
+ @endsection 

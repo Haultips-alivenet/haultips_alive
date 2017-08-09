@@ -60,7 +60,7 @@ License URL: http://creativecommons.org/licenses/by/3.0/
                         <a href="#"><i class="lnr lnr-cog"></i>
                         <span>User</span></a>
                         <ul class="sub-menu-list">
-                            <li><a href="{{ url('admin/newuser') }}">New User</a> </li>
+                            <li><a href="{{ url('admin/users/create') }}">New User</a> </li>
                             <li><a href="{{ url('admin/userList') }}">User List</a></li>
                         </ul>
                     </li>
@@ -271,7 +271,7 @@ License URL: http://creativecommons.org/licenses/by/3.0/
                                             <span style="background:url(images/1.jpg) no-repeat center"> </span> 
                                              <div class="user-name">
                                                  
-                                                    <p>{{$firstName}}<span>{{$lastName}}</span></p>
+                                                    <p>Haultips<span>Admin</span></p>
                                              </div>
                                              <i class="lnr lnr-chevron-down"></i>
                                              <i class="lnr lnr-chevron-up"></i>
@@ -294,7 +294,7 @@ License URL: http://creativecommons.org/licenses/by/3.0/
                 <!--notification menu end -->
                 </div>
         <!-- //header-ends -->
- @yield('body')
+    @yield('body')
  
  </div>
     <!--footer section start-->
@@ -307,7 +307,9 @@ License URL: http://creativecommons.org/licenses/by/3.0/
    </section>
  
     {!! HTML::script('public/admin/js/jquery.nicescroll.js')!!} 
-    {!! HTML::script('public/admin/js/scripts.js')!!}  
+    {!! HTML::script('public/admin/js/scripts.js')!!} 
     {!! HTML::script('public/admin/js/bootstrap.min.js')!!}
+    {!! Html::script('public/admin/js/jquery.validate.min.js') !!}
+    @yield('script')
  </body>
 </html>
