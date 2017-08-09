@@ -23,8 +23,19 @@ class AuthController extends Controller
 
     use AuthenticatesAndRegistersUsers, ThrottlesLogins;
     
-    protected $redirectPath = 'admin/dashboard';
-    protected $loginPath = 'admin/login';
+//    protected $redirectPath = '/login';
+//    protected $loginPath = 'admin/login';
+    
+    public function authenticated($request , $user){
+        if($user->user_type_id=='1'){            
+            return redirect('admin/dashboard') ;
+        }elseif($user->user_type_id=='2'){
+            return redirect()->route('carrier/dashboard') ;
+        }elseif($user->user_type_id=='3'){
+            return redirect()->route('user/dashboard') ;
+        }
+    }
+    
     
     /**
      * Create a new authentication controller instance.

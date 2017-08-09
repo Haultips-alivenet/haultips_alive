@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
+use Auth;
+use Session;
 
 class DashboardController extends Controller
 {
@@ -16,7 +18,10 @@ class DashboardController extends Controller
      */
     public function index()
     {
-        return view('admin.dashboards.dashboard');
+        $userData = Session::get('currentUser');
+        $firstName = $userData['first_name'];
+        $lastName = $userData['last_name'];
+        return view('admin.dashboards.dashboard',['firstName'=>$firstName,'lastName'=>$lastName]);
     }
 
     /**
