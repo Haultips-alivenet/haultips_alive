@@ -9,6 +9,7 @@ use App\Http\Controllers\Controller;
 use Auth;
 use Session;
 use App\User;
+use DB;
 
 class RegistrationController extends Controller
 {
@@ -17,9 +18,32 @@ class RegistrationController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        $user = User::where('user_type_id',3)->paginate(10);
+        $user = User::orderBy('id', 'desc');
+        if($request->name!=''){
+            $user->where(DB::raw('CONCAT_WS(" ", users.first_name, users.last_name)'), 'like', "%$request->name%");
+        }
+        if($request->email!=''){
+            $user->where('users.email', 'like', "%$request->email%");
+        }
+        if($request->mobile!=''){
+            $user->where('users.mobile_number', 'like', "%$request->mobile%");
+        }
+        if($request->status!=''){
+            $user->where('users.status', $request->status);
+        }
+        if ($request->ToDate != "" && $request->FromDate != "") {
+            $user->where(DB::raw('DATE_FORMAT(users.created_at,"%Y-%m-%d")'), '>=', $request->FromDate)->where(DB::raw('DATE_FORMAT(users.created_at,"%Y-%m-%d")'), '<=', $request->ToDate);
+        }
+        if ($request->ToDate != '' && $request->FromDate == '') {
+            $user->where(DB::raw('DATE_FORMAT(users.created_at,"%Y-%m-%d")'), '<=', $request->ToDate);
+        }
+        if ($request->ToDate == '' && $request->FromDate != '') {
+            $user->where(DB::raw('DATE_FORMAT(users.created_at,"%Y-%m-%d")'), '>=', $request->FromDate);
+        }
+        
+        $user = $user->where('user_type_id',3)->paginate(10);
         $page = $user->toArray();
         return view('admin.user.index')->with([
                     'users' => $user,

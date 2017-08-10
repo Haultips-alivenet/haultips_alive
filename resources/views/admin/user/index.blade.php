@@ -9,6 +9,32 @@
             <h3 class="blank1">Users</h3>
                 <div class="xs tabls">
                     <div class="panel panel-warning" >
+                        
+                                {!! Form::open(array('url'=>'admin/userList','id'=>'menu','method'=>'get')) !!}
+                                    <div class="row">  
+                                        <div class="form-group col-md-2 grid_box1">
+                                            {!! Form::text('name',Input::get('name'),['class'=>"form-control",'placeholder'=>'Name']) !!}
+                                        </div>
+                                        <div class="form-group col-md-2 grid_box1">
+                                            {!! Form::text('email',Input::get('email'),['class'=>"form-control",'placeholder'=>'Email']) !!}
+                                        </div>
+                                        <div class="form-group col-md-2 grid_box1">
+                                            {!! Form::text('mobile',Input::get('mobile'),['class'=>"form-control",'placeholder'=>'Mobile']) !!}
+                                        </div>
+                                        <div class="form-group col-md-2 grid_box1">
+                                            <select name="status" id="status" class="form-control select2">
+                                                <option value=""  >--Select Status--</option>                                                
+                                                <option   value="1"  {{Input::get('status')=='1' ? 'selected' : ''}}>Active</option>
+                                                <option   value="0" {{Input::get('status')=='0' ? 'selected' : ''}} >In Active</option>
+                                            </select>
+                                        </div>                                        
+                                        <div class="form-group col-sm-3">
+                                            {!! Form::submit('Search',['class'=>"btn btn-success"]) !!}
+                                            <a href="{{ url('admin/userList') }}" class="btn btn-success" title="Refresh"><i class="fa fa-refresh"></i></a>                                            
+                                        </div>                                        
+                                    </div>
+                                    {!! Form::close() !!}
+                        
                         <div class="panel-heading">
                             <h2>Users List</h2>
                             <div class="panel-ctrls"><span class="button-icon has-bg"><i class="ti ti-angle-down"></i></span></div>
