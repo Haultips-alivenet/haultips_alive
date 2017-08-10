@@ -65,35 +65,25 @@ License URL: http://creativecommons.org/licenses/by/3.0/
                         </ul>
                     </li>
                     <li class="menu-list">
-                            <a href="#"><i class="lnr lnr-cog"></i>
-                                    <span>Components</span></a>
-                                    <ul class="sub-menu-list">
-                                            <li><a href="grids.html">Grids</a> </li>
-                                            <li><a href="widgets.html">Widgets</a></li>
-                                    </ul>
+                        <a href="#"><i class="lnr lnr-cog"></i>
+                        <span>Partner</span></a>
+                        <ul class="sub-menu-list">
+                            <li><a href="#">New Partner</a> </li>
+                            <li><a href="#">Partner List</a></li>
+                        </ul>
                     </li>
-                        <li><a href="forms.html"><i class="lnr lnr-spell-check"></i> <span>Forms</span></a></li>
-                        <li><a href="tables.html"><i class="lnr lnr-menu"></i> <span>Tables</span></a></li>              
-                        <li class="menu-list"><a href="#"><i class="lnr lnr-envelope"></i> <span>MailBox</span></a>
-                                <ul class="sub-menu-list">
-                                        <li><a href="inbox.html">Inbox</a> </li>
-                                        <li><a href="compose-mail.html">Compose Mail</a></li>
-                                </ul>
-                        </li>      
-                        <li class="menu-list"><a href="#"><i class="lnr lnr-indent-increase"></i> <span>Menu Levels</span></a>  
-                                <ul class="sub-menu-list">
-                                        <li><a href="charts.html">Basic Charts</a> </li>
-                                </ul>
-                        </li>
-                        <li><a href="codes.html"><i class="lnr lnr-pencil"></i> <span>Typography</span></a></li>
-                        <li><a href="media.html"><i class="lnr lnr-select"></i> <span>Media Css</span></a></li>
-                        <li class="menu-list"><a href="#"><i class="lnr lnr-book"></i>  <span>Pages</span></a> 
-                                <ul class="sub-menu-list">
-                                        <li><a href="sign-in.html">Sign In</a> </li>
-                                        <li><a href="sign-up.html">Sign Up</a></li>
-                                        <li><a href="blank_page.html">Blank Page</a></li>
-                                </ul>
-                        </li>
+                    <li class="menu-list">
+                        <a href="#"><i class="lnr lnr-cog"></i>
+                        <span>Categories</span></a>
+                        <ul class="sub-menu-list">
+                            <li><a href="#">Main Category</a> </li>
+                            <li><a href="#">Sub Category</a></li>
+                        </ul>
+                    </li>
+                    <li><a href="#"><i class="lnr lnr-spell-check"></i> <span>Transaction History</span></a></li>
+                    <li><a href="#"><i class="lnr lnr-spell-check"></i> <span>Shipments</span></a></li>
+                           
+                        
                 </ul>
                     <!--sidebar nav end-->
             </div>

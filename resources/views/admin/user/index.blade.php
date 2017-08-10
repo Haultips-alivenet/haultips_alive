@@ -23,7 +23,7 @@
                                         </div>
                                         <div class="form-group col-md-2 grid_box1">
                                             <select name="status" id="status" class="form-control select2">
-                                                <option value=""  >--Select Status--</option>                                                
+                                                <option value=""  >Select Status</option>                                                
                                                 <option   value="1"  {{Input::get('status')=='1' ? 'selected' : ''}}>Active</option>
                                                 <option   value="0" {{Input::get('status')=='0' ? 'selected' : ''}} >In Active</option>
                                             </select>
