@@ -68,16 +68,17 @@ License URL: http://creativecommons.org/licenses/by/3.0/
                         <a href="#"><i class="lnr lnr-cog"></i>
                         <span>Partner</span></a>
                         <ul class="sub-menu-list">
-                            <li><a href="#">New Partner</a> </li>
-                            <li><a href="#">Partner List</a></li>
+                            <li><a href="{{ url('admin/partner/create') }}">New Partner</a> </li>
+                            <li><a href="{{ url('admin/partnerList') }}">Partner List</a></li>
                         </ul>
                     </li>
                     <li class="menu-list">
                         <a href="#"><i class="lnr lnr-cog"></i>
                         <span>Categories</span></a>
                         <ul class="sub-menu-list">
-                            <li><a href="#">Main Category List</a> </li>
-                            <li><a href="#">Add New Category</a></li>
+                            <!--<li><a href="{{url('admin/category/create')}}">Main Category List</a> </li>-->
+                            <li><a href="{{url('admin/category/create')}}">Add New Category</a></li>
+                            <li><a href="{{url('admin/subcategory/create')}}">Add New Sub Category</a></li>
                         </ul>
                     </li>
                     <li><a href="#"><i class="lnr lnr-spell-check"></i> <span>Transaction History</span></a></li>

@@ -33,7 +33,22 @@ Route::get('admin/userList', 'RegistrationController@index');
 Route::get('admin/users/{id}/delete', 'RegistrationController@destroy');
 Route::resource('admin/users', 'RegistrationController');
 
+# Admin Category
+Route::resource('admin/category', 'CategoryController');
+Route::post('admin/Category-Save', 'CategoryController@store');
+Route::get('admin/category/{id}/update', 'CategoryController@create');
+Route::get('admin/category/{id}/delete', 'CategoryController@destroy');
 
-#Admin Panel
+# Admin Sub Category
+Route::resource('admin/subcategory', 'SubCategoryController');
+Route::post('admin/subCategory-Save', 'SubCategoryController@store');
+Route::get('admin/subcategory/{id}/update', 'SubCategoryController@create');
+Route::get('admin/subcategory/{id}/delete', 'SubCategoryController@destroy');
+
+# Admin partner
+Route::resource('admin/partner', 'PartnerRegistrationController');
+Route::post('admin/partner/store', 'PartnerRegistrationController@store');
+Route::get('admin/partnerList', 'PartnerRegistrationController@index');
+
+#Webservices
 Route::post('webservices/login', 'AndroidController@login');
-
