@@ -51,6 +51,7 @@ Route::post('admin/partner/store', 'PartnerRegistrationController@store');
 Route::get('admin/partnerList', 'PartnerRegistrationController@index');
 
 #Webservices
+Route::post('webservicesToken/token', 'AndroidController@token');
 Route::post('webservices/login', 'AndroidController@login');
 Route::post('webservices/sendOtp', 'AndroidController@sendOtp');
 Route::post('webservices/otpVerification', 'AndroidController@otpVerification');

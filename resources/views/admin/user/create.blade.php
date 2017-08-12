@@ -99,7 +99,8 @@ $('#newUser').validate({
                 },
 
                 cpassword:{
-                    required : true
+                    required : true,
+                    equalTo: "#password"
                 }
             },
 
@@ -125,7 +126,7 @@ $('#newUser').validate({
                     required : "Enter your Password",
                 },                
                 cpassword :{
-                    required : "Enter your Confirm Password",
+                    required : "Please re-enter password",
                 }
             }
             

@@ -58,14 +58,16 @@ class AndroidController extends AppController
             $mobileData=User::where('mobile_number',$mobileNumber)->select('id')->get();
             $mobileExists = $mobileData->toArray();
             
-            if(empty($mobileExists)){
-                $user = new User;
-                $user->mobile_number = $mobileNumber;
+            $user = new User;
+            $user->mobile_number = $mobileNumber;
+            
+            if(empty($mobileExists)){               
                 $user->save();
                 $userId= $user->id;
             }else{
                 $userId = $mobileExists[0]['id'];
             }
+           // $token = JWTAuth::fromUser($user); 
             
             $userVerification =new UserVerification;
             $userVerification->user_id = $userId;
@@ -75,13 +77,14 @@ class AndroidController extends AppController
             $otpMsg = 'Your Otp is '.$otp;
             
             $smsObj = new Smsapi();
-            $smsObj->sendsms_api('+91'.$mobileNumber,$otpMsg);
-        
+            $smsObj->sendsms_api('+91'.$mobileNumber,$otpMsg);            
             
             $msg['responseCode'] = "200";
             $msg['responseMessage'] = "Otp is fetched successfully";
             $msg['userId'] = $userId;
-            $msg['otp'] = $otp;            
+            $msg['otp'] = $otp;    
+          //  $msg['token'] = $token;
+            
             
         }else{
             $msg['responseCode'] = "0";
@@ -128,7 +131,7 @@ class AndroidController extends AppController
         return $msg;
     }
     
-    public function userRegistration(){
+    public function userRegistration(Request $request){
         $msg = array();
         $userId = $_POST['userId'];
         $firstName = $_POST['firstName'];
@@ -165,13 +168,14 @@ class AndroidController extends AppController
                                 'email'=>$email,
                                 'password'=>bcrypt($password)
                                 ]);
-                        
+                                                
                         $msg['responseCode'] = "200";
                         $msg['responseMessage'] = "Registration is done successfully";
                         $msg['userId'] = $userId;
                         $msg['firstName'] = $firstName;
                         $msg['lastName'] = $lastName;
                         $msg['email'] = $email;
+                        $msg['token'] = $token;
                     } 
               }else{
                   $msg['responseCode'] = "0";
@@ -179,5 +183,10 @@ class AndroidController extends AppController
               }
         }        
         return $msg;
+    }
+    
+    public function token(Request $request){
+      $token = $request->session()->token();
+      return $token;
     }
 }
