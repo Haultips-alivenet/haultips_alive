@@ -15,6 +15,7 @@ class ComposerStaticInit9df7efa49b843b908d9b392fd6df8211
         'e7223560d890eab89cda23685e711e2c' => __DIR__ . '/..' . '/psy/psysh/src/Psy/functions.php',
         '5255c38a0faeba867671b61dfda6d864' => __DIR__ . '/..' . '/paragonie/random_compat/lib/random.php',
         '65fec9ebcfbb3cbb4fd0d519687aea01' => __DIR__ . '/..' . '/danielstjules/stringy/src/Create.php',
+        'bccfaf6207f67190a92f35585e9a78b2' => __DIR__ . '/..' . '/twilio/sdk/Services/Twilio.php',
         'f0906e6318348a765ffb6eb24e0d0938' => __DIR__ . '/..' . '/laravel/framework/src/Illuminate/Foundation/helpers.php',
         '58571171fd5812e6e447dce228f52f4d' => __DIR__ . '/..' . '/laravel/framework/src/Illuminate/Support/helpers.php',
         '752af1c2bdb339e8474c3c31b22b7d54' => __DIR__ . '/..' . '/illuminate/html/helpers.php',
@@ -98,6 +99,7 @@ class ComposerStaticInit9df7efa49b843b908d9b392fd6df8211
         'A' => 
         array (
             'App\\' => 4,
+            'Aloha\\Twilio\\' => 13,
         ),
     );
 
@@ -248,6 +250,10 @@ class ComposerStaticInit9df7efa49b843b908d9b392fd6df8211
         array (
             0 => __DIR__ . '/../..' . '/app',
         ),
+        'Aloha\\Twilio\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/aloha/twilio/src',
+        ),
     );
 
     public static $prefixesPsr0 = array (
@@ -298,15 +304,32 @@ class ComposerStaticInit9df7efa49b843b908d9b392fd6df8211
     );
 
     public static $classMap = array (
+        'Aloha\\Twilio\\Commands\\TwilioCallCommand' => __DIR__ . '/..' . '/aloha/twilio/src/Commands/TwilioCallCommand.php',
+        'Aloha\\Twilio\\Commands\\TwilioSmsCommand' => __DIR__ . '/..' . '/aloha/twilio/src/Commands/TwilioSmsCommand.php',
+        'Aloha\\Twilio\\Dummy' => __DIR__ . '/..' . '/aloha/twilio/src/Dummy.php',
+        'Aloha\\Twilio\\LoggingDecorator' => __DIR__ . '/..' . '/aloha/twilio/src/LoggingDecorator.php',
+        'Aloha\\Twilio\\Manager' => __DIR__ . '/..' . '/aloha/twilio/src/Manager.php',
+        'Aloha\\Twilio\\Support\\Laravel\\Facade' => __DIR__ . '/..' . '/aloha/twilio/src/Support/Laravel/Facade.php',
+        'Aloha\\Twilio\\Support\\Laravel\\L4ServiceProvider' => __DIR__ . '/..' . '/aloha/twilio/src/Support/Laravel/L4ServiceProvider.php',
+        'Aloha\\Twilio\\Support\\Laravel\\L5ServiceProvider' => __DIR__ . '/..' . '/aloha/twilio/src/Support/Laravel/L5ServiceProvider.php',
+        'Aloha\\Twilio\\Support\\Laravel\\ServiceProvider' => __DIR__ . '/..' . '/aloha/twilio/src/Support/Laravel/ServiceProvider.php',
+        'Aloha\\Twilio\\Support\\Laravel\\ServiceProviderTrait' => __DIR__ . '/..' . '/aloha/twilio/src/Support/Laravel/ServiceProviderTrait.php',
+        'Aloha\\Twilio\\Twilio' => __DIR__ . '/..' . '/aloha/twilio/src/Twilio.php',
+        'Aloha\\Twilio\\TwilioInterface' => __DIR__ . '/..' . '/aloha/twilio/src/TwilioInterface.php',
         'App\\Console\\Commands\\Inspire' => __DIR__ . '/../..' . '/app/Console/Commands/Inspire.php',
         'App\\Console\\Kernel' => __DIR__ . '/../..' . '/app/Console/Kernel.php',
         'App\\Events\\Event' => __DIR__ . '/../..' . '/app/Events/Event.php',
         'App\\Exceptions\\Handler' => __DIR__ . '/../..' . '/app/Exceptions/Handler.php',
+        'App\\Http\\Controllers\\AndroidController' => __DIR__ . '/../..' . '/app/Http/Controllers/AndroidController.php',
+        'App\\Http\\Controllers\\AppController' => __DIR__ . '/../..' . '/app/Http/Controllers/AppController.php',
         'App\\Http\\Controllers\\Auth\\AuthController' => __DIR__ . '/../..' . '/app/Http/Controllers/Auth/AuthController.php',
         'App\\Http\\Controllers\\Auth\\PasswordController' => __DIR__ . '/../..' . '/app/Http/Controllers/Auth/PasswordController.php',
+        'App\\Http\\Controllers\\CategoryController' => __DIR__ . '/../..' . '/app/Http/Controllers/CategoryController.php',
         'App\\Http\\Controllers\\Controller' => __DIR__ . '/../..' . '/app/Http/Controllers/Controller.php',
         'App\\Http\\Controllers\\DashboardController' => __DIR__ . '/../..' . '/app/Http/Controllers/DashboardController.php',
+        'App\\Http\\Controllers\\PartnerRegistrationController' => __DIR__ . '/../..' . '/app/Http/Controllers/PartnerRegistrationController.php',
         'App\\Http\\Controllers\\RegistrationController' => __DIR__ . '/../..' . '/app/Http/Controllers/RegistrationController.php',
+        'App\\Http\\Controllers\\SubCategoryController' => __DIR__ . '/../..' . '/app/Http/Controllers/SubCategoryController.php',
         'App\\Http\\Kernel' => __DIR__ . '/../..' . '/app/Http/Kernel.php',
         'App\\Http\\Middleware\\Authenticate' => __DIR__ . '/../..' . '/app/Http/Middleware/Authenticate.php',
         'App\\Http\\Middleware\\EncryptCookies' => __DIR__ . '/../..' . '/app/Http/Middleware/EncryptCookies.php',
@@ -319,6 +342,8 @@ class ComposerStaticInit9df7efa49b843b908d9b392fd6df8211
         'App\\Providers\\EventServiceProvider' => __DIR__ . '/../..' . '/app/Providers/EventServiceProvider.php',
         'App\\Providers\\RouteServiceProvider' => __DIR__ . '/../..' . '/app/Providers/RouteServiceProvider.php',
         'App\\User' => __DIR__ . '/../..' . '/app/User.php',
+        'App\\UserVerification' => __DIR__ . '/../..' . '/app/UserVerification.php',
+        'App\\Vehicle_categorie' => __DIR__ . '/../..' . '/app/Vehicle_categorie.php',
         'Carbon\\Carbon' => __DIR__ . '/..' . '/nesbot/carbon/src/Carbon/Carbon.php',
         'Carbon\\CarbonInterval' => __DIR__ . '/..' . '/nesbot/carbon/src/Carbon/CarbonInterval.php',
         'Carbon\\Exceptions\\InvalidDateException' => __DIR__ . '/..' . '/nesbot/carbon/src/Carbon/Exceptions/InvalidDateException.php',

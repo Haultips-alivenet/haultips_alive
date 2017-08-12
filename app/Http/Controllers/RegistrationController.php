@@ -81,7 +81,7 @@ class RegistrationController extends Controller
             $lastName = $request->lastName;
             $email = $request->email;
             $mobile = $request->mobile;
-            $password = md5($request->password);
+            $password = bcrypt($request->password);
             $userType = $request->userType;
 
             $user= new User;
