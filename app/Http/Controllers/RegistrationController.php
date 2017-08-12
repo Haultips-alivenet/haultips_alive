@@ -111,7 +111,7 @@ class RegistrationController extends Controller
     public function show($id)
     {
         $user = User::find($id);
-        return view('admin/users/view')->with([
+        return view('admin/user/view')->with([
                     'user' => $user,
                 ]);
     }

@@ -64,7 +64,7 @@
                                         @foreach($users as $user)
                                             <tr>
                                                 <td><?= $i++ ?></td>
-                                                <td><a href="{{URL :: asset('admin/users/'.$user->id)}}"  class="btn btn-xs btn-link">{{$user->first_name." ".$user->last_name}}</a></td>
+                                                <td><a href="{{url('admin/users/'.$user->id)}}"  class="btn btn-xs btn-link">{{$user->first_name." ".$user->last_name}}</a></td>
                                                 <td>{{$user->email}}</td>
                                                 <td>{{$user->mobile_number}}</td>
                                                 <td>{{($user->status=='1')?'Active' : 'Inactive'}}</td>

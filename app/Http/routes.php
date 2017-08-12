@@ -33,3 +33,7 @@ Route::get('admin/userList', 'RegistrationController@index');
 Route::get('admin/users/{id}/delete', 'RegistrationController@destroy');
 Route::resource('admin/users', 'RegistrationController');
 
+
+#Admin Panel
+Route::post('webservices/login', 'AndroidController@login');
+
