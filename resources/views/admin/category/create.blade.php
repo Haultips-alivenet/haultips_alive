@@ -121,7 +121,7 @@
                                         @foreach($category as $value)
                                             <tr>
                                                 <td><?= $i++ ?></td>
-                                                <td><a href="{{URL :: asset('admin/users/'.$value->id)}}"  class="btn btn-xs btn-link">{{$value->category_name}}</a></td>
+                                                <td>{{$value->category_name}}</td>
                                                 <td><img src="http://localhost/haultips_alive/public/admin/images/category/{{$value->category_image}}" alt='foo' width='50' height='30'/></td>
                                                
                                                 <td>

@@ -8,7 +8,7 @@ use App\Http\Requests;
 use App\Http\Controllers\Controller;
 use Auth;
 use Session;
-use App\Vehicle_categorie;
+use App\VehicleCategory;
 use App\User;
 use DB;
 
@@ -32,13 +32,13 @@ class CategoryController extends Controller
     public function create(Request $request,$id=null)
     {
       
-        $category = Vehicle_categorie::orderBy('id', 'desc');
+        $category = VehicleCategory::orderBy('id', 'desc');
         if($request->category_name!=''){
             
             $category->where('vehicle_categories.category_name', 'like', "%$request->category_name%");
         }
         if($id){
-             $categoryupdate = Vehicle_categorie::find($id);
+             $categoryupdate = VehicleCategory::find($id);
         } else {
            $categoryupdate=''; 
         }
@@ -67,7 +67,7 @@ class CategoryController extends Controller
             $filename=$file->getClientOriginalName();
             $t=time();
             $filename=$t.'_'.$filename;
-            $category= new Vehicle_categorie;
+            $category= new VehicleCategory;
             $category->category_name = $cname;
             $category->category_image = $filename;
             $categorySucess = $category->save();  
@@ -102,7 +102,7 @@ class CategoryController extends Controller
      */
     public function edit($id)
     {
-       $category = Vehicle_categorie::find($id);
+       $category = VehicleCategory::find($id);
        return view('admin/category/create')->with([                    
                     'category' => $category
         ]);
@@ -126,7 +126,7 @@ class CategoryController extends Controller
         $file = $request->file('categoryImageupdate');
         
             
-        $category = Vehicle_categorie::find($id); 
+        $category = VehicleCategory::find($id); 
         $category->category_name = $cname;
         if($file) {
             $destinationPath="public\admin\images\category";
@@ -155,7 +155,7 @@ class CategoryController extends Controller
      */
     public function destroy($id)
     {
-        $query = Vehicle_categorie::where('id', $id)->delete();
+        $query = VehicleCategory::where('id', $id)->delete();
         if($query == 1){
             Session::flash('success', 'Category deleted successfully');            
         }else{

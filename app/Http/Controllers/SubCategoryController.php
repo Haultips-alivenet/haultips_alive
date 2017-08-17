@@ -8,7 +8,7 @@ use App\Http\Requests;
 use App\Http\Controllers\Controller;
 use Auth;
 use Session;
-use App\Vehicle_categorie;
+use App\VehicleCategory;
 use App\User;
 use DB;
 
@@ -41,24 +41,27 @@ class SubCategoryController extends Controller
                             ->join('vehicle_categories as v1','v.parent_id', '=', 'v1.id')
                             ->where('v.parent_id','!=',0)
                             ->where('v.category_name', 'like', "%$request->subcategory_namesearch%")
+                            ->orderBy('id', 'desc')
                             ->select('v.*','v1.category_name as cname')->paginate(10);
         } else if($request->categoryNamesearch!=''){
              $category =DB::table('vehicle_categories as v')
                             ->join('vehicle_categories as v1','v.parent_id', '=', 'v1.id')
                             ->where('v.parent_id','!=',0)
                             ->where('v.parent_id',$request->categoryNamesearch)
+                            ->orderBy('id', 'desc')
                             ->select('v.*','v1.category_name as cname')->paginate(10);
             
         } else {
              $category =DB::table('vehicle_categories as v')
                             ->join('vehicle_categories as v1','v.parent_id', '=', 'v1.id')
                             ->where('v.parent_id','!=',0)
+                            ->orderBy('id', 'desc')
                             ->select('v.*','v1.category_name as cname')->paginate(10);
                
         }
         $page = $category->toArray();
          if($id){
-             $categoryupdate = Vehicle_categorie::find($id);
+             $categoryupdate = VehicleCategory::find($id);
         } else {
            $categoryupdate=''; 
         }
@@ -87,7 +90,7 @@ class SubCategoryController extends Controller
             $filename=$file->getClientOriginalName();
             $t=time();
             $filename=$t.'_'.$filename;
-            $category= new Vehicle_categorie;
+            $category= new VehicleCategory;
             $category->category_name = $subcategory;
             $category->parent_id = $category_id;
             $category->category_image = $filename;
@@ -123,7 +126,7 @@ class SubCategoryController extends Controller
      */
     public function edit($id)
     {
-       $category = Vehicle_categorie::find($id);
+       $category = VehicleCategory::find($id);
        return view('admin/category/create')->with([                    
                     'category' => $category
         ]);
@@ -149,7 +152,7 @@ class SubCategoryController extends Controller
         $file = $request->file('subcategoryImageupdate');
         
             
-        $category = Vehicle_categorie::find($id); 
+        $category = VehicleCategory::find($id); 
         $category->category_name = $cname;
         $category->parent_id = $c_id;
         if($file) {
@@ -179,7 +182,7 @@ class SubCategoryController extends Controller
      */
     public function destroy($id)
     {
-        $query = Vehicle_categorie::where('id', $id)->delete();
+        $query = VehicleCategory::where('id', $id)->delete();
         if($query == 1){
             Session::flash('success', 'Category deleted successfully');            
         }else{

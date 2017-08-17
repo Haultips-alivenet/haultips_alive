@@ -9,28 +9,25 @@
  <table class="table table-bordered"> 
      <tr>
          <td style="width: 20%;">Name</td>
-         <td>@Anjali</td>
+         <td>{{$user->first_name.' '.$user->last_name}}</td>
      </tr>
      <tr>
          <td style="width: 20%;">Email</td>
-         <td>Anjali@gmail.com</td>
+         <td>{{$user->email}}</td>
      </tr> 
      <tr>
          <td style="width: 20%;">Mobile</td>
-         <td>1234567890</td>
+         <td>{{$user->mobile_number}}</td>
      </tr> 
      <tr>
          <td style="width: 20%;">Status</td>
-         <td>Inactive</td>
+         <td>{{($user->status=='1')?'Active' : 'Inactive'}}</td>
      </tr> 
      <tr>
          <td style="width: 20%;">Registered Date</td>
-         <td>August 09, 2017</td>
+         <td>{{$user->created_at}}</td>
      </tr> 
-     <tr>
-         <td style="width: 20%;">Action</td>
-         <td>Active</td>
-     </tr> 
+     
  </tbody> 
  </table>
     </div>

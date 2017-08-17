@@ -10,7 +10,7 @@
                 <div class="xs tabls">
                     <div class="panel panel-warning" >
                         
-                                {!! Form::open(array('url'=>'admin/userList','id'=>'menu','method'=>'get')) !!}
+                                {!! Form::open(array('url'=>'admin/partnerList','id'=>'menu','method'=>'get')) !!}
                                     <div class="row">  
                                         <div class="form-group col-md-2 grid_box1">
                                             {!! Form::text('name',Input::get('name'),['class'=>"form-control",'placeholder'=>'Name']) !!}
@@ -30,7 +30,7 @@
                                         </div>                                        
                                         <div class="form-group col-sm-3">
                                             {!! Form::submit('Search',['class'=>"btn btn-success"]) !!}
-                                            <a href="{{ url('admin/userList') }}" class="btn btn-success" title="Refresh"><i class="fa fa-refresh"></i></a>                                            
+                                            <a href="{{ url('admin/partnerList') }}" class="btn btn-success" title="Refresh"><i class="fa fa-refresh"></i></a>                                            
                                         </div>                                        
                                     </div>
                                     {!! Form::close() !!}
@@ -54,6 +54,8 @@
                                         <th>Email</th>
                                         <th>Mobile</th>
                                         <th>Status</th>
+                                        <th>Kyc</th>
+                                        <th>Carrier Type</th>
                                         <th>Registered Date</th>
                                         <th>Action</th>
                                     </tr>
@@ -64,14 +66,16 @@
                                         @foreach($users as $user)
                                             <tr>
                                                 <td><?= $i++ ?></td>
-                                                <td><a href="{{URL :: asset('admin/users/'.$user->id)}}"  class="btn btn-xs btn-link">{{$user->first_name." ".$user->last_name}}</a></td>
+                                                <td><a href="{{URL :: asset('admin/partner/'.$user->id)}}"  class="btn btn-xs btn-link">{{$user->first_name." ".$user->last_name}}</a></td>
                                                 <td>{{$user->email}}</td>
                                                 <td>{{$user->mobile_number}}</td>
                                                 <td>{{($user->status=='1')?'Active' : 'Inactive'}}</td>
+                                                 <td><a href="{{URL :: asset('admin/partner/'.$user->id)}}/approve"  class="btn btn-xs btn-link">{{($user->documents_status=='1')?'Approved' : 'Unapproved'}}</a></td>
+                                                <td><a <?php if($user->carrier_type_id!='1') { ?>style="cursor: pointer" onclick="gettransporterData({{$user->id}});" <?php } ?>>{{($user->carrier_type_id=='1')?'Packer & Mover' : 'Transporter'}}</a></td>
                                                 <td>{{date('F d, Y', strtotime($user->created_at))}}</td>
                                                 <td>
-                                                    <a href="{{URL :: asset('admin/users/'.$user->id)}}/edit" class="btn btn-success" title='edit'><i class="fa fa-edit"></i></a>
-                                                    <a href="{{URL :: asset('admin/users/'.$user->id)}}/delete" class="btn btn-success" title='delete'><i class="fa fa-trash-o"></i></a>
+                                                    <a href="{{URL :: asset('admin/partner/'.$user->id)}}/edit" class="btn btn-success" title='edit'><i class="fa fa-edit"></i></a>
+                                                    <a onclick="return confirm('Do you Want to Delete Partner?');return false;" href="{{URL :: asset('admin/partner/'.$user->id)}}/delete" class="btn btn-success" title='delete'><i class="fa fa-trash-o"></i></a>
                                                 </td>
                                             </tr>
                                         @endforeach
@@ -87,4 +91,55 @@
         </div>
 </div>
 @endsection
+<script>
+    function gettransporterData(id){
+        //$("#success").modal('show');
+          $.ajax({ 
+        type: 'get',
+        url: '{{url('gettransporterData')}}',
+        data: 'id='+id,
+        //dataType: 'json',
+        //cache: false,
+
+        success: function(data) {
+        
+        $('#transport_details_div').html(data);
+        $("#success").modal('show');
+        }
+
+   });
+    }
+    </script>
+    
+     <!-- Modal -->
+    <div class="modal fade" id="success" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header modal-header-success">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                    <h1><i class="glyphicon glyphicon-thumbs-up"></i> Transporter Details</h1>
+                </div>
+                <div class="modal-body" id="transport_details_div">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Close</button>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
+    
+    <style>
+        .modal-header-success {
+    color:#fff;
+    padding:9px 15px;
+    border-bottom:1px solid #eee;
+    background-color: #5cb85c;
+    -webkit-border-top-left-radius: 5px;
+    -webkit-border-top-right-radius: 5px;
+    -moz-border-radius-topleft: 5px;
+    -moz-border-radius-topright: 5px;
+     border-top-left-radius: 5px;
+     border-top-right-radius: 5px;
+}
+    </style>
 
