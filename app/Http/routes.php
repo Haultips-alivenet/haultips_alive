@@ -67,4 +67,8 @@ Route::post('webservices/getGarageData', 'AndroidController@getGarageData');
 Route::post('webservices/getOutdoorData', 'AndroidController@getOutdoorData');
 Route::post('webservices/getMiscellaneousData', 'AndroidController@getMiscellaneousData');
 Route::post('webservices/homeCategory', 'AndroidController@homeCategory');
+Route::post('webservices/getBoxesData', 'AndroidController@getBoxesData');
+Route::post('webservices/getEquipmentData', 'AndroidController@getEquipmentData');
+Route::post('webservices/getGeneralShipmentData', 'AndroidController@getGeneralShipmentData');
+Route::post('webservices/officeCategory', 'AndroidController@officeCategory');
 

@@ -23,8 +23,11 @@ use App\AdminKitchen;
 use APp\AdminLivingRoom;
 use App\AdminMiscellaneous;
 use App\AdminOutdoor;
+use App\AdminGeneralShipment;
+use App\AdminEquipment;
 use App\ShippingDetail;
 use App\ShipmentListingHome;
+use App\ShipmentListingOffice;
 use DB;
 
 class AndroidController extends AppController
@@ -444,6 +447,48 @@ class AndroidController extends AppController
         return $msg;
     }
     
+    public function getBoxesData(Request $request){
+        try{
+            $msg = array();
+            $categories = AdminBox::where('status','1')->select('id','name')->get();
+            $msg['responseCode'] = "200";
+            $msg['responseMessage'] = "Miscellaneous Box Data get successfully";
+            $msg['miscellaneousBox'] = $categories;            
+        }catch(\Exception $e) {
+            $msg['responseCode'] = "0";
+            $msg['responseMessage'] =$e->getMessage();
+        }
+        return $msg;
+    }
+    
+    public function getEquipmentData(Request $request){
+        try{
+            $msg = array();
+            $categories = AdminEquipment::where('status','1')->select('id','name')->get();
+            $msg['responseCode'] = "200";
+            $msg['responseMessage'] = "Equipment Data get successfully";
+            $msg['equipments'] = $categories;            
+        }catch(\Exception $e) {
+            $msg['responseCode'] = "0";
+            $msg['responseMessage'] =$e->getMessage();
+        }
+        return $msg;
+    }
+    
+    public function getGeneralShipmentData(Request $request){
+        try{
+            $msg = array();
+            $categories = AdminGeneralShipment::where('status','1')->select('id','name')->get();
+            $msg['responseCode'] = "200";
+            $msg['responseMessage'] = "General Shipment Data get successfully";
+            $msg['generalShipment'] = $categories;            
+        }catch(\Exception $e) {
+            $msg['responseCode'] = "0";
+            $msg['responseMessage'] =$e->getMessage();
+        }
+        return $msg;
+    }
+    
     public function homeCategory(){
 
         try {
@@ -452,8 +497,8 @@ class AndroidController extends AppController
             $subCatId = $_POST['subCatId'];
             $title = $_POST['itemTitle'];
             $preShippingId = $_POST['shippingId'];
-
-            $required = array('catId','userId','subCatId','itemTitle');
+            $imageCount = $_POST['imageCount'];
+            $required = array('catId','userId','subCatId','itemTitle','imageCount');
 
             $error = false;
             foreach($required as $field) {
@@ -470,14 +515,12 @@ class AndroidController extends AppController
             }else{
                 $dining = $_POST['dining'];
                 $living = $_POST['living'];
-                $bedroom = $_POST['bedroom'];
                 $kitchen = $_POST['kitchen'];
-                $home = $_POST['home'];
+                $home = $_POST['homeOffice'];
                 $garage = $_POST['garage'];
                 $outdoor = $_POST['outdoor'];
                 $misc = $_POST['misc'];
-                $box = $_POST['box'];
-                
+                $homeImages = '';
 
                  for($i=1;$i<=$imageCount;$i++){
                     $pic=Input::file('image'.$i);
@@ -507,7 +550,7 @@ class AndroidController extends AppController
                     $shipmentList= new ShipmentListingHome;
                     $shipmentList->shipping_id = $shippingId;
                     $shipmentList->residence_type = $_POST['residenceType'];
-                    $shipmentList->no_of_room = $_POST['totalRoom'];
+                    $shipmentList->no_of_room = $_POST['no_of_room'];
                     $shipmentList->collection_story = '';
                     $shipmentList->delivery_story = '';
                     $shipmentList->delivery_title = $title;
@@ -530,7 +573,7 @@ class AndroidController extends AppController
                    ShipmentListingHome::where('shipping_id ',$preShippingId)
                                        ->update([
                                             'residence_type'=>$_POST['residenceType'],
-                                            'no_of_room'=>$_POST['totalRoom'],
+                                            'no_of_room'=>$_POST['no_of_room'],
                                             'collection_story'=>'',
                                             'delivery_story'=>'',                                           
                                             'delivery_title' => $title,
@@ -559,6 +602,219 @@ class AndroidController extends AppController
 
             $msg['responseCode'] = "0";
             $msg['responseMessage'] = "Some Error Occur";
+            $msg['technicalError'] = $e->getMessage();
+        }
+
+        finally {
+            $result = json_encode($msg);
+            echo $result;
+        }
+    }
+    
+    public function officeCategory(){
+        try {
+            $category_id = $_POST['catId'];
+            $custid = $_POST['userId'];
+            $subCatId = $_POST['subCatId'];
+            $title = $_POST['deliveryTitle'];
+            $preShipId = $_POST['shippingId'];
+            $imageCount = $_POST['imageCount'];
+            $required = array('catId','userId','subCatId','deliveryTitle','imageCount');
+
+            $error = false;
+            foreach($required as $field) {
+              if (empty($_POST[$field])) {
+                $error = true;
+                $fieldName = $field;
+                break;
+              }
+            }
+
+            if($error) {
+                $msg['responseCode'] = "0";
+                $msg['responseMessage'] = "$fieldName required.";
+            }else{
+
+                $general = $_POST['general'];
+                $equipment = $_POST['equipment'];
+                $box = $_POST['box'];
+                $officeImages = '';
+                
+                for($i=1;$i<=$imageCount;$i++){
+                    $pic=Input::file('image'.$i);
+
+                    $extension = $pic->getClientOriginalExtension(); // getting image extension
+                    $name = time() . rand(111, 999) . '.' . $extension; // renameing image                
+                    $pic->move(public_path().'/uploads/office/',$name);
+                    
+                    if($officeImages != ''){
+                        $officeImages.= ','.$name;
+                    }else{
+                        $officeImages = $name;
+                    }
+                }
+
+                if ($preShipId=='') {
+
+                    $shipping= new ShippingDetail;
+                    $shipping->user_id = $custid;
+                    $shipping->category_id = $category_id;
+                    $shipping->subcategory_id = $subCatId;
+                    $shipping->table_name = 'shipment_listing_offices';
+                    $shipping->status = 1;
+                    $shipping->save(); 
+                    $shippingId= $shipping->id;
+                    
+                    $shipmentList= new ShipmentListingOffice;
+                    $shipmentList->shipping_id = $shippingId;
+                    $shipmentList->collection_floor = $_POST['collectionFloor'];
+                    $shipmentList->delivery_floor = $_POST['deliveryFloor'];
+                    $shipmentList->lift_elevator = $_POST['liftElevator'];
+                    $shipmentList->delivery_title = $title;
+                    $shipmentList->general_shipment_inventory = $general;
+                    $shipmentList->equipment_shipment_inventory = $equipment;
+                    $shipmentList->boxes = $box;
+                    $shipmentList->item_image = $officeImages;
+                    $shipmentList->save();
+                }
+                else{
+
+                    ShipmentListingOffice::where('shipping_id ',$preShipId)
+                                       ->update([
+                                            'collection_floor'=>$_POST['collectionFloor'],
+                                            'delivery_floor'=>$_POST['deliveryFloor'],
+                                            'lift_elevator'=>$_POST['liftElevator'],
+                                            'delivery_title'=>$title,                                           
+                                            'general_shipment_inventory' => $general,
+                                            'equipment_shipment_inventory' => $equipment,
+                                            'boxes' => $box,
+                                            'item_image' => $officeImages
+                                        ]);         
+                   $shippingId = $preShipId;
+                }
+
+                $msg['responseCode'] = "200";
+                $msg['responseMessage'] = "Shipment successfully post";
+                $msg['shippingId'] = $shippingId;
+            }
+        }
+
+        catch (Exception $e){
+
+            $msg['responseCode'] = "0";
+            $msg['responseMessage'] = "Some Error Occur";
+            $msg['technicalError'] = $e->getMessage();
+        }
+
+        finally {
+            $result = json_encode($msg);
+            echo $result;
+        }
+    }
+    
+    public function othercategory(){
+        try{
+
+            $category_id = $_POST['catId'];
+            $custid = $_POST['userId'];
+            $subCatId = $_POST['subCatId'];
+            $title = $_POST['deliveryTitle'];
+            $preShipId = $_POST['shippingId'];
+            $imageCount = $_POST['imageCount'];
+            $required = array('catId','userId','subCatId','deliveryTitle','imageCount');
+
+            $error = false;
+            foreach($required as $field) {
+              if (empty($_POST[$field])) {
+                $error = true;
+                $fieldName = $field;
+                break;
+              }
+            }
+
+            if($error) {
+                $msg['responseCode'] = "0";
+                $msg['responseMessage'] = "$fieldName required.";
+            }else{
+
+                $otherImages = '';                
+                for($i=1;$i<=$imageCount;$i++){
+                    $pic=Input::file('image'.$i);
+
+                    $extension = $pic->getClientOriginalExtension(); // getting image extension
+                    $name = time() . rand(111, 999) . '.' . $extension; // renameing image                
+                    $pic->move(public_path().'/uploads/other/',$name);
+                    
+                    if($otherImages != ''){
+                        $otherImages.= ','.$name;
+                    }else{
+                        $otherImages = $name;
+                    }
+                }
+
+                if ($preShipId=='') {
+
+                    $this->db->trans_start();
+
+                    $shipping_id = $this->shipping->insert_data(array(
+                        'user_id' => $custid,
+                        'category_id' => $category_id,
+                        'subcategory_id' => $subCatId,
+                        'table_name' => 'shipment_listing11'
+
+                    ), 'shipping_details');
+
+                    $shipping_vehicle = $this->shipping->insert_data(array(
+
+                        'shipping_id' => $shipping_id,
+                        'delivery_title' => $title,
+                        'item_image' => $photo,
+                        'item_detail' => $this->input->post('itemDetail')
+
+                    ), 'shipment_listing11');
+
+                    $newShipId = $shipping_id;
+
+                    $this->db->trans_complete();
+                }
+
+                else{
+
+                    $this->db->trans_start();
+
+                    $shipping_id = $this->shipping->update_data_single_cond(array(
+                        'user_id' => $custid,
+                        'category_id' => $category_id,
+                        'subcategory_id' => $subCatId,
+                        'table_name' => 'shipment_listing11'
+
+                    ),$preShipId,'id', 'shipping_details');
+
+
+                    $shipping_vehicle = $this->shipping->update_data_single_cond(array(
+
+                        'shipping_id' => $preShipId,
+                        'delivery_title' => $title,
+                        'item_image' => $photo,
+                        'item_detail' => $this->input->post('itemDetail')
+
+                    ),$preShipId,'shipping_id', 'shipment_listing11');
+
+                    $newShipId = $shipping_id;
+
+                    $this->db->trans_complete();
+                }
+
+                $msg['responseCode'] = "200";
+                $msg['responseMessage'] = SUCCESS;
+                $msg['shippingId'] = $newShipId;
+            }
+        }
+
+        catch (Exception $e){
+
+            $msg['responseCode'] = "0";
+            $msg['responseMessage'] = Error;
             $msg['technicalError'] = $e->getMessage();
         }
 
