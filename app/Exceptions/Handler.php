@@ -45,6 +45,10 @@ class Handler extends ExceptionHandler
         if ($e instanceof ModelNotFoundException) {
             $e = new NotFoundHttpException($e->getMessage(), $e);
         }
+        
+//        if ($e instanceof \Illuminate\Session\TokenMismatchException) {    
+//          return response()->json(array('responseCode'=>'0','responseMessage'=>'Token Mismatch','token'=>$_POST['_token'],'servertoken'=>$request->session()->token()));
+//        }
 
         return parent::render($request, $e);
     }

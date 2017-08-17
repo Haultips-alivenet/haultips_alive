@@ -56,3 +56,15 @@ Route::post('webservices/login', 'AndroidController@login');
 Route::post('webservices/sendOtp', 'AndroidController@sendOtp');
 Route::post('webservices/otpVerification', 'AndroidController@otpVerification');
 Route::post('webservices/userRegistration', 'AndroidController@userRegistration');
+Route::post('webservices/partnerRegistration', 'AndroidController@partnerRegistration');
+Route::post('webservices/getCategories', 'AndroidController@getCategories');
+Route::post('webservices/getSubCategories', 'AndroidController@getSubCategories');
+Route::post('webservices/getDiningData', 'AndroidController@getDiningData');
+Route::post('webservices/getLivingRoomData', 'AndroidController@getLivingRoomData');
+Route::post('webservices/getKitchenData', 'AndroidController@getKitchenData');
+Route::post('webservices/getHomeOfficeData', 'AndroidController@getHomeOfficeData');
+Route::post('webservices/getGarageData', 'AndroidController@getGarageData');
+Route::post('webservices/getOutdoorData', 'AndroidController@getOutdoorData');
+Route::post('webservices/getMiscellaneousData', 'AndroidController@getMiscellaneousData');
+Route::post('webservices/homeCategory', 'AndroidController@homeCategory');
+
