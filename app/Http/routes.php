@@ -70,5 +70,10 @@ Route::post('webservices/homeCategory', 'AndroidController@homeCategory');
 Route::post('webservices/getBoxesData', 'AndroidController@getBoxesData');
 Route::post('webservices/getEquipmentData', 'AndroidController@getEquipmentData');
 Route::post('webservices/getGeneralShipmentData', 'AndroidController@getGeneralShipmentData');
+Route::post('webservices/getMaterial', 'AndroidController@getMaterial');
 Route::post('webservices/officeCategory', 'AndroidController@officeCategory');
+Route::post('webservices/otherCategory', 'AndroidController@otherCategory');
+Route::post('webservices/houseHoldGoodsCategory', 'AndroidController@houseHoldGoodsCategory');
+Route::post('webservices/vehicleShifting', 'AndroidController@vehicleShifting');
+Route::post('webservices/partLoad', 'AndroidController@partLoad');
 

@@ -25,9 +25,14 @@ use App\AdminMiscellaneous;
 use App\AdminOutdoor;
 use App\AdminGeneralShipment;
 use App\AdminEquipment;
+use App\Material;
 use App\ShippingDetail;
 use App\ShipmentListingHome;
 use App\ShipmentListingOffice;
+use App\ShipmentListingOther;
+use App\ShipmentListingHouseholdgood;
+use App\ShipmentListingVehicleShifing;
+use App\ShipmentListingMaterial;
 use DB;
 
 class AndroidController extends AppController
@@ -146,7 +151,7 @@ class AndroidController extends AppController
                         $verificationId = $userData->id;
                         UserVerification::where('id',$verificationId)->delete();
                         User::where('id',$userId)->update(['otp_verified'=>1 , 'status'=>1]);
-                        $status = ($userData->first_name != '')?'yes':'No';
+                        $status = ($verifiedData->first_name != '')?'yes':'No';
                         $msg['responseCode'] = "200";
                         $msg['responseMessage'] = "Mobile number successfully verified.";
                         $msg['userId'] = $userId;
@@ -489,6 +494,20 @@ class AndroidController extends AppController
         return $msg;
     }
     
+    public function getMaterial(Request $request){
+        try{
+            $msg = array();
+            $categories = Material::where('status','1')->select('id','name','image')->get();
+            $msg['responseCode'] = "200";
+            $msg['responseMessage'] = "Materials get successfully";
+            $msg['materials'] = $categories;            
+        }catch(\Exception $e) {
+            $msg['responseCode'] = "0";
+            $msg['responseMessage'] =$e->getMessage();
+        }
+        return $msg;
+    }
+    
     public function homeCategory(){
 
         try {
@@ -712,7 +731,7 @@ class AndroidController extends AppController
         }
     }
     
-    public function othercategory(){
+    public function otherCategory(){
         try{
 
             $category_id = $_POST['catId'];
@@ -751,70 +770,290 @@ class AndroidController extends AppController
                         $otherImages = $name;
                     }
                 }
-
+                
                 if ($preShipId=='') {
 
-                    $this->db->trans_start();
-
-                    $shipping_id = $this->shipping->insert_data(array(
-                        'user_id' => $custid,
-                        'category_id' => $category_id,
-                        'subcategory_id' => $subCatId,
-                        'table_name' => 'shipment_listing11'
-
-                    ), 'shipping_details');
-
-                    $shipping_vehicle = $this->shipping->insert_data(array(
-
-                        'shipping_id' => $shipping_id,
-                        'delivery_title' => $title,
-                        'item_image' => $photo,
-                        'item_detail' => $this->input->post('itemDetail')
-
-                    ), 'shipment_listing11');
-
-                    $newShipId = $shipping_id;
-
-                    $this->db->trans_complete();
+                    $shipping= new ShippingDetail;
+                    $shipping->user_id = $custid;
+                    $shipping->category_id = $category_id;
+                    $shipping->subcategory_id = $subCatId;
+                    $shipping->table_name = 'shipment_listing_others';
+                    $shipping->status = 1;
+                    $shipping->save(); 
+                    $shippingId= $shipping->id;
+                    
+                    $shipmentList= new ShipmentListingOther;
+                    $shipmentList->shipping_id = $shippingId;
+                    $shipmentList->delivery_title = $title;
+                    $shipmentList->additional_detail = $_POST['additionalDetail'];
+                    $shipmentList->image = $otherImages;
+                    $shipmentList->save();
                 }
-
                 else{
 
-                    $this->db->trans_start();
-
-                    $shipping_id = $this->shipping->update_data_single_cond(array(
-                        'user_id' => $custid,
-                        'category_id' => $category_id,
-                        'subcategory_id' => $subCatId,
-                        'table_name' => 'shipment_listing11'
-
-                    ),$preShipId,'id', 'shipping_details');
-
-
-                    $shipping_vehicle = $this->shipping->update_data_single_cond(array(
-
-                        'shipping_id' => $preShipId,
-                        'delivery_title' => $title,
-                        'item_image' => $photo,
-                        'item_detail' => $this->input->post('itemDetail')
-
-                    ),$preShipId,'shipping_id', 'shipment_listing11');
-
-                    $newShipId = $shipping_id;
-
-                    $this->db->trans_complete();
+                    ShipmentListingOther::where('shipping_id ',$preShipId)
+                                       ->update([
+                                            'delivery_title'=>$title,
+                                            'additional_detail'=>$_POST['additionalDetail'],
+                                            'image'=>$otherImages                                            
+                                        ]);         
+                   $shippingId = $preShipId;
                 }
 
                 $msg['responseCode'] = "200";
-                $msg['responseMessage'] = SUCCESS;
-                $msg['shippingId'] = $newShipId;
+                $msg['responseMessage'] = "Shipment successfully post";
+                $msg['shippingId'] = $shippingId;
             }
         }
 
         catch (Exception $e){
 
             $msg['responseCode'] = "0";
-            $msg['responseMessage'] = Error;
+            $msg['responseMessage'] = "Some Error Occur";
+            $msg['technicalError'] = $e->getMessage();
+        }
+
+        finally {
+            $result = json_encode($msg);
+            echo $result;
+        }
+    }
+    
+    public function houseHoldGoodsCategory(){
+        try{
+
+            $category_id = $_POST['catId'];
+            $custid = $_POST['userId'];
+            $subCatId = $_POST['subCatId'];
+            $preShipId = $_POST['shippingId'];
+            $imageCount = $_POST['imageCount'];
+            $required = array('catId','userId','subCatId','imageCount');
+
+            $error = false;
+            foreach($required as $field) {
+              if (empty($_POST[$field])) {
+                $error = true;
+                $fieldName = $field;
+                break;
+              }
+            }
+
+            if($error) {
+                $msg['responseCode'] = "0";
+                $msg['responseMessage'] = "$fieldName required.";
+            }else{
+                $otherImages = '';                
+                for($i=1;$i<=$imageCount;$i++){
+                    $pic=Input::file('image'.$i);
+
+                    $extension = $pic->getClientOriginalExtension(); // getting image extension
+                    $name = time() . rand(111, 999) . '.' . $extension; // renameing image                
+                    $pic->move(public_path().'/uploads/houseHoldGoods/',$name);
+                    
+                    if($otherImages != ''){
+                        $otherImages.= ','.$name;
+                    }else{
+                        $otherImages = $name;
+                    }
+                }
+                
+                if ($preShipId=='') {
+
+                    $shipping= new ShippingDetail;
+                    $shipping->user_id = $custid;
+                    $shipping->category_id = $category_id;
+                    $shipping->subcategory_id = $subCatId;
+                    $shipping->table_name = 'shipment_listing_householdgoods';
+                    $shipping->status = 1;
+                    $shipping->save(); 
+                    $shippingId= $shipping->id;
+                    
+                    $shipmentList= new ShipmentListingHouseholdgood;
+                    $shipmentList->shipping_id = $shippingId;
+                    $shipmentList->additional_detail = $_POST['additionalDetail'];
+                    $shipmentList->image = $otherImages;
+                    $shipmentList->save();
+                }
+                else{
+
+                    ShipmentListingHouseholdgood::where('shipping_id ',$preShipId)
+                                       ->update([
+                                            'additional_detail'=>$_POST['additionalDetail'],
+                                            'image'=>$otherImages                                            
+                                        ]);         
+                   $shippingId = $preShipId;
+                }
+
+                $msg['responseCode'] = "200";
+                $msg['responseMessage'] = "Shipment successfully post";
+                $msg['shippingId'] = $shippingId;
+            }
+        }
+
+        catch (Exception $e){
+
+            $msg['responseCode'] = "0";
+            $msg['responseMessage'] = "Some Error Occur";
+            $msg['technicalError'] = $e->getMessage();
+        }
+
+        finally {
+            $result = json_encode($msg);
+            echo $result;
+        }
+    }
+    
+    public function vehicleShifting(){
+        try{
+
+            $category_id = $_POST['catId'];
+            $custid = $_POST['userId'];
+            $subCatId = $_POST['subCatId'];
+            $title = $_POST['deliveryTitle'];
+            $vehicleName = $_POST['vehicleName'];
+            $preShipId = $_POST['shippingId'];
+            $imageCount = $_POST['imageCount'];
+            $required = array('catId','userId','subCatId','deliveryTitle','vehicleName','imageCount');
+
+            $error = false;
+            foreach($required as $field) {
+              if (empty($_POST[$field])) {
+                $error = true;
+                $fieldName = $field;
+                break;
+              }
+            }
+
+            if($error) {
+                $msg['responseCode'] = "0";
+                $msg['responseMessage'] = "$fieldName required.";
+            }else{
+                $otherImages = '';                
+                for($i=1;$i<=$imageCount;$i++){
+                    $pic=Input::file('image'.$i);
+
+                    $extension = $pic->getClientOriginalExtension(); // getting image extension
+                    $name = time() . rand(111, 999) . '.' . $extension; // renameing image                
+                    $pic->move(public_path().'/uploads/vehicleShifting/',$name);
+                    
+                    if($otherImages != ''){
+                        $otherImages.= ','.$name;
+                    }else{
+                        $otherImages = $name;
+                    }
+                }
+                
+                if ($preShipId=='') {
+
+                    $shipping= new ShippingDetail;
+                    $shipping->user_id = $custid;
+                    $shipping->category_id = $category_id;
+                    $shipping->subcategory_id = $subCatId;
+                    $shipping->table_name = 'shipment_listing_vehicle_shifings';
+                    $shipping->status = 1;
+                    $shipping->save(); 
+                    $shippingId= $shipping->id;
+                    
+                    $shipmentList= new ShipmentListingVehicleShifing;
+                    $shipmentList->shipping_id = $shippingId;
+                    $shipmentList->delivery_title = $title;
+                    $shipmentList->vehicle_name = $vehicleName;
+                    $shipmentList->image = $otherImages;
+                    $shipmentList->save();
+                }
+                else{
+
+                    ShipmentListingVehicleShifing::where('shipping_id ',$preShipId)
+                                       ->update([
+                                            'delivery_title'=>$title,
+                                            'vehicle_name'=>$vehicleName,
+                                            'image'=>$otherImages                                            
+                                        ]);         
+                   $shippingId = $preShipId;
+                }
+
+                $msg['responseCode'] = "200";
+                $msg['responseMessage'] = "Shipment successfully post";
+                $msg['shippingId'] = $shippingId;
+            }
+        }
+
+        catch (Exception $e){
+
+            $msg['responseCode'] = "0";
+            $msg['responseMessage'] = "Some Error Occur";
+            $msg['technicalError'] = $e->getMessage();
+        }
+
+        finally {
+            $result = json_encode($msg);
+            echo $result;
+        }
+    }
+    
+    public function partLoad(){
+        try{
+            $category_id = $_POST['catId'];
+            $custid = $_POST['userId'];
+            $subCatId = $_POST['subCatId'];
+            $weight = $_POST['weight'];
+            $remark = $_POST['remark'];
+            $preShipId = $_POST['shippingId'];
+            $materialId = $_POST['materialId'];
+            $required = array('catId','userId','subCatId','weight','materialId');
+
+            $error = false;
+            foreach($required as $field) {
+              if (empty($_POST[$field])) {
+                $error = true;
+                $fieldName = $field;
+                break;
+              }
+            }
+
+            if($error) {
+                $msg['responseCode'] = "0";
+                $msg['responseMessage'] = "$fieldName required.";
+            }else{
+                if ($preShipId=='') {
+
+                    $shipping= new ShippingDetail;
+                    $shipping->user_id = $custid;
+                    $shipping->category_id = $category_id;
+                    $shipping->subcategory_id = $subCatId;
+                    $shipping->table_name = 'shipment_listing_materials';
+                    $shipping->status = 1;
+                    $shipping->save(); 
+                    $shippingId= $shipping->id;
+                    
+                    $shipmentList= new ShipmentListingMaterial;
+                    $shipmentList->shipping_id = $shippingId;
+                    $shipmentList->material_id = $materialId;
+                    $shipmentList->weight = $weight;
+                    $shipmentList->remarks = $remark;
+                    $shipmentList->save();
+                }
+                else{
+
+                    ShipmentListingMaterial::where('shipping_id ',$preShipId)
+                                       ->update([
+                                            'material_id'=>$materialId,
+                                            'weight'=>$weight,
+                                            'remarks'=>$remark                                            
+                                        ]);         
+                   $shippingId = $preShipId;
+                }
+
+                $msg['responseCode'] = "200";
+                $msg['responseMessage'] = "Shipment successfully post";
+                $msg['shippingId'] = $shippingId;
+            }
+        }
+
+        catch (Exception $e){
+
+            $msg['responseCode'] = "0";
+            $msg['responseMessage'] = "Some Error Occur";
             $msg['technicalError'] = $e->getMessage();
         }
 
