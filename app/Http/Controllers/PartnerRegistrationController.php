@@ -9,9 +9,10 @@ use App\Http\Controllers\Controller;
 use Auth;
 use Session;
 use App\User;
-use App\Carrier_types;
-use App\Vehicle_categorie;
+use App\CarrierTypes;
+use App\VehicleCategorie;
 use App\UserVehicleDetails;
+use App\PartnerKyc;
 use DB;
 
 class PartnerRegistrationController extends Controller
@@ -361,7 +362,85 @@ class PartnerRegistrationController extends Controller
         //print_r($data);
     }
     public function approve($id){
-        $data='';
-        return view('admin/partner/kyc');
+        $data["user_id"]=$id;
+        $data["kycdata"] = DB::table('partner_kycs')
+                            ->join('users','partner_kycs.user_id','=','users.id')    
+                            ->where('user_id', $id)
+                            ->select('partner_kycs.*','users.documents_status')
+                            ->first();
+        return view('admin/partner/kyc',$data);
     }
+    public function DocumentsUpload(Request $request){
+        
+       $destinationPath=public_path()."/admin/kyc/"; 
+       $user_id=$request->user_id;
+       $rc_photo = $request->file('rc_photo');
+       $pancard = $request->file('pancard');
+       $businesscard = $request->file('businesscard');
+       $kycdata = DB::table('partner_kycs')->where('user_id', $user_id)->first();
+      
+      if($rc_photo) {
+            
+            $filename=$rc_photo->getClientOriginalName();
+            $t=time();
+            $rc_photofilename="RC_".$user_id.'_'.$t.'_'.$filename; 
+            $request->file('rc_photo')->move($destinationPath,$rc_photofilename);
+        } else if(@$kycdata->rc_photo){
+            $rc_photofilename=$kycdata->rc_photo;
+        } else {
+            $rc_photofilename='';
+        }
+        if($pancard) {
+            
+            $filename=$pancard->getClientOriginalName();
+            $t=time();
+            $pancard_filename="Pan_".$user_id.'_'.$t.'_'.$filename; 
+            $request->file('pancard')->move($destinationPath,$pancard_filename);
+        } else if(@$kycdata->pancart){
+            $pancard_filename=$kycdata->rc_photo;
+        }else {
+            $pancard_filename='';
+        }
+        if($businesscard) {
+            
+            $filename=$businesscard->getClientOriginalName();
+            $t=time();
+            $businesscard_filename="Business_".$user_id.'_'.$t.'_'.$filename; 
+            $request->file('businesscard')->move($destinationPath,$businesscard_filename);
+        } else if(@$kycdata->business_card){
+            $businesscard_filename=$kycdata->business_card;
+        } else {
+            $businesscard_filename='';
+        }
+        
+        $kyc1 = PartnerKyc::find(@$kycdata->id); 
+        if($kyc1){
+            
+            $kyc1->user_id = $user_id;
+            $kyc1->rc_photo = $rc_photofilename;
+            $kyc1->pancart = $pancard_filename;
+            $kyc1->business_card = $businesscard_filename;
+            $userSucess = $kyc1->save(); 
+        } else {
+            $kyc = new PartnerKyc; 
+            $kyc->user_id = $user_id;
+            $kyc->rc_photo = $rc_photofilename;
+            $kyc->pancart = $pancard_filename;
+            $kyc->business_card = $businesscard_filename;
+            $userSucess = $kyc->save(); 
+        }
+        $status=$request->status;
+        if($status==1){
+        $user = User::find($user_id); 
+        $user->documents_status = $status;
+        $statusupdate = $user->save(); 
+        }
+         if($userSucess == 1){
+            Session::flash('success', 'Documents Uploaded successfully!');            
+        }else{
+           Session::flash('success', 'Error occur ! Please try again.');
+        }
+        return redirect(url('admin/partner/'.$user_id.'/approve'));
+    }
+    
 }

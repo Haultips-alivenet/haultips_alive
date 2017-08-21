@@ -49,36 +49,6 @@ Route::get('admin/subcategory/{id}/delete', 'SubCategoryController@destroy');
 Route::resource('admin/partner', 'PartnerRegistrationController');
 Route::post('admin/partner/store', 'PartnerRegistrationController@store');
 Route::get('admin/partnerList', 'PartnerRegistrationController@index');
-Route::get('gettransporterData', 'PartnerRegistrationController@gettransporterData');
-Route::get('admin/partner/{id}/delete', 'PartnerRegistrationController@destroy');
-Route::get('admin/partner/{id}/approve', 'PartnerRegistrationController@approve');
-Route::post('admin/partnerDocumentsUpload', 'PartnerRegistrationController@DocumentsUpload');
-
-# Truck Length
-Route::resource('admin/trucklength', 'TruckLengthController');
-Route::post('admin/trucklength-Save', 'TruckLengthController@store');
-Route::get('admin/trucklength/{id}/update', 'TruckLengthController@create');
-Route::get('admin/trucklength/{id}/delete', 'TruckLengthController@destroy');
-Route::get('checktrucklength ', 'TruckLengthController@checktrucklength');
-
-# Truck Capacity
-Route::resource('admin/truckcapacity', 'TruckCapacityController');
-Route::get('gettrucklength ', 'TruckCapacityController@gettrucklength');
-Route::post('admin/truckcapacity-Save', 'TruckCapacityController@store');
-Route::get('admin/truckcapacity/{id}/update', 'TruckCapacityController@create');
-Route::get('admin/truckcapacity/{id}/delete', 'TruckCapacityController@destroy');
-Route::get('gettruckcapacity ', 'TruckCapacityController@gettruckcapacity');
-
-# Cost Estimation
-Route::resource('admin/cost', 'CostController');
-Route::post('admin/cost-Save', 'CostController@store');
-Route::get('admin/cost/{id}/update', 'CostController@create');
-Route::get('admin/cost/{id}/delete', 'CostController@destroy');
-
-# adminshipment
-Route::resource('admin/adminshipment', 'AdminShipmentController');
-Route::post('admin/adminshipment-Save', 'AdminShipmentController@store');
-Route::get('admin/adminshipment/{id}/delete', 'TruckCapacityController@destroy');
 
 #Webservices
 Route::post('webservicesToken/token', 'AndroidController@token');

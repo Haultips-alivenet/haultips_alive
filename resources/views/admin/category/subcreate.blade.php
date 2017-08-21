@@ -52,7 +52,7 @@
                                      {!! Form :: file('subcategoryImageupdate','',['class'=>'form-control1', 'id'=>'subcategoryImageupdate'])  !!}
                                 </div> 
                                 <div class="col-sm-4">
-                                     <img src="http://localhost/haultips_alive/public/admin/images/category/{{$categoryupdate->category_image}}" alt='foo' width='50' height='30'/>
+                                     <img src="{{asset('public/admin/images/category/'.$categoryupdate->category_image)}}" alt='foo' width='50' height='30'/>
                                 </div>   
                             </div>
                             <div class="col-sm-8 col-sm-offset-2">
@@ -156,7 +156,7 @@
                                                 <td><?= $i++ ?></td>
                                                 <td>{{$value->cname}}</td>
                                                 <td>{{$value->category_name}}</td>
-                                                <td><img src="http://localhost/haultips_alive/public/admin/images/category/{{$value->category_image}}" alt='foo' width='50' height='30'/></td>
+                                                <td><img src="{{asset('public/admin/images/category/'.$value->category_image)}}" alt='foo' width='50' height='30'/></td>
                                                
                                                 <td>
                                                     <a href="{{URL :: asset('admin/subcategory/'.$value->id)}}/update" class="btn btn-success" title='edit'><i class="fa fa-edit"></i></a>

@@ -18,10 +18,15 @@
                         </ul>
                         @endif
                     {{--    Error Display ends--}}
-                
+                    @if(Session::has('success'))
+                            <div class="alert alert-success">
+                                <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+                                {{Session::get('success')}}
+                            </div>
+                        @endif
                     
                     <div class="tab-pane active" id="horizontal-form">
-                        {!! Form::open(array('url'=>'admin/subCategory-Save','class'=>'form-horizontal','id'=>'newCategory','files' => true)) !!}
+                        {!! Form::open(array('url'=>'admin/partnerDocumentsUpload','class'=>'form-horizontal','id'=>'docupload','files' => true)) !!}
                             
                             <div id="msgStatus"></div>
                              <div class="form-group" style="display:none">
@@ -30,27 +35,65 @@
                             <div class="form-group">
                                 <label for="name" class="col-sm-2 control-label">Status</label>
                                 <div class="col-sm-8">
-                                    <select name="categoryName" id="status" class="form-control select2">
+                                    <select name="status" id="status" class="form-control select2">
                                         <option value=""  >Select Status</option>  
                                          <option value="1"  >Approve</option>  
                                          <option value="0"  >UnApprove</option>  
                                         
                                     </select>
+                                    <input type="hidden" name="user_id" value="<?php echo $user_id; ?>">
                                 </div> 
                             </div>
                             <div class="form-group">
-                                <label for="name" class="col-sm-2 control-label">Category Image</label>
+                                <label for="name" class="col-sm-2 control-label">RC Photo</label>
                                 <div class="col-sm-8">
-                                     {!! Form :: file('subcategoryImage','',['class'=>'form-control1', 'id'=>'categoryImage'])  !!}
+                                     {!! Form :: file('rc_photo','',['class'=>'form-control1', 'id'=>'rc_photo'])  !!}
+                                </div>                                
+                            </div>
+                            <div class="form-group">
+                                <label for="name" class="col-sm-2 control-label">Company PanCard</label>
+                                <div class="col-sm-8">
+                                     {!! Form :: file('pancard','',['class'=>'form-control1', 'id'=>'pancard'])  !!}
+                                </div>                                
+                            </div>
+                             <div class="form-group">
+                                <label for="name" class="col-sm-2 control-label">Business Card</label>
+                                <div class="col-sm-8">
+                                     {!! Form :: file('businesscard','',['class'=>'form-control1', 'id'=>'businesscard'])  !!}
                                 </div>                                
                             </div>
                             <div class="col-sm-8 col-sm-offset-2">
-                            {!! Form :: submit("Save Category",["class"=>"btn-success btn",'id'=>'Category']) !!}
+                            {!! Form :: submit("Save",["class"=>"btn-success btn",'id'=>'upload']) !!}
+                            <a href="{{ url('admin/partnerList') }}" class="btn-success btn" title="Back"><i class="fa fa-backward">Back</i></a>                                            
                             </div>
                         {!! Form::close() !!}
 					
                     </div>
-                    
+                        <?php if($kycdata) { ?>
+                    <div class="panel-body no-padding">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr class="warning">
+                                      
+                                        <th>RC Photo</th>
+                                        <th>Company PanCard</th>
+                                        <th>Business Card</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><img src="{{asset('public/admin/kyc/'.$kycdata->rc_photo)}}" alt='foo' width='300' height='200'/></td>
+                                        <td><img src="{{asset('public/admin/kyc/'.$kycdata->pancart)}}" alt='foo' width='300' height='200'/></td>
+                                        <td><img src="{{asset('public/admin/kyc/'.$kycdata->business_card)}}" alt='foo' width='300' height='200'/></td>
+                                        <td>{{($kycdata->documents_status=='1')?'Approved' : 'UnApproved'}}</td>
+                                    </tr>
+                                     
+                                </tbody>
+                            </table>
+                                                                  
+                        </div>
+                        <?php } ?>
                 </div>
            
         </div>
@@ -59,36 +102,21 @@
 
 @section('script')
 <script>
-$('#newCategory').validate({
+$('#docupload').validate({
 
             rules: {
-                categoryName:{
-                    required : true
-                    
-                },
-                subCategoryName:{
-                    required : true,
-                    minlength:2
-                },
-                subcategoryImage:{
+                status:{
                     required : true
                     
                 }
+               
                 
             },
 
             messages: {
                 
-                categoryName :{
-                    required : "Select Category Name"
-                    
-                },
-                 subCategoryName :{
-                    required : "Enter Sub Category Name",
-                    minlength : 'Sub Category Name should be 2 digits'
-                },
-                 subcategoryImage :{
-                    required : "Select Image For Sub Category"
+                status :{
+                    required : "Select Status"
                     
                 }
                
