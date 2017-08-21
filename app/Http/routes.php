@@ -111,4 +111,5 @@ Route::post('webservices/getTruckCapacity', 'AndroidController@getTruckCapacity'
 Route::post('webservices/truckBooking', 'AndroidController@truckBooking');
 Route::post('webservices/confirmAddress', 'AndroidController@confirmAddress');
 Route::post('webservices/shipmentPost', 'AndroidController@shipmentPost');
+Route::post('webservices/myDeliveries', 'AndroidController@myDeliveries');
 

@@ -106,8 +106,8 @@ class AndroidController extends AppController
 
                     $otpMsg = 'Your Otp is '.$otp;
 
-                    //$smsObj = new Smsapi();
-                    //$smsObj->sendsms_api('+91'.$mobileNumber,$otpMsg);            
+                   // $smsObj = new Smsapi();
+                  //  $smsObj->sendsms_api('+91'.$mobileNumber,$otpMsg);            
 
                     $msg['responseCode'] = "200";
                     $msg['responseMessage'] = "Otp is fetched successfully";
@@ -821,7 +821,7 @@ class AndroidController extends AppController
                     $shipmentList->shipping_id = $shippingId;
                     $shipmentList->delivery_title = $title;
                     $shipmentList->additional_detail = $_POST['additionalDetail'];
-                    $shipmentList->image = $otherImages;
+                    $shipmentList->item_image = $otherImages;
                     $shipmentList->save();
                 }
                 else{
@@ -830,7 +830,7 @@ class AndroidController extends AppController
                                        ->update([
                                             'delivery_title'=>$title,
                                             'additional_detail'=>$_POST['additionalDetail'],
-                                            'image'=>$otherImages                                            
+                                            'item_image'=>$otherImages                                            
                                         ]);         
                    $shippingId = $preShipId;
                 }
@@ -862,7 +862,8 @@ class AndroidController extends AppController
             $subCatId = $_POST['subCatId'];
             $preShipId = $_POST['shippingId'];
             $imageCount = $_POST['imageCount'];
-            $required = array('catId','userId','subCatId','imageCount');
+            $deliveryTitle = $_POST['deliveryTitle'];
+            $required = array('catId','userId','subCatId','imageCount','deliveryTitle');
 
             $error = false;
             foreach($required as $field) {
@@ -905,8 +906,9 @@ class AndroidController extends AppController
                     
                     $shipmentList= new ShipmentListingHouseholdgood;
                     $shipmentList->shipping_id = $shippingId;
+                    $shipmentList->delivery_title = $deliveryTitle;
                     $shipmentList->additional_detail = $_POST['additionalDetail'];
-                    $shipmentList->image = $otherImages;
+                    $shipmentList->item_image = $otherImages;
                     $shipmentList->save();
                 }
                 else{
@@ -914,7 +916,7 @@ class AndroidController extends AppController
                     ShipmentListingHouseholdgood::where('shipping_id ',$preShipId)
                                        ->update([
                                             'additional_detail'=>$_POST['additionalDetail'],
-                                            'image'=>$otherImages                                            
+                                            'item_image'=>$otherImages                                            
                                         ]);         
                    $shippingId = $preShipId;
                 }
@@ -993,7 +995,7 @@ class AndroidController extends AppController
                     $shipmentList->shipping_id = $shippingId;
                     $shipmentList->delivery_title = $title;
                     $shipmentList->vehicle_name = $vehicleName;
-                    $shipmentList->image = $otherImages;
+                    $shipmentList->item_image = $otherImages;
                     $shipmentList->save();
                 }
                 else{
@@ -1002,7 +1004,7 @@ class AndroidController extends AppController
                                        ->update([
                                             'delivery_title'=>$title,
                                             'vehicle_name'=>$vehicleName,
-                                            'image'=>$otherImages                                            
+                                            'item_image'=>$otherImages                                            
                                         ]);         
                    $shippingId = $preShipId;
                 }
@@ -1035,7 +1037,8 @@ class AndroidController extends AppController
             $remark = $_POST['remark'];
             $preShipId = $_POST['shippingId'];
             $materialId = $_POST['materialId'];
-            $required = array('catId','userId','subCatId','weight','materialId');
+            $deliveryTitle = $_POST['deliveryTitle'];
+            $required = array('catId','userId','subCatId','weight','materialId','deliveryTitle');
 
             $error = false;
             foreach($required as $field) {
@@ -1064,7 +1067,9 @@ class AndroidController extends AppController
                     $shipmentList= new ShipmentListingMaterial;
                     $shipmentList->shipping_id = $shippingId;
                     $shipmentList->material_id = $materialId;
+                    $shipmentList->delivery_title = $deliveryTitle;
                     $shipmentList->weight = $weight;
+                    $shipmentList->item_image = '';
                     $shipmentList->remarks = $remark;
                     $shipmentList->save();
                 }
@@ -1116,8 +1121,9 @@ class AndroidController extends AppController
             $pickupDate = $_POST['pickupDate'];
             $deliveryDate = $_POST['deliveryDate'];
             $materialId = $_POST['materialId'];
+            $deliveryTitle = $_POST['deliveryTitle'];
             $remarks = $_POST['remarks'];
-            $required = array('catId','userId','subCatId','truckSubCatId','truckLengthId','truckCapacityId','pickupLocation','pickupLat','pickupLong','dropLocation','dropLat','dropLong','pickupDate','materialId');
+            $required = array('catId','userId','subCatId','truckSubCatId','truckLengthId','truckCapacityId','pickupLocation','pickupLat','pickupLong','dropLocation','dropLat','dropLong','pickupDate','deliveryTitle','materialId');
 
             $error = false;
             foreach($required as $field) {
@@ -1150,6 +1156,8 @@ class AndroidController extends AppController
                     $shipmentList->truck_length_id = $truckLengthId;
                     $shipmentList->truck_capacity_id = $truckCapacityId;
                     $shipmentList->material_id = $materialId;
+                    $shipmentList->delivery_title = $deliveryTitle;
+                    $shipmentList->item_image = '';
                     $shipmentList->remarks = $remarks;
                     $shipmentList->save();
                     
@@ -1317,6 +1325,42 @@ class AndroidController extends AppController
             $msg['responseCode'] = "0";
             $msg['responseMessage'] = "Some Error Occur";
             $msg['technicalError'] = $e->getMessage();
+        }
+        finally {
+            $result = json_encode($msg);
+            echo $result;
+        }
+    }
+    
+    public function myDeliveries(){
+        try{
+            $msg = array();
+            $i = 0;
+            $userId = $_POST['userId'];
+            $shiipings = ShippingDetail::where('user_id',$userId)->get();
+            foreach($shiipings as $shipping){
+               $shippingId = $shipping->id;
+               $shippingData = DB::table($shipping->table_name)->select('delivery_title','item_image')->where('shipping_id',$shippingId)->first();
+               //$shippingData = ShipmentListingHome::where('shipping_id',$shippingId)->select('delivery_title','item_image')->first();    
+               
+               $image = explode(',',$shippingData->item_image);
+               $status = array("Inactive","Active","Process","Complete");
+               
+               $shippingDetails[$i]['id'] = $shipping->id;
+               $shippingDetails[$i]['title'] = $shippingData->delivery_title;
+               $shippingDetails[$i]['image'] = $image[0];
+               $shippingDetails[$i]['price'] = $shipping->shipping_price;
+               $shippingDetails[$i]['status'] = $status[$shipping->status];
+               $shippingDetails[$i]['postDate'] = date('d-F-Y', strtotime($shipping->created_at)); 
+               $i++;
+            }
+            
+            $msg['responseCode'] = "200";
+            $msg['responseMessage'] = "Shipment Details get successfully";
+            $msg['shippingDetails'] = $shippingDetails;            
+        }catch(\Exception $e) {
+            $msg['responseCode'] = "0";
+            $msg['responseMessage'] =$e->getMessage();
         }
         finally {
             $result = json_encode($msg);
