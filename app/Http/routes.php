@@ -106,4 +106,9 @@ Route::post('webservices/otherCategory', 'AndroidController@otherCategory');
 Route::post('webservices/houseHoldGoodsCategory', 'AndroidController@houseHoldGoodsCategory');
 Route::post('webservices/vehicleShifting', 'AndroidController@vehicleShifting');
 Route::post('webservices/partLoad', 'AndroidController@partLoad');
+Route::post('webservices/getTruckLength', 'AndroidController@getTruckLength');
+Route::post('webservices/getTruckCapacity', 'AndroidController@getTruckCapacity');
+Route::post('webservices/truckBooking', 'AndroidController@truckBooking');
+Route::post('webservices/confirmAddress', 'AndroidController@confirmAddress');
+Route::post('webservices/shipmentPost', 'AndroidController@shipmentPost');
 
