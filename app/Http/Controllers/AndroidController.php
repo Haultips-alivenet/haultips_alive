@@ -38,7 +38,11 @@ use App\ShippingDeliveryDetail;
 use App\ShippingPickupDetail;
 use App\TruckLength;
 use App\TruckCapacity;
+use App\ShippingQuote;
+use App\PayInfo;
+use App\UserDetail;
 use DB;
+use Hash;
 
 class AndroidController extends AppController
 {
@@ -1032,13 +1036,12 @@ class AndroidController extends AppController
         try{
             $category_id = $_POST['catId'];
             $custid = $_POST['userId'];
-            $subCatId = $_POST['subCatId'];
             $weight = $_POST['weight'];
             $remark = $_POST['remark'];
             $preShipId = $_POST['shippingId'];
             $materialId = $_POST['materialId'];
             $deliveryTitle = $_POST['deliveryTitle'];
-            $required = array('catId','userId','subCatId','weight','materialId','deliveryTitle');
+            $required = array('catId','userId','weight','materialId','deliveryTitle');
 
             $error = false;
             foreach($required as $field) {
@@ -1058,7 +1061,6 @@ class AndroidController extends AppController
                     $shipping= new ShippingDetail;
                     $shipping->user_id = $custid;
                     $shipping->category_id = $category_id;
-                    $shipping->subcategory_id = $subCatId;
                     $shipping->table_name = 'shipment_listing_materials';
                     $shipping->status = 0;
                     $shipping->save(); 
@@ -1305,16 +1307,22 @@ class AndroidController extends AppController
     }
     
     public function shipmentPost(){
-        try{            
+        try{   
+            $msg = array();
             $shippingId = $_POST['shippingId']; 
             
             if(empty($shippingId)) {
                 $msg['responseCode'] = "0";
                 $msg['responseMessage'] = "shippingId required.";
             }else{
-                   ShippingDetail::where('id ',$shippingId)
+                    $string = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890abcdefghijklmnopqrstuvwxyz';
+                    $string_shuffled = str_shuffle($string);
+                    $orderId = substr($string_shuffled, 1, 10);
+                
+                   ShippingDetail::where('id',$shippingId)
                                        ->update([
-                                            'status'=>1
+                                            'status'=>1,
+                                            'order_id'=>$orderId
                                         ]); 
 
                 $msg['responseCode'] = "200";
@@ -1338,26 +1346,391 @@ class AndroidController extends AppController
             $i = 0;
             $userId = $_POST['userId'];
             $shiipings = ShippingDetail::where('user_id',$userId)->get();
-            foreach($shiipings as $shipping){
-               $shippingId = $shipping->id;
-               $shippingData = DB::table($shipping->table_name)->select('delivery_title','item_image')->where('shipping_id',$shippingId)->first();
-               //$shippingData = ShipmentListingHome::where('shipping_id',$shippingId)->select('delivery_title','item_image')->first();    
-               
-               $image = explode(',',$shippingData->item_image);
-               $status = array("Inactive","Active","Process","Complete");
-               
-               $shippingDetails[$i]['id'] = $shipping->id;
-               $shippingDetails[$i]['title'] = $shippingData->delivery_title;
-               $shippingDetails[$i]['image'] = $image[0];
-               $shippingDetails[$i]['price'] = $shipping->shipping_price;
-               $shippingDetails[$i]['status'] = $status[$shipping->status];
-               $shippingDetails[$i]['postDate'] = date('d-F-Y', strtotime($shipping->created_at)); 
-               $i++;
+            $shipArray = $shiipings->toArray();
+            if(count($shipArray) > 0){
+               foreach($shiipings as $shipping){
+                  $shippingId = $shipping->id;
+                  $shippingData = DB::table($shipping->table_name)->select('delivery_title','item_image')->where('shipping_id',$shippingId)->first();
+
+                  $image = explode(',',$shippingData->item_image);
+                  $status = array("Inactive","Active","Process","Complete");
+
+                  $shippingDetails[$i]['shippingId'] = $shipping->id;
+                  $shippingDetails[$i]['title'] = $shippingData->delivery_title;
+                  $shippingDetails[$i]['image'] = $image[0];
+                  $shippingDetails[$i]['price'] = $shipping->shipping_price;
+                  $shippingDetails[$i]['status'] = $status[$shipping->status];
+                  $shippingDetails[$i]['postDate'] = date('d-F-Y', strtotime($shipping->created_at)); 
+                  $i++;
+               }
+
+               $msg['responseCode'] = "200";
+               $msg['responseMessage'] = "Shipment Details get successfully";
+               $msg['shippingDetails'] = $shippingDetails; 
+            }else{
+               $msg['responseCode'] = "200";
+               $msg['responseMessage'] = "Shipment Details get successfully";
+               $msg['shippingDetails'] = "No Data foud"; 
             }
+        }catch(\Exception $e) {
+            $msg['responseCode'] = "0";
+            $msg['responseMessage'] =$e->getMessage();
+        }
+        finally {
+            $result = json_encode($msg);
+            echo $result;
+        }
+    }
+    
+    public function deliveryDetail(){
+        try{
+            $msg = array();
+            $shipmentId = $_POST['shippingId'];
             
-            $msg['responseCode'] = "200";
-            $msg['responseMessage'] = "Shipment Details get successfully";
-            $msg['shippingDetails'] = $shippingDetails;            
+            if(empty($shipmentId)) {
+                $msg['responseCode'] = "0";
+                $msg['responseMessage'] = "shippingId required.";
+            }else{            
+                $shipmentDetail = ShippingDetail::select('shipping_price as price','shipping_details.created_at as published', 'spd.pickup_address', 'spd.pickup_date','sdd.delivery_address', 'sdd.delivery_date', 'pm.method as paymnentType')
+                            ->leftJoin('shipping_pickup_details as spd','spd.shipping_id','=','shipping_details.id')
+                            ->leftJoin('shipping_delivery_details as sdd','sdd.shipping_id','=','shipping_details.id')
+                            ->leftJoin('payment_methods as pm','pm.id','=','shipping_details.payment_method_id')
+                            ->where('shipping_details.id', $shipmentId)->first();
+                
+               $msg['responseCode'] = "200";
+               $msg['responseMessage'] = "Shipment Detail get successfully";
+               $msg['shippingDetails'] = $shipmentDetail; 
+            }                    
+        }catch(\Exception $e) {
+            $msg['responseCode'] = "0";
+            $msg['responseMessage'] =$e->getMessage();
+        }
+        finally {
+            $result = json_encode($msg);
+            echo $result;
+        }
+    }
+    
+    public function quotationOffer(){
+        try{
+            $msg = array();
+            $data = array();
+            $i =0;
+            $shippingId = $_POST['shippingId'];
+            
+            if(empty($shippingId)) {
+                $msg['responseCode'] = "0";
+                $msg['responseMessage'] = "shippingId required.";
+            }else{            
+                    $quoteDetails = ShippingQuote::select('u.first_name','u.last_name', 'quote_price')
+                            ->leftJoin('users as u','u.id','=','shipping_quotes.carrier_id')                            
+                            ->where('shipping_quotes.shipping_id',$shippingId)->get();
+                    $quoteArray = $quoteDetails->toArray();
+                
+                    if(count($quoteArray) > 0){
+                        foreach($quoteDetails as $quotes){
+                            $data[$i]['carrier'] = $quotes['first_name'].' '.$quotes['last_name'];
+                            $data[$i]['price'] = $quotes['quote_price'];
+                            $i++;
+                        }
+                        $msg['responseCode'] = "200";
+                        $msg['responseMessage'] = "Quotation Details get successfully";               
+                        $msg['quotationDetails'] = $data; 
+                    }else{
+                        $msg['responseCode'] = "200";
+                        $msg['responseMessage'] = "Quotation Details get successfully";               
+                        $msg['quotationDetails'] = 'No Data found'; 
+                    }
+                }
+        }catch(\Exception $e) {
+            $msg['responseCode'] = "0";
+            $msg['responseMessage'] =$e->getMessage();
+        }
+        finally {
+            $result = json_encode($msg);
+            echo $result;
+        }
+    }
+    
+    public function notification(){
+        try{
+            $msg = array();
+            $data = array();
+            $i =0;
+            $userId = $_POST['userId'];
+            
+            if(empty($userId)) {
+                $msg['responseCode'] = "0";
+                $msg['responseMessage'] = "userId required.";
+            }else{            
+                    $quoteDetails = ShippingDetail::select('shipping_details.id','u.first_name','u.last_name', 'sq.quote_price','sq.created_at','shipping_details.table_name')                            
+                            ->leftJoin('shipping_quotes as sq','sq.shipping_id','=','shipping_details.id')
+                            ->leftJoin('users as u','u.id','=','sq.carrier_id')
+                            ->where('shipping_details.user_id',$userId)->get();
+                    $quoteArray = $quoteDetails->toArray();
+                
+                    if(count($quoteArray) > 0){
+                        foreach($quoteDetails as $quotes){
+                            $shippingData = DB::table($quotes->table_name)->select('delivery_title')->where('shipping_id',$quotes->id)->first();
+                            
+                            $data[$i]['partnerName'] = $quotes['first_name'].' '.$quotes['last_name'];
+                            $data[$i]['title'] = $shippingData->delivery_title;
+                            $data[$i]['price'] = $quotes['quote_price'];
+                            $data[$i]['time'] = date('d-F-Y h:i:s', strtotime($quotes['created_at'])); 
+                            $i++;
+                        }
+                        $msg['responseCode'] = "200";
+                        $msg['responseMessage'] = "Notifications get successfully";               
+                        $msg['notifications'] = $data; 
+                    }else{
+                        $msg['responseCode'] = "200";
+                        $msg['responseMessage'] = "Notifications get successfully";               
+                        $msg['notifications'] = 'No Data found'; 
+                    }
+                }
+        }catch(\Exception $e) {
+            $msg['responseCode'] = "0";
+            $msg['responseMessage'] =$e->getMessage();
+        }
+        finally {
+            $result = json_encode($msg);
+            echo $result;
+        }
+    }
+    
+    public function addNewAccount(){
+        try{
+            $msg = array();
+            $userId = $_POST['userId'];
+            $userName = $_POST['userName'];
+            $accountNumber = $_POST['acNumber'];
+            $ifscCode = $_POST['ifscCode'];            
+            $required = array('userId','userName','acNumber','ifscCode');
+
+            $error = false;
+            foreach($required as $field) {
+              if (empty($_POST[$field])) {
+                $error = true;
+                $fieldName = $field;
+                break;
+              }
+            }
+
+            if($error) {
+                $msg['responseCode'] = "0";
+                $msg['responseMessage'] = "$fieldName required.";
+            }else{           
+                    $data = new PayInfo;
+                    $data->user_id = $userId;
+                    $data->name = $userName;
+                    $data->number = $accountNumber;
+                    $data->code = $ifscCode;
+                    $data->save();
+                    
+                    $msg['responseCode'] = "200";
+                    $msg['responseMessage'] = "Information saved successfully";    
+                }
+        }catch(\Exception $e) {
+            $msg['responseCode'] = "0";
+            $msg['responseMessage'] =$e->getMessage();
+        }
+        finally {
+            $result = json_encode($msg);
+            echo $result;
+        }
+    }
+    
+    public function bankInfo(){
+        try{
+            $msg = array();
+            $userId = $_POST['userId'];
+            
+            if(empty('userId')) {
+                $msg['responseCode'] = "0";
+                $msg['responseMessage'] = "userId required.";
+            }else{           
+                    $data = PayInfo::where('user_id',$userId)->select('name as userName', 'number as accountNumber', 'code as ifscCode')->get();                    
+                    $info = $data->toArray();
+                    if(count($info) > 0){
+                        $msg['responseCode'] = "200";
+                        $msg['responseMessage'] = "Information get successfully"; 
+                        $msg['details'] = $data; 
+                    }else{
+                        $msg['responseCode'] = "200";
+                        $msg['responseMessage'] = "No data found";  
+                    }                      
+                }
+        }catch(\Exception $e) {
+            $msg['responseCode'] = "0";
+            $msg['responseMessage'] =$e->getMessage();
+        }
+        finally {
+            $result = json_encode($msg);
+            echo $result;
+        }
+    }
+    
+    public function transactionDetail(){
+        try{
+            $msg = array();
+            $i = 0;
+            $userId = $_POST['userId'];
+            
+            if(empty('userId')) {
+                $msg['responseCode'] = "0";
+                $msg['responseMessage'] = "userId required.";
+            }else{           
+                    $tdetails = ShippingDetail::select('shipping_details.id', 'shipping_details.order_id', 'shipping_details.table_name','pd.created_at','pd.amount','pd.status')                            
+                                    ->leftJoin('payment_details as pd','pd.shipping_id','=','shipping_details.id')
+                                    ->where('shipping_details.user_id',$userId)->get();                
+                    $info = $tdetails->toArray();
+                    if(count($info) > 0){
+                        foreach($tdetails as $detail){
+                            $shippingData = DB::table($detail->table_name)->select('delivery_title')->where('shipping_id',$detail->id)->first();
+                            
+                            $data[$i]['orderId'] = $detail['order_id'];
+                            $data[$i]['title'] = $shippingData->delivery_title;
+                            $data[$i]['status'] = $detail['status'];
+                            $data[$i]['amount'] = $detail['amount'];
+                            $data[$i]['paymentDate'] = date('d-F-Y h:i:s', strtotime($detail['created_at'])); 
+                            $i++;
+                        }
+                        $msg['responseCode'] = "200";
+                        $msg['responseMessage'] = "Information get successfully"; 
+                        $msg['details'] = $data; 
+                    }else{
+                        $msg['responseCode'] = "200";
+                        $msg['responseMessage'] = "No data found";  
+                    }                      
+                }
+        }catch(\Exception $e) {
+            $msg['responseCode'] = "0";
+            $msg['responseMessage'] =$e->getMessage();
+        }
+        finally {
+            $result = json_encode($msg);
+            echo $result;
+        }
+    }
+    
+    
+    public function changePassword(Request $request)
+    {
+       try
+       {
+           $userId=$request->userId;
+           $oldPassword=$request->currentPwd;
+           $newPassword=$request->newPwd;
+           $required = array('userId','currentPwd','newPwd');
+
+            $error = false;
+            foreach($required as $field) {
+              if (empty($_POST[$field])) {
+                $error = true;
+                $fieldName = $field;
+                break;
+              }
+            }
+
+            if($error) {
+                $msg['responseCode'] = "0";
+                $msg['responseMessage'] = "$fieldName required.";
+            }else{
+           
+           $user=User::select('password')->where('id',$userId)->first();
+           if(Hash::check($oldPassword,$user->password))
+           {
+               User::where('id',$userId)->update(['password'=>bcrypt($newPassword)]);
+               $msg['responseCode']="200";
+               $msg["responseMessage"]='Password changed successfully';
+           }
+           else
+           {
+               $msg['responseCode']="0";
+               $msg["responseMessage"]='Current Password is incorrect';
+           }
+         }
+       }
+       catch(Exception $e)
+       {
+           $msg['responseCode']="0";
+           $msg["responseMessage"]='Failed,Please Try Again';
+           $msg['error']=$e;
+       }
+       finally
+       {
+           return $msg;
+       }
+    }
+    
+    public function editProfile(){
+        try{
+            $msg = array();
+            $userId = $_POST['userId'];
+            $fName = $_POST['fName'];
+            $lName = $_POST['lName'];
+            $email = $_POST['email'];
+            $street = $_POST['street'];    
+            $city = $_POST['city']; 
+            $location = $_POST['location']; 
+            $pincode = $_POST['pincode']; 
+            $country = $_POST['country']; 
+            
+            $required = array('userId','fName','lName','email');
+
+            $error = false;
+            foreach($required as $field) {
+              if (empty($_POST[$field])) {
+                $error = true;
+                $fieldName = $field;
+                break;
+              }
+            }
+
+            if($error) {
+                $msg['responseCode'] = "0";
+                $msg['responseMessage'] = "$fieldName required.";
+            }else{   
+                
+                $pic=Input::file('image');
+                $extension = $pic->getClientOriginalExtension(); // getting image extension
+                $userImage = time() . rand(111, 999) . '.' . $extension; // renameing image                
+                $pic->move(public_path().'/uploads/user/',$userImage);
+                
+                User::where('id',$userId)
+                    ->update([
+                        'first_name'=>$fName,
+                        'last_name'=>$lName,
+                        'email'=>$email
+                        ]);
+                
+                $userDetails = UserDetail::where('user_id',$userId)->first();
+                if($userDetails->id != ''){
+                    UserDetail::where('user_id',$userId)
+                    ->update([
+                        'image'=>$userImage,
+                        'street'=>$street,
+                        'location'=>$location,
+                        'city'=>$city,
+                        'pincode'=>$pincode,
+                        'country'=>$country
+                        ]);
+                }else{
+                    $data = new UserDetail;
+                    $data->user_id = $userId;
+                    $data->image = $userImage;
+                    $data->street = $street;
+                    $data->location = $location;
+                    $data->city = $city;
+                    $data->pincode = $pincode;
+                    $data->country = $country;
+                    $data->save();
+                }
+                    
+                    
+                $msg['responseCode'] = "200";
+                $msg['responseMessage'] = "Data saved successfully";    
+                }
         }catch(\Exception $e) {
             $msg['responseCode'] = "0";
             $msg['responseMessage'] =$e->getMessage();
