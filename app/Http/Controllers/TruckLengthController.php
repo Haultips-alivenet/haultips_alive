@@ -10,7 +10,7 @@ use Auth;
 use Session;
 use App\VehicleCategory;
 use App\User;
-use App\TruckLengths;
+use App\TruckLength;
 use DB;
 
 class TruckLengthController extends Controller
@@ -33,7 +33,7 @@ class TruckLengthController extends Controller
     public function create(Request $request,$id=null)
     {
         $data["categoryname"] =   DB::table('vehicle_categories')
-                            ->where('parent_id',5)
+                            ->where('parent_id',1)
                             ->select('category_name','id')
                             ->get();
         
@@ -56,7 +56,7 @@ class TruckLengthController extends Controller
         }
         $data["page"] = $data["trucklength"]->toArray();
          if($id){
-             $data["truckupdate"] = TruckLengths::find($id);
+             $data["truckupdate"] = TruckLength::find($id);
         } else {
            $data["truckupdate"]=''; 
         }
@@ -91,7 +91,7 @@ class TruckLengthController extends Controller
             $trucktype=$request->trucktype;
             $trucklength=$request->trucklength;
             
-            $truck= new TruckLengths;
+            $truck= new TruckLength;
             $truck->truck_type_id = $trucktype;
             $truck->truck_length = $trucklength;
             
@@ -149,7 +149,7 @@ class TruckLengthController extends Controller
         ]);
         
         
-        $truck = TruckLengths::find($id); 
+        $truck = TruckLength::find($id); 
         $truck->truck_type_id = $request->trucktypeupdate;
         $truck->truck_length = $request->trucklengthupdate;
         
@@ -172,7 +172,7 @@ class TruckLengthController extends Controller
      */
     public function destroy($id)
     {
-        $query = TruckLengths::where('id', $id)->delete();
+        $query = TruckLength::where('id', $id)->delete();
         if($query == 1){
             Session::flash('success', 'Truck Length deleted successfully');            
         }else{

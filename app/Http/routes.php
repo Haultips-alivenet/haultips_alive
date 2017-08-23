@@ -75,10 +75,25 @@ Route::post('admin/cost-Save', 'CostController@store');
 Route::get('admin/cost/{id}/update', 'CostController@create');
 Route::get('admin/cost/{id}/delete', 'CostController@destroy');
 
-# adminshipment
+# adminshipment admin
+Route::resource('admin/adminshipment/shipList', 'AdminShipmentController@shipList');
 Route::resource('admin/adminshipment', 'AdminShipmentController');
 Route::post('admin/adminshipment-Save', 'AdminShipmentController@store');
-Route::get('admin/adminshipment/{id}/delete', 'TruckCapacityController@destroy');
+Route::post('admin/adminshipment-update', 'AdminShipmentController@update');
+Route::get('admin/adminshipment/{id}/update', 'AdminShipmentController@edit');
+Route::get('admin/adminshipment/{id}/delete', 'AdminShipmentController@destroy');
+
+
+
+#shipment/report
+Route::get('shipment/detailsReport/{id}', 'ShipmentReportController@details_report');
+Route::resource('shipment/{id}/report', 'ShipmentReportController');
+Route::resource('shipment/reportList/{id}', 'ShipmentReportController@index');
+
+
+
+
+
 
 #Webservices
 Route::post('webservicesToken/token', 'AndroidController@token');

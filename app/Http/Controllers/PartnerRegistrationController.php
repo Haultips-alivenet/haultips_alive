@@ -63,7 +63,7 @@ class PartnerRegistrationController extends Controller
     public function create()
     {
         $data["categoryname"] =   DB::table('vehicle_categories')
-                            ->where('parent_id',5)
+                            ->where('parent_id',1)
                             ->select('category_name','id')
                             ->get();
        $data["carrier_types"] =   DB::table('Carrier_types')->select('*')->get();
@@ -147,7 +147,7 @@ class PartnerRegistrationController extends Controller
                                
                                 $data[] = array(
                                     'user_id' => $insertedId, 
-                                    'vehicle_category_id' => '5',
+                                    'vehicle_category_id' => '1',
                                     'vehicle_subcategory_id' => $trucktype[$i],
                                     'vehicle_length_id' => $trucklength[$j],
                                     'vehicle_capacity_id' => $truckcapacity[$k],
@@ -210,7 +210,7 @@ class PartnerRegistrationController extends Controller
                                     ->get();
         $data["carrier_types"] =   DB::table('Carrier_types')->select('*')->get();
         $data["categoryname"] =   DB::table('vehicle_categories')
-                            ->where('parent_id',5)
+                            ->where('parent_id',1)
                             ->select('category_name','id')
                             ->get();
        return view('admin/partner/edit',$data);
@@ -282,7 +282,7 @@ class PartnerRegistrationController extends Controller
                                 }
                                 $data[] = array(
                                     'user_id' => $id, 
-                                    'vehicle_category_id' => '5',
+                                    'vehicle_category_id' => '1',
                                     'vehicle_subcategory_id' => $trucktype[$i],
                                     'vehicle_length_id' => $trucklength[$j],
                                     'vehicle_capacity_id' => $truckcapacity[$k],

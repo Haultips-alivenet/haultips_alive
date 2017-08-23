@@ -4,7 +4,7 @@
 @endsection
 
 @section('body')
-<?php //print_r($category); ?>
+<?php //print_r($edit_name); ?>
     <div id="page-wrapper">
         <div class="graphs">
             <h3 class="blank1">Admin</h3>
@@ -26,7 +26,7 @@
                         @endif
                    
                     <div class="tab-pane active" id="horizontal-form">
-                        {!! Form::open(array('url'=>'admin/adminshipment-Save','class'=>'form-horizontal','id'=>'costestimation','files' => true)) !!}
+                        {!! Form::open(array('url'=>'admin/adminshipment-update','class'=>'form-horizontal','id'=>'costestimation','files' => true)) !!}
                             
                             <div id="msgStatus"></div>
                              
@@ -36,7 +36,7 @@
                                     <select name="type" id="costtype" class="form-control select2" >
                                         <option value=""  >Select Type</option> 
                                         <?php foreach($type as $value) { ?>
-                                        <option value="<?php echo $value->name; ?>" ><?php echo $value->details; ?></option>
+                                        <option value="<?php echo $value->name; ?>" {{$edit_type==$value->name ? 'selected' : ''}} ><?php echo $value->details; ?></option>
                                         <?php } ?>
                                        
                                     </select>
@@ -46,14 +46,15 @@
                             <div class="form-group">
                                 <label for="name" class="col-sm-2 control-label">Name</label>
                                 <div class="col-sm-8">
-                                     {!! Form :: text('name','',['class'=>'form-control1', 'id'=>'name'])  !!}
+                                    {!! Form :: hidden('id',$edit_name->id,['class'=>'form-control1', 'id'=>'id'])  !!}
+                                     {!! Form :: text('name',$edit_name->name,['class'=>'form-control1', 'id'=>'name'])  !!}
                                 </div>  
                                
                             </div>
                            
                            
                             <div class="col-sm-8 col-sm-offset-2">
-                            {!! Form :: submit("Save",["class"=>"btn-success btn",'id'=>'trucklen']) !!}
+                            {!! Form :: submit("Update",["class"=>"btn-success btn",'id'=>'trucklen']) !!}
                              
                             </div>
                               

@@ -34,7 +34,7 @@ class TruckCapacityController extends Controller
     public function create(Request $request,$id=null)
     {
         $data["categoryname"] =   DB::table('vehicle_categories')
-                            ->where('parent_id',5)
+                            ->where('parent_id',1)
                             ->select('category_name','id')
                             ->get();
       

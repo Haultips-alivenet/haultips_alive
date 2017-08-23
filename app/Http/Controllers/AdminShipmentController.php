@@ -52,11 +52,8 @@ class AdminShipmentController extends Controller
             
             $type=$request->type;
             $name=$request->name;
-           // $cost= new $type;
-           // $cost->name = $name;
-           // $costSucess = $cost->save();  
-           $costSucess= DB::table($type)->insert([['name' => $name]]);
-            if($costSucess == 1){
+            $costSucess= DB::table($type)->insert([['name' => $name]]);
+             if($costSucess == 1){
                 Session::flash('success', 'Data created successfully');                
             }else{
                Session::flash('success', 'Error occur ! Please try again.');
@@ -64,12 +61,25 @@ class AdminShipmentController extends Controller
             return redirect(url('admin/adminshipment/create'));
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
+    public function shipList(Request $request)
+    {
+       if($request->type){
+           $data["tableList"] =DB::table($request->type)->select('*')->paginate(10);
+           $data["page"] = $data["tableList"]->toArray(); 
+           //$data["page"]["next_page_url"]=$data["page"]["next_page_url"].'&type='.$request->type;
+       } else {
+           $data["tableList"]=array();
+           
+       }
+       
+       //echo $data["page"]["next_page_url"];
+       //print_r($data["page"]);die;
+     //print_r($data["tableList"]->render());die;
+      $data["type"] =DB::table('admin_general_shipments_types')->select('*')->get();
+        
+       return view('admin.shipmentmaster.shiplist',$data);
+    }
+   
     public function show($id)
     {
         $user = User::find($id);
@@ -78,67 +88,50 @@ class AdminShipmentController extends Controller
                 ]);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
+ 
+    public function edit(Request $request,$id)
     {
-       $category = Vehicle_categorie::find($id);
-       return view('admin/category/create')->with([                    
-                    'category' => $category
-        ]);
+      
+       $data["edit_type"] =$request->name;
+       $data["edit_name"] =DB::table($request->name)->select('id','name')->where('id',$id)->first();
+      $data["type"] =DB::table('admin_general_shipments_types')->select('*')->get();
+       return view('admin/shipmentmaster/edit',$data);
     }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, $id)
+    
+    public function update(Request $request)
     {
-       
+       //print_r($_POST);die;
         $this->validate($request, [
-               'costtypeupdate' => 'required',
-               'titleupdate' => 'required',
-               'priceupdate' => 'required',
+               'type' => 'required',
+               'name' => 'required',
+              
         ]);
         
-        
-        $cost = CostEstimations::find($id); 
-        $cost->cost_type = $request->costtypeupdate;
-        $cost->title = $request->titleupdate;
-        $cost->price = $request->priceupdate;
-        
-        $truckSucess = $cost->save();  
+      $truckSucess =  DB::table($request->type)
+            ->where('id', $request->id)
+            ->update(['name' => $request->name]);
+     
         if($truckSucess == 1){
-            Session::flash('success', 'Cost Estimation Updated successfully');            
+            Session::flash('success', 'Data Updated successfully');            
         }else{
            Session::flash('success', 'Error occur ! Please try again.');
         } 
-        return redirect(url('admin/cost/create'));
+        return redirect(url('admin/adminshipment/shipList?type='.$request->type));
         
         
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy($id)
+   
+    public function destroy(Request $request,$id)
     {
-        $query = CostEstimations::where('id', $id)->delete();
+        //echo $id;die;
+        $query =DB::table($request->name)->where('id',$id)->delete();
         if($query == 1){
-            Session::flash('success', 'Cost Estimation deleted successfully');            
+            Session::flash('success', 'Data deleted successfully');            
         }else{
            Session::flash('success', 'Error occur ! Please try again.');
         } 
-        return redirect(url('admin/cost/create'));
+        return redirect(url('admin/adminshipment/shipList?type='.$request->name));
     }
 }

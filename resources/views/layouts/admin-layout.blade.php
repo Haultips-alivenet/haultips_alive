@@ -85,18 +85,24 @@ License URL: http://creativecommons.org/licenses/by/3.0/
                     </li>
                     <li><a href="#"><i class="lnr lnr-spell-check"></i> <span>Transaction History</span></a></li>
                     
-                     <li class="menu-list">
+                    <li class="menu-list">
                         <a href="#"><i class="lnr lnr-cog"></i>
-                        <span>Shipments</span></a>
-                        <ul class="sub-menu-list"></ul>
+                        <span>Shipment</span></a>
+                         <ul class="sub-menu-list">
+                            <li><a href="{{url('shipment/1/report')}}">Truck Booking</a></li> 
+                            <li><a href="{{url('shipment/2/report')}}">Packers & Movers</a></li> 
+                            <li><a href="{{url('shipment/3/report')}}">Vehicle Shifting</a></li> 
+                            <li><a href="{{url('shipment/4/report')}}">Part Load</a></li> 
+                         </ul>
                     </li>
+                     
                      <li><a href="{{url('admin/cost/create')}}"><i class="lnr lnr-spell-check"></i> <span>Cost Estimation</span></a></li>       
                      <li class="menu-list">
                         <a href="#"><i class="lnr lnr-cog"></i>
                         <span>Shipment Details </span></a>
                          <ul class="sub-menu-list">
                             <li><a href="{{url('admin/adminshipment/create')}}">Add Shipment Master</a></li> 
-                            <li><a href="{{url('admin/adminshipment/1/Bad')}}">Bad Rooms List</a></li> 
+                            <li><a href="{{url('admin/adminshipment/shipList')}}">Shipment Master List</a></li> 
                          </ul>
                     </li>   
                 </ul>
