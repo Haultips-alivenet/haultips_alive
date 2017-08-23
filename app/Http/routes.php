@@ -121,4 +121,17 @@ Route::post('webservices/otherCategory', 'AndroidController@otherCategory');
 Route::post('webservices/houseHoldGoodsCategory', 'AndroidController@houseHoldGoodsCategory');
 Route::post('webservices/vehicleShifting', 'AndroidController@vehicleShifting');
 Route::post('webservices/partLoad', 'AndroidController@partLoad');
-
+Route::post('webservices/getTruckLength', 'AndroidController@getTruckLength');
+Route::post('webservices/getTruckCapacity', 'AndroidController@getTruckCapacity');
+Route::post('webservices/truckBooking', 'AndroidController@truckBooking');
+Route::post('webservices/confirmAddress', 'AndroidController@confirmAddress');
+Route::post('webservices/shipmentPost', 'AndroidController@shipmentPost');
+Route::post('webservices/myDeliveries', 'AndroidController@myDeliveries');
+Route::post('webservices/deliveryDetail', 'AndroidController@deliveryDetail');
+Route::post('webservices/quotationOffer', 'AndroidController@quotationOffer');
+Route::post('webservices/notification', 'AndroidController@notification');
+Route::post('webservices/addNewAccount', 'AndroidController@addNewAccount');
+Route::post('webservices/bankInfo', 'AndroidController@bankInfo');
+Route::post('webservices/transactionDetail', 'AndroidController@transactionDetail');
+Route::post('webservices/changePassword', 'AndroidController@changePassword');
+Route::post('webservices/editProfile', 'AndroidController@editProfile');
