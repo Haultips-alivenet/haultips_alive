@@ -135,3 +135,6 @@ Route::post('webservices/bankInfo', 'AndroidController@bankInfo');
 Route::post('webservices/transactionDetail', 'AndroidController@transactionDetail');
 Route::post('webservices/changePassword', 'AndroidController@changePassword');
 Route::post('webservices/editProfile', 'AndroidController@editProfile');
+Route::post('webservices/viewProfile', 'AndroidController@viewProfile');
+Route::post('webservices/userQuestions', 'AndroidController@userQuestions');
+Route::post('webservices/findDelivery', 'AndroidController@findDelivery');

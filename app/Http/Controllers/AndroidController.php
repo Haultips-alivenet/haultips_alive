@@ -9,6 +9,7 @@ use App\Http\Controllers\Controller;
 use Tymon\JWTAuth\Exceptions\JWTException;
 use Tymon\JWTAuth\Facades\JWTAuth;
 use Session;
+use Input;
 use App\library\Smsapi;
 use App\User;
 use App\UserVerification;
@@ -41,6 +42,9 @@ use App\TruckCapacity;
 use App\ShippingQuote;
 use App\PayInfo;
 use App\UserDetail;
+use App\TblAnswer;
+use App\TblQuestion;
+use App\TblQuesMaster;
 use DB;
 use Hash;
 
@@ -577,6 +581,8 @@ class AndroidController extends AppController
                 $home = $_POST['homeOffice'];
                 $garage = $_POST['garage'];
                 $outdoor = $_POST['outdoor'];
+//                $bedroom = $_POST['bedroom'];
+//                $box = $_POST['box'];
                 $misc = $_POST['misc'];
                 $homeImages = '';
 
@@ -614,13 +620,13 @@ class AndroidController extends AppController
                     $shipmentList->delivery_title = $title;
                     $shipmentList->dining_room = $dining;
                     $shipmentList->living_room = $living;
-                    $shipmentList->bedroom = $bedroom;
+                    //$shipmentList->bedroom = $bedroom;
                     $shipmentList->kitchen = $kitchen;
                     $shipmentList->home_office = $home;
                     $shipmentList->garage = $garage;
                     $shipmentList->outdoor = $outdoor;
                     $shipmentList->miscellaneous = $misc;
-                    $shipmentList->boxes = $box;
+                    //$shipmentList->boxes = $box;
                     $shipmentList->item_image = $homeImages;
                     $shipmentList->item_detail = $_POST['additionalDetail'];
                     $shipmentList->save(); 
@@ -637,13 +643,13 @@ class AndroidController extends AppController
                                             'delivery_title' => $title,
                                             'dining_room' => $dining,
                                             'living_room' => $living,
-                                            'bedroom' => $bedroom,
+                                            //'bedroom' => $bedroom,
                                             'kitchen' => $kitchen,
                                             'home_office' => $home,
                                             'garage' => $garage,
                                             'outdoor' => $outdoor,
                                             'miscellaneous' => $misc,
-                                            'boxes' => $box,
+                                            //'boxes' => $box,
                                             'item_image' => $homeImages,
                                             'item_detail' => $_POST['additionalDetail']
                                         ]);         
@@ -1557,7 +1563,8 @@ class AndroidController extends AppController
                         $msg['details'] = $data; 
                     }else{
                         $msg['responseCode'] = "200";
-                        $msg['responseMessage'] = "No data found";  
+                        $msg['responseMessage'] = "Information get successfully";  
+                        $msg['details'] = 'No Data found'; 
                     }                      
                 }
         }catch(\Exception $e) {
@@ -1600,7 +1607,8 @@ class AndroidController extends AppController
                         $msg['details'] = $data; 
                     }else{
                         $msg['responseCode'] = "200";
-                        $msg['responseMessage'] = "No data found";  
+                        $msg['responseMessage'] = "Information get successfully";  
+                        $msg['details'] = 'No Data found';
                     }                      
                 }
         }catch(\Exception $e) {
@@ -1705,7 +1713,8 @@ class AndroidController extends AppController
                         ]);
                 
                 $userDetails = UserDetail::where('user_id',$userId)->first();
-                if($userDetails->id != ''){
+               
+                if($userDetails){
                     UserDetail::where('user_id',$userId)
                     ->update([
                         'image'=>$userImage,
@@ -1730,6 +1739,158 @@ class AndroidController extends AppController
                     
                 $msg['responseCode'] = "200";
                 $msg['responseMessage'] = "Data saved successfully";    
+                }
+        }catch(\Exception $e) {
+            $msg['responseCode'] = "0";
+            $msg['responseMessage'] =$e->getMessage();
+        }
+        finally {
+            $result = json_encode($msg);
+            echo $result;
+        }
+    }
+    
+    public function viewProfile(){
+        try{
+            $msg = array();
+            $i = 0;
+            $userId = $_POST['userId'];
+            
+            if(empty('userId')) {
+                $msg['responseCode'] = "0";
+                $msg['responseMessage'] = "userId required.";
+            }else{           
+                    $userdetails = User::select('first_name', 'last_name','email','mobile_number','ud.*')                            
+                                    ->leftJoin('user_details as ud','ud.user_id','=','users.id')
+                                    ->where('users.id',$userId)->first();                
+                   
+                    if($userdetails){
+                        $msg['responseCode'] = "200";
+                        $msg['responseMessage'] = "Information get successfully"; 
+                        $msg['details'] = $userdetails; 
+                    }else{
+                        $msg['responseCode'] = "200";
+                        $msg['responseMessage'] = "Information get successfully";  
+                        $msg['details'] = 'No Data found';
+                    }                      
+                }
+        }catch(\Exception $e) {
+            $msg['responseCode'] = "0";
+            $msg['responseMessage'] =$e->getMessage();
+        }
+        finally {
+            $result = json_encode($msg);
+            echo $result;
+        }
+    }
+    
+    public function userQuestions(){
+        try{
+            $msg = array();
+            $data = array();
+            $i = 0;
+            $userId = $_POST['userId'];
+            
+            if(empty('userId')) {
+                $msg['responseCode'] = "0";
+                $msg['responseMessage'] = "userId required.";
+            }else{           
+                    $quesdetails = TblQuesMaster::select('tq.question', 'u.first_name','u.last_name','ud.image','sd.table_name','sd.id','tq.id as quesId')                            
+                                    ->leftJoin('tbl_questions as tq','tq.ques_master_id','=','tbl_ques_masters.id')
+                                    ->leftJoin('users as u','u.id','=','tbl_ques_masters.carrier_id')
+                                    ->leftJoin('user_details as ud','ud.user_id','=','tbl_ques_masters.carrier_id')
+                                    ->leftJoin('shipping_details as sd','sd.id','=','tbl_ques_masters.shipping_id')                                   
+                                    ->orderBy('tq.id', 'desc')
+                                    ->groupBy('tbl_ques_masters.carrier_id')
+                                    ->where('tq.status',1)
+                                    ->where('tbl_ques_masters.user_id',$userId)->get();                
+                   
+                    $info = $quesdetails->toArray();
+                    if(count($info) > 0){
+                        foreach($quesdetails as $detail){
+                            $shippingData = DB::table($detail->table_name)->select('delivery_title')->where('shipping_id',$detail->id)->first();
+                            
+                            $data[$i]['quesId'] = $detail['quesId'];
+                            $data[$i]['title'] = $shippingData->delivery_title;
+                            $data[$i]['partnerName'] = $detail['first_name'].' '.$detail['last_name'];
+                            $data[$i]['partnerImage'] = $detail['image'];
+                            $data[$i]['question'] = $detail['question']; 
+                            $i++;
+                        }
+                        $msg['responseCode'] = "200";
+                        $msg['responseMessage'] = "Information get successfully"; 
+                        $msg['quesDetails'] = $data; 
+                    }else{
+                        $msg['responseCode'] = "200";
+                        $msg['responseMessage'] = "Information get successfully";  
+                        $msg['quesDetails'] = 'No Data found';
+                    }                     
+                }
+        }catch(\Exception $e) {
+            $msg['responseCode'] = "0";
+            $msg['responseMessage'] =$e->getMessage();
+        }
+        finally {
+            $result = json_encode($msg);
+            echo $result;
+        }
+    }
+    
+    public function findDelivery(){
+        try{
+            $msg = array();
+            $data = array();
+            $i = 0;
+            $userId = $_POST['userId'];
+            
+            if(empty('userId')) {
+                $msg['responseCode'] = "0";
+                $msg['responseMessage'] = "userId required.";
+            }else{           
+                    $userdetails = User::select('carrier_type_id')->where('id',$userId)->first();        
+                    $userType = $userdetails->carrier_type_id;
+                    $catType = array('1','2','3','4');
+                    if($userType == 1){
+                        $catType = array('2','3');
+                    }
+                    if($userType == 2){
+                        $catType = array('1','4');
+                    }
+                     
+                    $shippingData = ShippingDetail::select(DB::raw('shipping_details.id, table_name, shipping_details.created_at, spd.pickup_address, spd.pickup_date,  sdd.delivery_date, spd.latitude as pickupLat, spd.longitutde as pickupLong, sdd.delivery_address, sdd.latitude as deliveryLat, sdd.longitutde as deliveryLong, min(sq.quote_price) as minimumBid'))
+                                    ->leftJoin('shipping_pickup_details as spd','spd.shipping_id','=','shipping_details.id')
+                                    ->leftJoin('shipping_delivery_details as sdd','sdd.shipping_id','=','shipping_details.id')
+                                    ->leftJoin('shipping_quotes as sq','sq.shipping_id','=','shipping_details.id')
+                                    ->whereIn('category_id', $catType)->get();
+                    
+                     $info = $shippingData->toArray();
+                    if(count($info) > 0){
+                        foreach($shippingData as $detail){
+                            $shippingData = DB::table($detail->table_name)->select('delivery_title','item_image')->where('shipping_id',$detail->id)->first();
+                            $shippingQuote = ShippingQuote::where('carrier_id',$userId)->where('shipping_id',$detail->id)->select('quote_price')->first();
+                            $image = explode(',',$shippingData->item_image);
+
+                            $data[$i]['ShippingId'] = $detail['id'];
+                            $data[$i]['image'] = $image[0];
+                            $data[$i]['title'] = $shippingData->delivery_title;
+                            $data[$i]['pickupAddress'] = $detail['pickup_address'];
+                            $data[$i]['deliveryAddress'] = $detail['delivery_address'];
+                            $data[$i]['minimumBid'] = $detail['minimumBid']; 
+                            $data[$i]['partnerQuote'] = ($shippingQuote) ? $shippingQuote->quote_price : '';
+                            $data[$i]['distance'] = ShippingDetail::distance($detail['pickupLat'],$detail['pickupLong'],$detail['deliveryLat'],$detail['deliveryLong'], "K"); 
+                            $data[$i]['postingDate'] = date('d-m-Y', strtotime($detail['created_at'])); 
+                            $data[$i]['pickupDate'] = date('d-m-Y', strtotime($detail['pickup_date']));
+                            $data[$i]['deliveryDate'] = date('d-m-Y', strtotime($detail['delivery_date']));
+                            $i++;
+                        }
+                        $msg['responseCode'] = "200";
+                        $msg['responseMessage'] = "Information get successfully"; 
+                        $msg['diliveries'] = $data; 
+                    }else{
+                        $msg['responseCode'] = "200";
+                        $msg['responseMessage'] = "Information get successfully";  
+                        $msg['details'] = 'No Data found';
+                    }                     
                 }
         }catch(\Exception $e) {
             $msg['responseCode'] = "0";
