@@ -11,7 +11,7 @@
                 <div class="xs tabls">
                     <div class="panel panel-warning" >
                         
-                                {!! Form::open(array('url'=>'admin/adminshipment/shipList','id'=>'menu','method'=>'get')) !!}
+                                {!! Form::open(array('url'=>'admin/adminshipment/shipList','id'=>'menu','method'=>'post')) !!}
                                     <div class="row">  
                                         <div class="form-group col-md-4 grid_box1">
                                               <select name="type" id="costtype" class="form-control select2" >
@@ -68,7 +68,9 @@
                                     @endif
                                 </tbody>
                             </table>
-                            <?php if(count($tableList)>0) { echo $tableList->render(); } ?>                                        
+                            <?php if($tableList) { ?>
+                            {!! $tableList->appends(Request::except('page'))->render() !!}
+                            <?php } ?>
                         </div>
                     </div>						
                 </div>

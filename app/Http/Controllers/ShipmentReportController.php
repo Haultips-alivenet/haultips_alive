@@ -32,19 +32,22 @@ class ShipmentReportController extends Controller
                             ->get();
          if($request->category){
         $data["shiping_details"] =   DB::table('shipping_details as s')
-                             ->join('vehicle_categories as v','v.id', '=', 's.category_id')
-                             ->join('vehicle_categories as v1','v1.id', '=', 's.subcategory_id')
-                              ->join('payment_methods as p','p.id', '=', 's.payment_method_id')
+                             ->leftjoin('vehicle_categories as v','v.id', '=', 's.category_id')
+                             ->leftjoin('vehicle_categories as v1','v1.id', '=', 's.subcategory_id')
+                              ->leftjoin('payment_methods as p','p.id', '=', 's.payment_method_id')
                             ->where('s.subcategory_id',$request->category)
+                            ->where('s.status',1)
                             ->select('s.id','s.estimated_price','s.status','v.category_name as categoty_name','v1.category_name as subcategory_name','p.method')
+                            
                             ->paginate(10);
        
          } else {
            $data["shiping_details"] =   DB::table('shipping_details as s')
-                             ->join('vehicle_categories as v','v.id', '=', 's.category_id')
-                             ->join('vehicle_categories as v1','v1.id', '=', 's.subcategory_id')
-                              ->join('payment_methods as p','p.id', '=', 's.payment_method_id')
+                             ->leftjoin('vehicle_categories as v','v.id', '=', 's.category_id')
+                             ->leftjoin('vehicle_categories as v1','v1.id', '=', 's.subcategory_id')
+                              ->leftjoin('payment_methods as p','p.id', '=', 's.payment_method_id')
                             ->where('s.category_id',$id)
+                            ->where('s.status',1)
                             ->select('s.id','s.estimated_price','s.status','v.category_name as categoty_name','v1.category_name as subcategory_name','p.method')
                             ->paginate(10);
          }

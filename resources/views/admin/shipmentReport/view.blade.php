@@ -27,7 +27,14 @@ error_reporting(0);
          <td style="width: 20%;">DELIVERY DATE</td>
          <td>{{date('d-m-Y',strtotime($delivery->delivery_date))}}</td>
      </tr> 
-     <?php for($i=1;$i<count($tables_columns); $i++) {  $name=str_replace("_"," ",$tables_columns[$i]);?>
+     <?php for($i=1;$i<count($tables_columns); $i++) {  
+        
+         $n=str_replace("_id"," ",$tables_columns[$i]);
+         $name=str_replace("_"," ",$n);
+         if(strtoupper($name)=='STATUS') {
+             
+         }
+      ?>
      <tr>
          <td style="width: 20%;"><?php echo strtoupper($name); ?></td>
          <td>{{$tables_value->$tables_columns[$i]}}</td>
@@ -40,5 +47,8 @@ error_reporting(0);
     </div>
 </div>
 @endsection
+
+
+
 
 

@@ -11,7 +11,7 @@ use Session;
 use App\VehicleCategory;
 use App\User;
 use App\TruckLengths;
-use App\CostEstimations;
+use App\CostEstimation;
 use DB;
 
 class CostController extends Controller
@@ -40,7 +40,7 @@ class CostController extends Controller
         
         $data["page"] = $data["cost"]->toArray();
          if($id){
-             $data["costupdate"] = CostEstimations::find($id);
+             $data["costupdate"] = CostEstimation::find($id);
         } else {
            $data["costupdate"]=''; 
         }
@@ -60,7 +60,7 @@ class CostController extends Controller
             $title=$request->title;
             $price=$request->price;
             
-            $cost= new CostEstimations;
+            $cost= new CostEstimation;
             $cost->cost_type = $costtype;
             $cost->title = $title;
             $cost->price = $price;
@@ -121,7 +121,7 @@ class CostController extends Controller
         ]);
         
         
-        $cost = CostEstimations::find($id); 
+        $cost = CostEstimation::find($id); 
         $cost->cost_type = $request->costtypeupdate;
         $cost->title = $request->titleupdate;
         $cost->price = $request->priceupdate;
@@ -145,7 +145,7 @@ class CostController extends Controller
      */
     public function destroy($id)
     {
-        $query = CostEstimations::where('id', $id)->delete();
+        $query = CostEstimation::where('id', $id)->delete();
         if($query == 1){
             Session::flash('success', 'Cost Estimation deleted successfully');            
         }else{

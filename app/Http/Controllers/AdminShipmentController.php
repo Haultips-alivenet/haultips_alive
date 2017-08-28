@@ -68,7 +68,8 @@ class AdminShipmentController extends Controller
            $data["page"] = $data["tableList"]->toArray(); 
            //$data["page"]["next_page_url"]=$data["page"]["next_page_url"].'&type='.$request->type;
        } else {
-           $data["tableList"]=array();
+          
+           $data["tableList"]='';
            
        }
        

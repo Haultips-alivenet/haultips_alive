@@ -7,6 +7,8 @@ use Illuminate\Http\Request;
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
 use Auth;
+use Mail;
+use App\library\Smsapi;
 use Session;
 use App\User;
 use DB;
@@ -93,8 +95,22 @@ class RegistrationController extends Controller
             $user->mobile_number = $mobile;
             $user->country_code = '+91';
             $userSucess = $user->save();  
+            $insertedId = $user->id;
+            $string = '1234567890';
+            $string_shuffled = str_shuffle($string);
+            $otp = substr($string_shuffled, 1, 5);
+            $otpMsg = 'Your Otp is '.$otp;
             
             if($userSucess == 1){
+                  
+
+                $smsObj = new Smsapi();
+                $smsObj->sendsms_api('+91'.$mobile,$otpMsg);  
+                 $user = User::findOrFail($insertedId);
+                Mail::send('layouts.adminAppointment', ['user' => $user], function ($m) use ($user) {
+                $m->from('richalive158@gmail.com', 'Your Application');
+                $m->to($user->email, $user->name)->subject('Your Reminder!');
+                });
                 Session::flash('success', 'User created successfully');                
             }else{
                Session::flash('success', 'Error occur ! Please try again.');

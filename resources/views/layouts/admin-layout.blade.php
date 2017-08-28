@@ -83,7 +83,7 @@ License URL: http://creativecommons.org/licenses/by/3.0/
                             <li><a href="{{url('admin/truckcapacity/create')}}">Add Truck Capacity</a></li>
                         </ul>
                     </li>
-                    <li><a href="#"><i class="lnr lnr-spell-check"></i> <span>Transaction History</span></a></li>
+                    <li><a href="{{url('admin/transaction/history')}}"><i class="lnr lnr-spell-check"></i> <span>Transaction History</span></a></li>
                     
                     <li class="menu-list">
                         <a href="#"><i class="lnr lnr-cog"></i>
@@ -169,6 +169,7 @@ License URL: http://creativecommons.org/licenses/by/3.0/
     {!! HTML::script('public/admin/js/scripts.js')!!} 
     {!! HTML::script('public/admin/js/bootstrap.min.js')!!}
     {!! Html::script('public/admin/js/jquery.validate.min.js') !!}
+    {!! Html::script('public/admin/js/additional-methods.min.js') !!}
     @yield('script')
  </body>
 </html>

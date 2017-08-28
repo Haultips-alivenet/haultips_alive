@@ -59,7 +59,7 @@ class CategoryController extends Controller
     public function store(Request $request)
     {          
         $this->validate($request, [
-               'categoryName' => 'required|min:3|unique:Vehicle_categories,category_name|max:255|Regex:/^[a-z-.]+( [a-z-.]+)*$/i'
+               'categoryName' => 'required|min:3|unique:vehicle_categories,category_name|max:255|Regex:/^[a-z-.]+( [a-z-.]+)*$/i'
             ]);
             $destinationPath="public\admin\images\category";
             $cname=$request->categoryName;
@@ -119,7 +119,7 @@ class CategoryController extends Controller
     {
        
         $this->validate($request, [
-               'categoryNameupdate' => 'required|min:3|unique:Vehicle_categories,category_name,'.$id,
+               'categoryNameupdate' => 'required|min:3|unique:vehicle_categories,category_name,'.$id,
         ]);
         
         $cname = $request->categoryNameupdate;

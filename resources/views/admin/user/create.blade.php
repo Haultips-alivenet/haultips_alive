@@ -99,8 +99,8 @@ $('#newUser').validate({
                 },
 
                 cpassword:{
-                    required : true,
-                    equalTo: "#password"
+                    required : true
+                   // equalTo: "#password"
                 }
             },
 

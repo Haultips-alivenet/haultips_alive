@@ -117,7 +117,7 @@
                                 <label class="col-sm-2 control-label"></label>
                                 <?php $i=1; foreach($carrier_types as $types) {?>
                                 <div class="col-sm-1">
-                                    <input type="checkbox" name="carrer_type<?php echo $i; ?>" id="carrer_type<?php echo $i; ?>"  value="{{$types->id}}">
+                                    <input class="carrer_group" type="checkbox" name="carrer_type<?php echo $i; ?>" id="carrer_type<?php echo $i; ?>"  value="{{$types->id}}">
                                 </div>
                                  <div class="col-sm-2">
                                  {{$types->carrier_type}}
@@ -149,6 +149,7 @@
 @endsection
 
 @section('script')
+
 <script>
 $(document).ready(function(){
     $('input[type="checkbox"]').click(function(){
@@ -160,6 +161,7 @@ $('#carrer_type2').click(function(){
    
 this.checked?$('#transport_div').show():$('#transport_div').hide(); //time for show
 });
+
 $('#newUser').validate({
 
             rules: {
@@ -206,7 +208,14 @@ $('#newUser').validate({
                     required : true,
                     minlength:1,
                     number:true
-                }
+                },
+                carrer_type1: {
+                    require_from_group: [1, ".carrer_group"]
+                  },
+                  carrer_type2: {
+                    require_from_group: [1, ".carrer_group"]
+                  }
+               
             },
 
             messages: {
@@ -310,6 +319,8 @@ $('#newUser').validate({
 
    });
     }    
+    
+ 
 </script>
 @endsection
 

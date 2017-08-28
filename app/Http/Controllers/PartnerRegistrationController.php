@@ -7,12 +7,15 @@ use Illuminate\Http\Request;
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
 use Auth;
+use Mail;
 use Session;
 use App\User;
+use App\UserVerification;
 use App\CarrierTypes;
 use App\VehicleCategorie;
 use App\UserVehicleDetails;
 use App\PartnerKyc;
+use App\library\Smsapi;
 use DB;
 
 class PartnerRegistrationController extends Controller
@@ -66,7 +69,7 @@ class PartnerRegistrationController extends Controller
                             ->where('parent_id',1)
                             ->select('category_name','id')
                             ->get();
-       $data["carrier_types"] =   DB::table('Carrier_types')->select('*')->get();
+       $data["carrier_types"] =   DB::table('carrier_types')->select('*')->get();
        return view('admin.partner.create',$data);
     }
 
@@ -169,18 +172,37 @@ class PartnerRegistrationController extends Controller
                 DB::rollback();
             }
             
+            $string = '1234567890';
+            $string_shuffled = str_shuffle($string);
+            $otp = substr($string_shuffled, 1, 5);
+            $otpMsg = 'Your Otp is '.$otp;
             
+            $userverify= new UserVerification;
+            $userverify->user_id = $insertedId;
+            $userverify->otp = $otp;
+            $userverify->email = $email;
             
-            
+            $userSucess1 = $userverify->save();
             
             if($userSucess == 1){
+                $smsObj = new Smsapi();
+                $smsObj->sendsms_api('+91'.$mobile,$otpMsg);  
+                
+                $user = User::findOrFail($insertedId);
+                Mail::send('layouts.adminAppointment', ['user' => $user], function ($m) use ($user) {
+                $m->from('richalive158@gmail.com', 'Your Application');
+
+            $m->to($user->email, $user->name)->subject('Your Reminder!');
+        });
+                
+                
                 Session::flash('success', 'User created successfully');                
             }else{
                Session::flash('success', 'Error occur ! Please try again.');
             }            
             return redirect(url('admin/partnerList'));
     }
-
+    
     /**
      * Display the specified resource.
      *
@@ -208,7 +230,7 @@ class PartnerRegistrationController extends Controller
         $data["UserVehicleDetails"] =DB::table('user_vehicle_details')->select('*')
                                     ->where('user_id',$id)
                                     ->get();
-        $data["carrier_types"] =   DB::table('Carrier_types')->select('*')->get();
+        $data["carrier_types"] =   DB::table('carrier_types')->select('*')->get();
         $data["categoryname"] =   DB::table('vehicle_categories')
                             ->where('parent_id',1)
                             ->select('category_name','id')

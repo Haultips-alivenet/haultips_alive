@@ -81,7 +81,7 @@ class SubCategoryController extends Controller
     {          
         $this->validate($request, [
                'categoryName' => 'required|max:255',
-               'subCategoryName' => 'required|min:3|unique:Vehicle_categories,category_name|max:255|Regex:/^[a-z-.]+( [a-z-.]+)*$/i'
+               'subCategoryName' => 'required|min:3|unique:vehicle_categories,category_name|max:255|Regex:/^[a-z-.]+( [a-z-.]+)*$/i'
             ]);
             $destinationPath="public\admin\images\category";
             $subcategory=$request->subCategoryName;
@@ -143,7 +143,7 @@ class SubCategoryController extends Controller
     {
        
         $this->validate($request, [
-               'subcategoryupdate' => 'required|min:3|unique:Vehicle_categories,category_name,'.$id,
+               'subcategoryupdate' => 'required|min:3|unique:vehicle_categories,category_name,'.$id,
                'categoryupdate' => 'required',
         ]);
         
