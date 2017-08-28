@@ -2,6 +2,8 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use App\AdminDinningRoom;
+use DB;
 
 class ShippingDetail extends Model
 {
@@ -21,5 +23,26 @@ class ShippingDetail extends Model
             }
 
       }    
-
+      
+      public static function getDineInData($data, $table) {
+        $dineInData = array();
+        $item = array();
+        $itemName = '';
+        $dineInData = explode(",",$data);
+        foreach($dineInData as $dineIn){
+            $item = explode("-",$dineIn);
+            $dineInName = DB::table($table)->select('name')->where('id',$item[0])->first();
+            $itemName.= ($itemName == '') ? $item[1].' '.$dineInName->name : ','.$item[1].' '.$dineInName->name;            
+        }
+        return $itemName;
+      }
+      
+      public static function getCategoryName($id, $searchField, $selectField, $table) {
+        
+        $itemName = '';
+        $dineInName = DB::table($table)->select($selectField)->where($searchField, $id)->first();
+        $itemName =  $dineInName->$selectField;            
+        
+        return $itemName;
+      }
 }

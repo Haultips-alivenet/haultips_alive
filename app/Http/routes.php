@@ -138,3 +138,4 @@ Route::post('webservices/editProfile', 'AndroidController@editProfile');
 Route::post('webservices/viewProfile', 'AndroidController@viewProfile');
 Route::post('webservices/userQuestions', 'AndroidController@userQuestions');
 Route::post('webservices/findDelivery', 'AndroidController@findDelivery');
+Route::post('webservices/findDetail', 'AndroidController@findDetail');

@@ -1113,6 +1113,7 @@ class AndroidController extends AppController
     
     public function truckBooking(){
         try{
+            $msg = array();
             $category_id = $_POST['catId'];
             $custid = $_POST['userId'];
             $subCatId = $_POST['subCatId'];
@@ -1841,14 +1842,17 @@ class AndroidController extends AppController
             $msg = array();
             $data = array();
             $i = 0;
+            $condition = '';
             $userId = $_POST['userId'];
+            $categoryId = $_POST['categoryId'];
+            $orderBy = $_POST['orderBy'];
             
             if(empty('userId')) {
                 $msg['responseCode'] = "0";
                 $msg['responseMessage'] = "userId required.";
             }else{           
                     $userdetails = User::select('carrier_type_id')->where('id',$userId)->first();        
-                    $userType = $userdetails->carrier_type_id;
+                    $userType = $userdetails->carrier_type_id; 
                     $catType = array('1','2','3','4');
                     if($userType == 1){
                         $catType = array('2','3');
@@ -1857,27 +1861,45 @@ class AndroidController extends AppController
                         $catType = array('1','4');
                     }
                      
-                    $shippingData = ShippingDetail::select(DB::raw('shipping_details.id, table_name, shipping_details.created_at, spd.pickup_address, spd.pickup_date,  sdd.delivery_date, spd.latitude as pickupLat, spd.longitutde as pickupLong, sdd.delivery_address, sdd.latitude as deliveryLat, sdd.longitutde as deliveryLong, min(sq.quote_price) as minimumBid'))
+                    $shippingData = ShippingDetail::select(DB::raw('shipping_details.id, table_name, shipping_details.created_at, spd.pickup_address, spd.pickup_date,  sdd.delivery_date, spd.latitude as pickupLat, spd.longitutde as pickupLong, sdd.delivery_address, sdd.latitude as deliveryLat, sdd.longitutde as deliveryLong'))
                                     ->leftJoin('shipping_pickup_details as spd','spd.shipping_id','=','shipping_details.id')
-                                    ->leftJoin('shipping_delivery_details as sdd','sdd.shipping_id','=','shipping_details.id')
-                                    ->leftJoin('shipping_quotes as sq','sq.shipping_id','=','shipping_details.id')
-                                    ->whereIn('category_id', $catType)->get();
+                                    ->leftJoin('shipping_delivery_details as sdd','sdd.shipping_id','=','shipping_details.id');
+                    
+                    if($categoryId != ''){
+                        $shippingData = $shippingData->whereIn('shipping_details.category_id', $categoryId);
+                    }
+                    
+                    if($orderBy == 'origin asc'){
+                        $shippingData = $shippingData->orderBy('spd.pickup_address', 'ASC');
+                    }elseif($orderBy == 'origin desc'){
+                        $shippingData = $shippingData->orderBy('spd.pickup_address', 'DESC');
+                    }elseif($orderBy == 'destination asc'){
+                        $shippingData = $shippingData->orderBy('sdd.delivery_address', 'ASC');
+                    }elseif($orderBy == 'destination desc'){
+                        $shippingData = $shippingData->orderBy('sdd.delivery_address', 'DESC');
+                    }
+                    
+                    $shippingData = $shippingData->whereIn('shipping_details.category_id', $catType);
+                    $shippingData = $shippingData->where('shipping_details.status', 1);
+                    $shippingData = $shippingData->get();
                     
                      $info = $shippingData->toArray();
                     if(count($info) > 0){
                         foreach($shippingData as $detail){
                             $shippingData = DB::table($detail->table_name)->select('delivery_title','item_image')->where('shipping_id',$detail->id)->first();
                             $shippingQuote = ShippingQuote::where('carrier_id',$userId)->where('shipping_id',$detail->id)->select('quote_price')->first();
+                            $miid = ShippingQuote::where('shipping_id',$detail->id)->select((DB::raw('min(quote_price) as minimumBid')))->first();
+                            
                             $image = explode(',',$shippingData->item_image);
 
-                            $data[$i]['ShippingId'] = $detail['id'];
+                            $data[$i]['shippingId'] = $detail['id'];
                             $data[$i]['image'] = $image[0];
                             $data[$i]['title'] = $shippingData->delivery_title;
                             $data[$i]['pickupAddress'] = $detail['pickup_address'];
                             $data[$i]['deliveryAddress'] = $detail['delivery_address'];
-                            $data[$i]['minimumBid'] = $detail['minimumBid']; 
+                            $data[$i]['minimumBid'] = ($miid) ? $miid->minimumBid : '0'; 
                             $data[$i]['partnerQuote'] = ($shippingQuote) ? $shippingQuote->quote_price : '';
-                            $data[$i]['distance'] = ShippingDetail::distance($detail['pickupLat'],$detail['pickupLong'],$detail['deliveryLat'],$detail['deliveryLong'], "K"); 
+                            $data[$i]['distance'] = ShippingDetail::distance($detail['pickupLat'],$detail['pickupLong'],$detail['deliveryLat'],$detail['deliveryLong'], "K"). ' km'; 
                             $data[$i]['postingDate'] = date('d-m-Y', strtotime($detail['created_at'])); 
                             $data[$i]['pickupDate'] = date('d-m-Y', strtotime($detail['pickup_date']));
                             $data[$i]['deliveryDate'] = date('d-m-Y', strtotime($detail['delivery_date']));
@@ -1891,6 +1913,104 @@ class AndroidController extends AppController
                         $msg['responseMessage'] = "Information get successfully";  
                         $msg['details'] = 'No Data found';
                     }                     
+                }
+        }catch(\Exception $e) {
+            $msg['responseCode'] = "0";
+            $msg['responseMessage'] =$e->getMessage();
+        }
+        finally {
+            $result = json_encode($msg);
+            echo $result;
+        }
+    }
+    
+    public function findDetail(){
+        try{
+            $msg = array();
+            $data = array();
+            $i = 0;
+            
+            $shippingId = $_POST['shippingId'];
+            
+            if(empty('shippingId')) {
+                $msg['responseCode'] = "0";
+                $msg['responseMessage'] = "shippingId required.";
+            }else{           
+                    
+                     
+                    $shippingData = ShippingDetail::select('shipping_details.id', 'table_name', 'u.id as userId', 'u.first_name', 'u.last_name' , 'shipping_details.created_at', 'spd.pickup_address', 'spd.pickup_date',  'sdd.delivery_date', 'spd.latitude as pickupLat', 'spd.longitutde as pickupLong', 'sdd.delivery_address', 'sdd.latitude as deliveryLat', 'sdd.longitutde as deliveryLong', 'vc.category_name as category', 'vsc.category_name as subCategory')
+                                    ->leftJoin('users as u','u.id','=','shipping_details.user_id')                            
+                                    ->leftJoin('shipping_pickup_details as spd','spd.shipping_id','=','shipping_details.id')                            
+                                    ->leftJoin('shipping_delivery_details as sdd','sdd.shipping_id','=','shipping_details.id')
+                                    ->leftJoin('vehicle_categories as vc','vc.id','=','shipping_details.category_id')
+                                    ->leftJoin('vehicle_categories as vsc','vsc.id','=','shipping_details.subcategory_id')
+                                    ->where('shipping_details.id', $shippingId)->first(); 
+                    
+                    $data['userId'] = $shippingData->userId;
+                    $data['userName'] = $shippingData->first_name. ' '.$shippingData->last_name;
+                    $data['publishDate'] = date('d-m-Y', strtotime($shippingData->created_at)); 
+                    $data['expireDate'] = date('d-m-Y', strtotime($shippingData->pickup_date));
+                    $data['pickupDate'] = date('d-m-Y', strtotime($shippingData->pickup_date));
+                    $data['deliveryDate'] = date('d-m-Y', strtotime($shippingData->delivery_date));
+                    $data['pickupAddress'] = $shippingData->pickup_address;
+                    $data['deliveryAddress'] = $shippingData->delivery_address;
+                    $data['category'] = $shippingData->category;
+                    $data['subCategory'] = $shippingData->subCategory;
+                    $data['distance'] = ShippingDetail::distance($shippingData->pickupLat, $shippingData->pickupLong, $shippingData->deliveryLat, $shippingData->deliveryLong, "K"). ' km'; 
+                    
+                    $shippingDetail = DB::table($shippingData->table_name)->where('shipping_id',$shippingId)->first();
+                     if($shippingData->table_name == 'shipment_listing_homes'){
+                         $data['residenceType'] = $shippingDetail->residence_type;
+                         $data['no_ofRooms'] = $shippingDetail->no_of_room;
+                         $data['deliveryTitle'] = $shippingDetail->delivery_title;
+                         $data['dining_room'] = (empty($shippingDetail->dining_room)) ? 'N/A' : ShippingDetail::getDineInData($shippingDetail->dining_room, 'admin_dinning_rooms');
+                         $data['living_room'] = (empty($shippingDetail->living_room)) ? 'N/A' : ShippingDetail::getDineInData($shippingDetail->living_room, 'admin_living_rooms');
+                         $data['kitchen'] = (empty($shippingDetail->kitchen)) ? 'N/A' : ShippingDetail::getDineInData($shippingDetail->kitchen, 'admin_kitchens');
+                         $data['home_office'] = (empty($shippingDetail->home_office)) ? 'N/A' : ShippingDetail::getDineInData($shippingDetail->home_office, 'admin_home_offices');
+                         $data['garage'] = (empty($shippingDetail->garage)) ? 'N/A' : ShippingDetail::getDineInData($shippingDetail->garage, 'admin_garages');
+                         $data['living_room'] = (empty($shippingDetail->outdoor)) ? 'N/A' : ShippingDetail::getDineInData($shippingDetail->outdoor, 'admin_outdoors');
+                         $data['miscellaneous'] = (empty($shippingDetail->miscellaneous)) ? 'N/A' : ShippingDetail::getDineInData($shippingDetail->miscellaneous, 'admin_miscellaneouses');
+                         $data['itemImage'] = $shippingDetail->item_image;
+                         $data['additionalDetail'] = $shippingDetail->item_detail;
+                     }
+                     else if($shippingData->table_name == 'shipment_listing_offices'){
+                         $data['collectionFloor'] = $shippingDetail->collection_floor;
+                         $data['deliveryFloor'] = $shippingDetail->delivery_floor;
+                         $data['deliveryTitle'] = $shippingDetail->delivery_title;
+                         $data['liftElevator'] = ($shippingDetail->lift_elevator == 0) ? 'No' : 'Yes';
+                         $data['general'] = (empty($shippingDetail->general_shipment_inventory)) ? 'N/A' : ShippingDetail::getDineInData($shippingDetail->general_shipment_inventory, 'admin_general_shipments');
+                         $data['equipment'] = (empty($shippingDetail->equipment_shipment_inventory)) ? 'N/A' : ShippingDetail::getDineInData($shippingDetail->equipment_shipment_inventory, 'admin_equipments');
+                         $data['boxes'] = (empty($shippingDetail->boxes)) ? 'N/A' : ShippingDetail::getDineInData($shippingDetail->boxes, 'admin_boxes');
+                         $data['itemImage'] = $shippingDetail->item_image;
+                         $data['additionalDetail'] = $shippingDetail->item_detail;
+                     }
+                     else if($shippingData->table_name == 'shipment_listing_householdgoods' || $shippingData->table_name == 'shipment_listing_others'){                        
+                         $data['deliveryTitle'] = $shippingDetail->delivery_title;
+                         $data['itemImage'] = $shippingDetail->item_image;
+                         $data['additionalDetail'] = $shippingDetail->additional_detail;
+                     }
+                     else if($shippingData->table_name == 'shipment_listing_truck_bookings'){                        
+                         $data['truckType'] = (empty($shippingDetail->truck_type_id)) ? 'N/A' : ShippingDetail::getCategoryName($shippingDetail->truck_type_id, 'id', 'category_name','vehicle_categories');
+                         $data['truckLength'] = (empty($shippingDetail->truck_length_id)) ? 'N/A' : ShippingDetail::getCategoryName($shippingDetail->truck_length_id, 'id', 'truck_length','truck_lengths');
+                         $data['truckCapacity'] = (empty($shippingDetail->truck_capacity_id)) ? 'N/A' : ShippingDetail::getCategoryName($shippingDetail->truck_capacity_id, 'id', 'truck_capacity','truck_capacities');
+                         $data['material'] = (empty($shippingDetail->material_id)) ? 'N/A' : ShippingDetail::getCategoryName($shippingDetail->material_id, 'id', 'name','materials');
+                         $data['deliveryTitle'] = $shippingDetail->delivery_title;
+                         $data['itemImage'] = $shippingDetail->item_image;
+                     }
+                     else if($shippingData->table_name == 'shipment_listing_vehicle_shifings'){                        
+                         $data['deliveryTitle'] = $shippingDetail->delivery_title;
+                         $data['itemImage'] = $shippingDetail->item_image;
+                     }
+                     else if($shippingData->table_name == 'shipment_listing_materials'){      
+                         $data['material'] = (empty($shippingDetail->material_id)) ? 'N/A' : ShippingDetail::getCategoryName($shippingDetail->material_id, 'id', 'name','materials');
+                         $data['deliveryTitle'] = $shippingDetail->delivery_title;
+                         $data['itemImage'] = $shippingDetail->item_image;
+                         $data['deliveryTitle'] = $shippingDetail->weight;
+                         $data['itemImage'] = $shippingDetail->remarks;
+                     }
+                        $msg['responseCode'] = "200";
+                        $msg['responseMessage'] = "Information get successfully"; 
+                        $msg['details'] = $data;     
                 }
         }catch(\Exception $e) {
             $msg['responseCode'] = "0";
