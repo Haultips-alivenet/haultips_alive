@@ -10,10 +10,10 @@
 | and give it the controller to call when that URI is requested.
 |
 */
-
-Route::get('/', function () {
-    return view('welcome');
-});
+Route::get('/', 'Front\UserHomeController@index');
+//Route::get('/', function () {
+//    return view('welcome');
+//});
 
 Route::get('/admin/login', function () {
     return view('admin/login');
@@ -83,6 +83,8 @@ Route::post('admin/adminshipment-update', 'AdminShipmentController@update');
 Route::get('admin/adminshipment/{id}/update', 'AdminShipmentController@edit');
 Route::get('admin/adminshipment/{id}/delete', 'AdminShipmentController@destroy');
 
+#Transaction-History
+Route::resource('admin/transaction/history', 'TransactionHistoryController');
 
 
 #shipment/report

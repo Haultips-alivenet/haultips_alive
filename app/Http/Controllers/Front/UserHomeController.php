@@ -1,15 +1,21 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Front;
 
 use Illuminate\Http\Request;
 
 use App\Http\Requests;
-use App\Http\Controllers\Controller;
+use App\Http\Controllers\FrontController;
 use Auth;
 use Session;
+use App\VehicleCategory;
+use App\User;
+use App\TruckLengths;
+use App\AdminBedroom;
+use App\AdminBox;
+use DB;
 
-class UserHomeController extends Controller
+class UserHomeController extends FrontController
 {
     /**
      * Display a listing of the resource.
@@ -18,9 +24,9 @@ class UserHomeController extends Controller
      */
     public function index()
     {
-        echo "gfdg";die;
+       
         return view('welcome');
-        //return view('admin.dashboards.dashboard',['firstName'=>$firstName,'lastName'=>$lastName]);
+       
     }
 
     /**

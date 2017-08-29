@@ -72,6 +72,7 @@ class ShipmentReportController extends Controller
                             ->where('shipping_id',$id)
                             ->select('delivery_address','delivery_date')
                             ->first(); 
+        $data["table_name"]=$data["shipping_details"]->table_name;
         return view('admin/shipmentReport/view',$data);
     }
 

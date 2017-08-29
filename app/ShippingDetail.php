@@ -45,4 +45,13 @@ class ShippingDetail extends Model
         
         return $itemName;
       }
+       public static function getDeliveryName($table_name,$id) {
+         
+        $shippingData = DB::table($table_name)->select('delivery_title')->where('shipping_id',$id)->first();
+        if($shippingData) {
+        return $shippingData->delivery_title;
+        } else {
+            return "";
+        }
+      }
 }
