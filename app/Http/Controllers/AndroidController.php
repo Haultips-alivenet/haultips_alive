@@ -1040,6 +1040,7 @@ class AndroidController extends AppController
     
     public function partLoad(){
         try{
+            $msg = array();
             $category_id = $_POST['catId'];
             $custid = $_POST['userId'];
             $weight = $_POST['weight'];
@@ -1234,7 +1235,8 @@ class AndroidController extends AppController
     }    
     
     public function confirmAddress(){
-        try{            
+        try{   
+            $msg =array();
             $shippingId = $_POST['shippingId'];           
             $pickupLocation = $_POST['pickupLocation'];
             $pickupLat = $_POST['pickupLat'];
@@ -1259,9 +1261,10 @@ class AndroidController extends AppController
                 $msg['responseCode'] = "0";
                 $msg['responseMessage'] = "$fieldName required.";
             }else{
-                   $shippingPickupData = ShippingPickupDetail::where('$shippingId',$shippingId)->select('id')->first();
-                if ($shippingPickupData->id != ''){                    
-                    ShippingPickupDetail::where('shipping_id ',$shippingId)
+                   $shippingPickupData = ShippingPickupDetail::where('shipping_id',$shippingId)->select('id')->first();
+                 //  $shippingPickupData = $shippingPickupData->toArray();
+                if ($shippingPickupData){                    
+                    ShippingPickupDetail::where('shipping_id',$shippingId)
                                        ->update([
                                             'pickup_address'=>$pickupLocation,
                                             'latitude'=>$pickupLat,
@@ -1269,7 +1272,7 @@ class AndroidController extends AppController
                                             'pickup_date'=>$pickupDate
                                         ]); 
                     
-                    ShippingDeliveryDetail::where('shipping_id ',$shippingId)
+                    ShippingDeliveryDetail::where('shipping_id',$shippingId)
                                        ->update([
                                             'delivery_address'=>$dropLocation,
                                             'latitude'=>$dropLat,
@@ -1350,19 +1353,20 @@ class AndroidController extends AppController
     public function myDeliveries(){
         try{
             $msg = array();
+            $shippingDetails = array();
             $i = 0;
             $userId = $_POST['userId'];
             $shiipings = ShippingDetail::where('user_id',$userId)->get();
             $shipArray = $shiipings->toArray();
             if(count($shipArray) > 0){
                foreach($shiipings as $shipping){
-                  $shippingId = $shipping->id;
+                  $shippingId = $shipping->id; 
                   $shippingData = DB::table($shipping->table_name)->select('delivery_title','item_image')->where('shipping_id',$shippingId)->first();
 
                   $image = explode(',',$shippingData->item_image);
                   $status = array("Inactive","Active","Process","Complete");
 
-                  $shippingDetails[$i]['shippingId'] = $shipping->id;
+                 $shippingDetails[$i]['shippingId'] = $shippingId;
                   $shippingDetails[$i]['title'] = $shippingData->delivery_title;
                   $shippingDetails[$i]['image'] = $image[0];
                   $shippingDetails[$i]['price'] = $shipping->shipping_price;
@@ -1552,7 +1556,7 @@ class AndroidController extends AppController
             $msg = array();
             $userId = $_POST['userId'];
             
-            if(empty('userId')) {
+            if(empty($userId)) {
                 $msg['responseCode'] = "0";
                 $msg['responseMessage'] = "userId required.";
             }else{           
@@ -1584,7 +1588,7 @@ class AndroidController extends AppController
             $i = 0;
             $userId = $_POST['userId'];
             
-            if(empty('userId')) {
+            if(empty($userId)) {
                 $msg['responseCode'] = "0";
                 $msg['responseMessage'] = "userId required.";
             }else{           
@@ -1757,7 +1761,7 @@ class AndroidController extends AppController
             $i = 0;
             $userId = $_POST['userId'];
             
-            if(empty('userId')) {
+            if(empty($userId)) {
                 $msg['responseCode'] = "0";
                 $msg['responseMessage'] = "userId required.";
             }else{           
@@ -1792,7 +1796,7 @@ class AndroidController extends AppController
             $i = 0;
             $userId = $_POST['userId'];
             
-            if(empty('userId')) {
+            if(empty($userId)) {
                 $msg['responseCode'] = "0";
                 $msg['responseMessage'] = "userId required.";
             }else{           
@@ -1847,7 +1851,7 @@ class AndroidController extends AppController
             $categoryId = $_POST['categoryId'];
             $orderBy = $_POST['orderBy'];
             
-            if(empty('userId')) {
+            if(empty($userId)) {
                 $msg['responseCode'] = "0";
                 $msg['responseMessage'] = "userId required.";
             }else{           
@@ -1932,7 +1936,7 @@ class AndroidController extends AppController
             
             $shippingId = $_POST['shippingId'];
             
-            if(empty('shippingId')) {
+            if(empty($shippingId)) {
                 $msg['responseCode'] = "0";
                 $msg['responseMessage'] = "shippingId required.";
             }else{           
@@ -2022,4 +2026,341 @@ class AndroidController extends AppController
         }
     }
     
+    public function categoryFilter(){
+        try{
+            $msg = array();
+            $data = array();
+            $i = 0;
+            
+            $userId = $_POST['userId'];
+            
+            if(empty($userId)){
+                $msg['responseCode'] = "0";
+                $msg['responseMessage'] = "userId required.";
+            }else{           
+                $userData = User::where('id',$userId)->select('carrier_type_id')->first();
+                $userType = $userData->carrier_type_id;
+                $catType = array('1','2','3','4');
+                if($userType == 1){
+                    $catType = array('2','3');
+                }
+                if($userType == 2){
+                    $catType = array('1','4');
+                }
+                
+                $categories = VehicleCategorie::where('status',1)->whereIn('id',$catType)->select('id','category_name','category_image')->get();
+                $msg['responseCode'] = "200";
+                $msg['responseMessage'] = "Categories get successfully";
+                $msg['categories'] = $categories;     
+            }
+        }catch(\Exception $e) {
+            $msg['responseCode'] = "0";
+            $msg['responseMessage'] =$e->getMessage();
+        }
+        finally {
+            $result = json_encode($msg);
+            echo $result;
+        }
+    }
+    
+    public function minimumBid(){
+        try{
+            $msg = array();
+            $data = array();
+            $i = 0;
+            
+            $shippingId = $_POST['shippingId'];
+            
+            if(empty($shippingId)){
+                $msg['responseCode'] = "0";
+                $msg['responseMessage'] = "shippingId required.";
+            }else{           
+                
+                $miid = ShippingQuote::where('shipping_id',$shippingId)->select((DB::raw('min(quote_price) as minimumBid')))->first();
+                
+                $msg['responseCode'] = "200";
+                $msg['responseMessage'] = "Minimum Bid get successfully";
+                $msg['minimumBid'] = ($miid->minimumBid == '') ? '0' : $miid->minimumBid;      
+            }
+        }catch(\Exception $e) {
+            $msg['responseCode'] = "0";
+            $msg['responseMessage'] =$e->getMessage();
+        }
+        finally {
+            $result = json_encode($msg);
+            echo $result;
+        }
+    }
+    
+    public function submitOffer(){
+        try{
+            $msg = array();
+            $data = array();
+            $i = 0;
+            
+            $shippingId = $_POST['shippingId'];
+            $userId = $_POST['userId'];
+            $quotation = $_POST['quotation'];
+            $minimumBid = $_POST['minimumBid'];            
+            $quotationId = $_POST['quotationId'];  
+            $required = array('shippingId','userId','quotation','minimumBid');
+
+            $error = false;
+            foreach($required as $field) {
+              if (empty($_POST[$field])) {
+                $error = true;
+                $fieldName = $field;
+                break;
+              }
+            }
+
+            if($error) {
+                $msg['responseCode'] = "0";
+                $msg['responseMessage'] = "$fieldName required.";
+            }else{           
+                if($quotationId == ''){
+                    $quote = new ShippingQuote;
+                    $quote->shipping_id = $shippingId;
+                    $quote->carrier_id = $userId;
+                    $quote->quote_price = $quotation;
+                    $quote->lowest_quote_price = $minimumBid;
+                    $quote->quote_status = 0;
+                    $quote->save();
+                    $quotationId= $quote->id;
+                }else{
+                    ShippingQuote::where('id',$quotationId)
+                            ->update([
+                                    'quote_price'=>$quotation,
+                                    'lowest_quote_price'=>$minimumBid
+                                ]);
+                }
+                $msg['responseCode'] = "200";
+                $msg['responseMessage'] = "Quotation post successfully";
+                $msg['quotationId'] = $quotationId;
+            }
+        }catch(\Exception $e) {
+            $msg['responseCode'] = "0";
+            $msg['responseMessage'] =$e->getMessage();
+        }
+        finally {
+            $result = json_encode($msg);
+            echo $result;
+        }
+    }
+    
+    public function myOffers(){
+        try{
+            $msg = array();
+            $offerDetails = array();
+            $i = 0;
+            $userId = $_POST['userId'];
+            if(empty($userId)){
+                $msg['responseCode'] = "0";
+                $msg['responseMessage'] = "userId required.";
+            }else{
+                $offerData = ShippingQuote::select('shipping_quotes.id','shipping_quotes.shipping_id','shipping_quotes.quote_status','shipping_quotes.quote_price','sd.table_name','sd.subcategory_id','sd.category_id')
+                            ->leftJoin('shipping_details as sd','sd.id','=','shipping_quotes.shipping_id')
+                            ->where('shipping_quotes.carrier_id', $userId)->get();
+                
+                
+                $offerArray = $offerData->toArray();
+                if(count($offerArray) > 0){
+                  foreach($offerData as $offer){ 
+                     $shippingId = $offer->shipping_id;
+                     $shippingData = DB::table($offer->table_name)->select('delivery_title','item_image')->where('shipping_id',$shippingId)->first();
+
+                     $image = explode(',',$shippingData->item_image);
+                     $status = array("Pending","Accepted","Rejected");
+
+                     $offerDetails[$i]['quoteId'] = $offer->id;
+                     $offerDetails[$i]['shippingId'] = $shippingId;
+                     $offerDetails[$i]['title'] = $shippingData->delivery_title;
+                     $offerDetails[$i]['image'] = $image[0];
+                     $offerDetails[$i]['category'] = (empty($offer->category_id)) ? 'N/A' : ShippingDetail::getCategoryName($offer->category_id, 'id', 'category_name','vehicle_categories');
+                     $offerDetails[$i]['subcategory'] = (empty($offer->subcategory_id)) ? 'N/A' : ShippingDetail::getCategoryName($offer->subcategory_id, 'id', 'category_name','vehicle_categories');
+                     $offerDetails[$i]['status'] = $status[$offer->quote_status];
+                     $offerDetails[$i]['quotePrice'] = $offer->quote_price;
+                     $i++;
+                  }
+
+                  $msg['responseCode'] = "200";
+                  $msg['responseMessage'] = "Offer Details get successfully";
+                  $msg['offers'] = $offerDetails; 
+                }else{
+                  $msg['responseCode'] = "200";
+                  $msg['responseMessage'] = "Shipment Details get successfully";
+                  $msg['offers'] = "No Data foud"; 
+                }
+            }
+        }catch(\Exception $e) {
+            $msg['responseCode'] = "0";
+            $msg['responseMessage'] =$e->getMessage();
+        }
+        finally {
+            $result = json_encode($msg);
+            echo $result;
+        }
+    }
+    
+    public function myOfferDetail(){
+        try{
+            $msg = array();
+            $offerDetails = array();
+            $shippingId = $_POST['shippingId'];
+            $quoteId = $_POST['quoteId'];
+            $required = array('shippingId','quoteId');
+
+            $error = false;
+            foreach($required as $field) {
+              if (empty($_POST[$field])) {
+                $error = true;
+                $fieldName = $field;
+                break;
+              }
+            }
+
+            if($error) {
+                $msg['responseCode'] = "0";
+                $msg['responseMessage'] = "$fieldName required.";
+            }else{
+                $offerData = ShippingQuote::select('shipping_quotes.shipping_id','shipping_quotes.quote_status','sd.order_id','sd.category_id','sd.subcategory_id','sd.order_id','sd.table_name','sd.created_at','u.first_name','u.last_name','u.email','spd.pickup_date','spd.pickup_address','sdd.delivery_address')
+                            ->leftJoin('shipping_details as sd','sd.id','=','shipping_quotes.shipping_id')
+                            ->leftJoin('users as u','u.id','=','sd.user_id')
+                            ->leftJoin('shipping_pickup_details as spd','spd.shipping_id','=','shipping_quotes.shipping_id')
+                            ->leftJoin('shipping_delivery_details as sdd','sdd.shipping_id','=','shipping_quotes.shipping_id')
+                            ->where('shipping_quotes.id', $quoteId)->first();
+                
+               
+                if($offerData){
+                     $shippingId = $offerData->shipping_id;
+                     $shippingData = DB::table($offerData->table_name)->select('delivery_title')->where('shipping_id',$shippingId)->first();
+
+                     $status = array("Pending","Accepted","Rejected");
+
+                     $offerDetails['customer'] = $offerData->first_name. ' '.$offerData->last_name;
+                     $offerDetails['email'] = $offerData->email;
+                     $offerDetails['validTill'] = date('d-m-Y', strtotime($offerData->pickup_date));
+                     $offerDetails['developed'] = date('d-m-Y', strtotime($offerData->created_at));
+                     $offerDetails['status'] = $status[$offerData->quote_status];
+                     $offerDetails['category'] = (empty($offerData->category_id)) ? 'N/A' : ShippingDetail::getCategoryName($offerData->category_id, 'id', 'category_name','vehicle_categories');
+                     $offerDetails['subcategory'] = (empty($offerData->subcategory_id)) ? 'N/A' : ShippingDetail::getCategoryName($offerData->subcategory_id, 'id', 'category_name','vehicle_categories');
+                     $offerDetails['orderNo'] = $offerData->order_id;
+                     $offerDetails['title'] = $shippingData->delivery_title;
+                     $offerDetails['takeAway'] = $offerData->pickup_address;
+                     $offerDetails['deliver'] = $offerData->delivery_address;
+                    
+                  $msg['responseCode'] = "200";
+                  $msg['responseMessage'] = "Offer Details get successfully";
+                  $msg['offers'] = $offerDetails; 
+                }else{
+                  $msg['responseCode'] = "200";
+                  $msg['responseMessage'] = "Shipment Details get successfully";
+                  $msg['offers'] = "No Data foud"; 
+                }
+            }
+        }catch(\Exception $e) {
+            $msg['responseCode'] = "0";
+            $msg['responseMessage'] =$e->getMessage();
+        }
+        finally {
+            $result = json_encode($msg);
+            echo $result;
+        }
+    }
+    
+    public function partnerNotification(){
+        try{
+            $msg = array();
+            $data = array();
+            $i =0;
+            $userId = $_POST['userId'];
+            
+            if(empty($userId)) {
+                $msg['responseCode'] = "0";
+                $msg['responseMessage'] = "userId required.";
+            }else{            
+                    $quoteDetails = ShippingQuote::select('sd.id','sd.table_name','shipping_quotes.quote_status','shipping_quotes.quote_price')
+                                    ->leftJoin('shipping_details as sd','sd.id','=','shipping_quotes.shipping_id')
+                                    ->whereIn('shipping_quotes.quote_status',array('1','2'))
+                                    ->where('shipping_quotes.carrier_id',$userId)->get();
+                    $quoteArray = $quoteDetails->toArray();
+                
+                    if(count($quoteArray) > 0){
+                        foreach($quoteDetails as $quotes){
+                            $shippingData = DB::table($quotes->table_name)->select('delivery_title')->where('shipping_id',$quotes->id)->first();
+                            $status = array("Pending","Accepted","Rejected");
+                            
+                            $data[$i]['title'] = $shippingData->delivery_title;
+                            $data[$i]['price'] = $quotes['quote_price'];
+                            $data[$i]['status'] = $status[$quotes['quote_status']]; 
+                            $i++;
+                        }
+                        $msg['responseCode'] = "200";
+                        $msg['responseMessage'] = "Notifications get successfully";               
+                        $msg['notifications'] = $data; 
+                    }else{
+                        $msg['responseCode'] = "200";
+                        $msg['responseMessage'] = "Notifications get successfully";               
+                        $msg['notifications'] = 'No Data found'; 
+                    }
+                }
+        }catch(\Exception $e) {
+            $msg['responseCode'] = "0";
+            $msg['responseMessage'] =$e->getMessage();
+        }
+        finally {
+            $result = json_encode($msg);
+            echo $result;
+        }
+    }
+    
+    public function partnerTransactionDetail(){
+        try{
+            $msg = array();
+            $i = 0;
+            $userId = $_POST['userId'];
+            
+            if(empty($userId)) {
+                $msg['responseCode'] = "0";
+                $msg['responseMessage'] = "userId required.";
+            }else{           
+                    $tdetails = ShippingQuote::select('sd.id', 'shipping_quotes.quote_price', 'sd.order_id', 'sd.table_name','pd.created_at','pd.amount','pd.status')                            
+                                    ->leftJoin('shipping_details as sd','sd.id','=','shipping_quotes.shipping_id')
+                                    ->leftJoin('payment_details as pd','pd.shipping_id','=','sd.id')
+                                    ->where('shipping_quotes.carrier_id',$userId)
+                                    ->where('shipping_quotes.quote_status','1')->get();                
+                    $info = $tdetails->toArray();
+                    if(count($info) > 0){
+                        foreach($tdetails as $detail){
+                            $shippingData = DB::table($detail->table_name)->select('delivery_title')->where('shipping_id',$detail->id)->first();
+                            
+                            $data[$i]['orderId'] = $detail['order_id'];
+                            $data[$i]['title'] = $shippingData->delivery_title;
+                            $data[$i]['bidPrice'] = $detail['quote_price'];
+                            $data[$i]['status'] = $detail['status'];
+                            $data[$i]['amount'] = $detail['amount'];
+                            $data[$i]['paymentDate'] = date('d-F-Y h:i:s', strtotime($detail['created_at'])); 
+                            $i++;
+                        }
+                        $msg['responseCode'] = "200";
+                        $msg['responseMessage'] = "Information get successfully"; 
+                        $msg['details'] = $data; 
+                    }else{
+                        $msg['responseCode'] = "200";
+                        $msg['responseMessage'] = "Information get successfully";  
+                        $msg['details'] = 'No Data found';
+                    }                      
+                }
+        }catch(\Exception $e) {
+            $msg['responseCode'] = "0";
+            $msg['responseMessage'] =$e->getMessage();
+        }
+        finally {
+            $result = json_encode($msg);
+            echo $result;
+        }
+    }
+    
 }
+    
+   
