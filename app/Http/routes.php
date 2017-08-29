@@ -89,8 +89,8 @@ Route::resource('admin/transaction/history', 'TransactionHistoryController');
 
 #shipment/report
 Route::get('shipment/detailsReport/{id}', 'ShipmentReportController@details_report');
-Route::resource('shipment/{id}/report', 'ShipmentReportController');
 Route::resource('shipment/reportList/{id}', 'ShipmentReportController@index');
+Route::resource('shipment/{id}/report', 'ShipmentReportController');
 
 
 
@@ -148,3 +148,11 @@ Route::post('webservices/myOffers', 'AndroidController@myOffers');
 Route::post('webservices/myOfferDetail', 'AndroidController@myOfferDetail');
 Route::post('webservices/partnerNotification', 'AndroidController@partnerNotification');
 Route::post('webservices/partnerTransactionDetail', 'AndroidController@partnerTransactionDetail');
+Route::post('webservices/quotationOfferDetail', 'AndroidController@quotationOfferDetail');
+Route::post('webservices/acceptOffer', 'AndroidController@acceptOffer');
+Route::post('webservices/rejectOffer', 'AndroidController@rejectOffer');
+Route::post('webservices/payment', 'AndroidController@payment');
+Route::post('webservices/askQuestion', 'AndroidController@askQuestion');
+Route::post('webservices/quesAnswer', 'AndroidController@quesAnswer');
+Route::post('webservices/getAnswer', 'AndroidController@getAnswer');
+Route::post('webservices/deleteShipment', 'AndroidController@deleteShipment');

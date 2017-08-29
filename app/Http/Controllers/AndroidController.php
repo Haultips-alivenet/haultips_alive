@@ -591,7 +591,7 @@ class AndroidController extends AppController
 
                     $extension = $pic->getClientOriginalExtension(); // getting image extension
                     $name = time() . rand(111, 999) . '.' . $extension; // renameing image                
-                    $pic->move(public_path().'/uploads/home/',$name);
+                    $pic->move(public_path().'/uploads/userimages/',$name);
                     
                     if($homeImages != ''){
                         $homeImages.= ','.$name;
@@ -709,7 +709,7 @@ class AndroidController extends AppController
 
                     $extension = $pic->getClientOriginalExtension(); // getting image extension
                     $name = time() . rand(111, 999) . '.' . $extension; // renameing image                
-                    $pic->move(public_path().'/uploads/office/',$name);
+                    $pic->move(public_path().'/uploads/userimages/',$name);
                     
                     if($officeImages != ''){
                         $officeImages.= ','.$name;
@@ -807,7 +807,7 @@ class AndroidController extends AppController
 
                     $extension = $pic->getClientOriginalExtension(); // getting image extension
                     $name = time() . rand(111, 999) . '.' . $extension; // renameing image                
-                    $pic->move(public_path().'/uploads/other/',$name);
+                    $pic->move(public_path().'/uploads/userimages/',$name);
                     
                     if($otherImages != ''){
                         $otherImages.= ','.$name;
@@ -894,7 +894,7 @@ class AndroidController extends AppController
 
                     $extension = $pic->getClientOriginalExtension(); // getting image extension
                     $name = time() . rand(111, 999) . '.' . $extension; // renameing image                
-                    $pic->move(public_path().'/uploads/houseHoldGoods/',$name);
+                    $pic->move(public_path().'/uploads/userimages/',$name);
                     
                     if($otherImages != ''){
                         $otherImages.= ','.$name;
@@ -981,7 +981,7 @@ class AndroidController extends AppController
 
                     $extension = $pic->getClientOriginalExtension(); // getting image extension
                     $name = time() . rand(111, 999) . '.' . $extension; // renameing image                
-                    $pic->move(public_path().'/uploads/vehicleShifting/',$name);
+                    $pic->move(public_path().'/uploads/userimages/',$name);
                     
                     if($otherImages != ''){
                         $otherImages.= ','.$name;
@@ -1433,13 +1433,14 @@ class AndroidController extends AppController
                 $msg['responseCode'] = "0";
                 $msg['responseMessage'] = "shippingId required.";
             }else{            
-                    $quoteDetails = ShippingQuote::select('u.first_name','u.last_name', 'quote_price')
+                    $quoteDetails = ShippingQuote::select('shipping_quotes.id as quoteId','u.first_name','u.last_name', 'quote_price')
                             ->leftJoin('users as u','u.id','=','shipping_quotes.carrier_id')                            
                             ->where('shipping_quotes.shipping_id',$shippingId)->get();
                     $quoteArray = $quoteDetails->toArray();
                 
                     if(count($quoteArray) > 0){
                         foreach($quoteDetails as $quotes){
+                            $data[$i]['quoteId'] = $quotes['quoteId'];
                             $data[$i]['carrier'] = $quotes['first_name'].' '.$quotes['last_name'];
                             $data[$i]['price'] = $quotes['quote_price'];
                             $i++;
@@ -1800,7 +1801,7 @@ class AndroidController extends AppController
                 $msg['responseCode'] = "0";
                 $msg['responseMessage'] = "userId required.";
             }else{           
-                    $quesdetails = TblQuesMaster::select('tq.question', 'u.first_name','u.last_name','ud.image','sd.table_name','sd.id','tq.id as quesId')                            
+                    $quesdetails = TblQuesMaster::select('tq.question', 'u.first_name','u.last_name','ud.image','sd.table_name','sd.id as shippingId','tq.id as quesId')                            
                                     ->leftJoin('tbl_questions as tq','tq.ques_master_id','=','tbl_ques_masters.id')
                                     ->leftJoin('users as u','u.id','=','tbl_ques_masters.carrier_id')
                                     ->leftJoin('user_details as ud','ud.user_id','=','tbl_ques_masters.carrier_id')
@@ -1813,9 +1814,10 @@ class AndroidController extends AppController
                     $info = $quesdetails->toArray();
                     if(count($info) > 0){
                         foreach($quesdetails as $detail){
-                            $shippingData = DB::table($detail->table_name)->select('delivery_title')->where('shipping_id',$detail->id)->first();
+                            $shippingData = DB::table($detail->table_name)->select('delivery_title')->where('shipping_id',$detail->shippingId)->first();
                             
                             $data[$i]['quesId'] = $detail['quesId'];
+                            $data[$i]['shippingId'] = $detail['shippingId'];
                             $data[$i]['title'] = $shippingData->delivery_title;
                             $data[$i]['partnerName'] = $detail['first_name'].' '.$detail['last_name'];
                             $data[$i]['partnerImage'] = $detail['image'];
@@ -1885,6 +1887,7 @@ class AndroidController extends AppController
                     
                     $shippingData = $shippingData->whereIn('shipping_details.category_id', $catType);
                     $shippingData = $shippingData->where('shipping_details.status', 1);
+                    $shippingData = $shippingData->where('shipping_details.quote_status', 0);
                     $shippingData = $shippingData->get();
                     
                      $info = $shippingData->toArray();
@@ -2351,6 +2354,396 @@ class AndroidController extends AppController
                         $msg['details'] = 'No Data found';
                     }                      
                 }
+        }catch(\Exception $e) {
+            $msg['responseCode'] = "0";
+            $msg['responseMessage'] =$e->getMessage();
+        }
+        finally {
+            $result = json_encode($msg);
+            echo $result;
+        }
+    }
+    
+    public function quotationOfferDetail(){
+        try{
+            $msg = array();
+            $offerDetails = array();
+            $quoteId = $_POST['quoteId'];
+            $required = array('quoteId');
+
+            $error = false;
+            foreach($required as $field) {
+              if (empty($_POST[$field])) {
+                $error = true;
+                $fieldName = $field;
+                break;
+              }
+            }
+
+            if($error) {
+                $msg['responseCode'] = "0";
+                $msg['responseMessage'] = "$fieldName required.";
+            }else{
+                $offerData = ShippingQuote::select('shipping_quotes.quote_status','sd.created_at','sd.id as shippingId','spd.pickup_date','shipping_quotes.quote_price')
+                            ->leftJoin('shipping_details as sd','sd.id','=','shipping_quotes.shipping_id')
+                            ->leftJoin('shipping_pickup_details as spd','spd.shipping_id','=','shipping_quotes.shipping_id')
+                            ->where('shipping_quotes.id', $quoteId)->first();
+                
+               
+                if($offerData){
+                     $status = array("Pending","Accepted","Rejected");
+                     
+                     $offerDetails['quoteId'] = $offerData->quoteId;
+                     $offerDetails['shippingId'] = $offerData->shippingId;
+                     $offerDetails['price'] = $offerData->quote_price;
+                     $offerDetails['validTill'] = date('d-m-Y', strtotime($offerData->pickup_date));
+                     $offerDetails['developed'] = date('d-m-Y', strtotime($offerData->created_at));
+                     $offerDetails['status'] = $status[$offerData->quote_status];
+                     
+                    
+                  $msg['responseCode'] = "200";
+                  $msg['responseMessage'] = "Offer Details get successfully";
+                  $msg['detail'] = $offerDetails; 
+                }else{
+                  $msg['responseCode'] = "200";
+                  $msg['responseMessage'] = "Offer Details get successfully";
+                  $msg['detail'] = "No Data foud"; 
+                }
+            }
+        }catch(\Exception $e) {
+            $msg['responseCode'] = "0";
+            $msg['responseMessage'] =$e->getMessage();
+        }
+        finally {
+            $result = json_encode($msg);
+            echo $result;
+        }
+    }
+    
+    public function acceptOffer(){
+        try{
+            $msg = array();
+            $offerDetails = array();
+            $quoteId = $_POST['quoteId'];
+            $shippingId = $_POST['shippingId'];
+            $required = array('quoteId','shippingId');
+
+            $error = false;
+            foreach($required as $field) {
+              if (empty($_POST[$field])) {
+                $error = true;
+                $fieldName = $field;
+                break;
+              }
+            }
+
+            if($error) {
+                $msg['responseCode'] = "0";
+                $msg['responseMessage'] = "$fieldName required.";
+            }else{
+                
+                $rejectOther = ShippingQuote::where('shipping_id',$shippingId)->update(['quote_status'=>2]);
+                $acceptBid = ShippingQuote::where('id',$quoteId)->update(['quote_status'=>1]);
+                
+                if($acceptBid){                                        
+                  $msg['responseCode'] = "200";
+                  $msg['responseMessage'] = "Offer Accepted successfully";
+                }else{
+                  $msg['responseCode'] = "0";
+                  $msg['responseMessage'] = "Some Error occur! Please try again";
+                }
+            }
+        }catch(\Exception $e) {
+            $msg['responseCode'] = "0";
+            $msg['responseMessage'] =$e->getMessage();
+        }
+        finally {
+            $result = json_encode($msg);
+            echo $result;
+        }
+    }
+    
+    public function rejectOffer(){
+        try{
+            $msg = array();
+            $offerDetails = array();
+            $quoteId = $_POST['quoteId'];
+            $required = array('quoteId');
+
+            $error = false;
+            foreach($required as $field) {
+              if (empty($_POST[$field])) {
+                $error = true;
+                $fieldName = $field;
+                break;
+              }
+            }
+
+            if($error) {
+                $msg['responseCode'] = "0";
+                $msg['responseMessage'] = "$fieldName required.";
+            }else{
+                
+                $rejectOffer = ShippingQuote::where('id',$quoteId)->update(['quote_status'=>2]);
+                
+                if($rejectOffer){                                        
+                  $msg['responseCode'] = "200";
+                  $msg['responseMessage'] = "Offer Rejected successfully";
+                }else{
+                  $msg['responseCode'] = "0";
+                  $msg['responseMessage'] = "Some Error occur! Please try again";
+                }
+            }
+        }catch(\Exception $e) {
+            $msg['responseCode'] = "0";
+            $msg['responseMessage'] =$e->getMessage();
+        }
+        finally {
+            $result = json_encode($msg);
+            echo $result;
+        }
+    }
+    
+    public function payment(){
+        try{
+            $msg = array();
+            $offerDetails = array();
+            $quoteId = $_POST['quoteId'];
+            $paymentType = $_POST['paymentType'];
+            $shippingId = $_POST['shippingId'];
+            $amount = $_POST['amount'];
+            $required = array('quoteId','paymentType','shippingId','amount');
+
+            $error = false;
+            foreach($required as $field) {
+              if (empty($_POST[$field])) {
+                $error = true;
+                $fieldName = $field;
+                break;
+              }
+            }
+
+            if($error) {
+                $msg['responseCode'] = "0";
+                $msg['responseMessage'] = "$fieldName required.";
+            }else{
+                
+                $payment = ShippingDetail::where('id',$shippingId)->update(['payment_method_id'=>$paymentType, 'shipping_price'=>$amount, 'quote_status'=>1]);
+                
+                if($payment){                                        
+                  $msg['responseCode'] = "200";
+                  $msg['responseMessage'] = "Sucess";
+                }else{
+                  $msg['responseCode'] = "0";
+                  $msg['responseMessage'] = "Some Error occur! Please try again";
+                }
+            }
+        }catch(\Exception $e) {
+            $msg['responseCode'] = "0";
+            $msg['responseMessage'] =$e->getMessage();
+        }
+        finally {
+            $result = json_encode($msg);
+            echo $result;
+        }
+    }
+    
+    public function askQuestion(){
+        try{
+            $msg = array();
+            $offerDetails = array();
+            $userId = $_POST['userId'];
+            $shippingId = $_POST['shippingId'];
+            $question = $_POST['question'];
+            $required = array('userId','shippingId','question');
+
+            $error = false;
+            foreach($required as $field) {
+              if (empty($_POST[$field])) {
+                $error = true;
+                $fieldName = $field;
+                break;
+              }
+            }
+
+            if($error) {
+                $msg['responseCode'] = "0";
+                $msg['responseMessage'] = "$fieldName required.";
+            }else{
+                
+                $userDetail = ShippingDetail::where('id',$shippingId)->select('user_id')->first();
+                $customerId = $userDetail->user_id;
+                
+                $queMaster = new TblQuesMaster;
+                $queMaster->shipping_id = $shippingId;
+                $queMaster->user_id = $customerId;
+                $queMaster->carrier_id = $userId;
+                $queMaster->save();
+                
+                $masterQuesId = $queMaster->id;
+                
+                $ques = new TblQuestion;
+                $ques->ques_master_id = $masterQuesId;
+                $ques->question = $question;
+                $ques->status =1;
+                $ques->save();
+                
+                if($masterQuesId){                                        
+                  $msg['responseCode'] = "200";
+                  $msg['responseMessage'] = "Question Successfully asked.";
+                }else{
+                  $msg['responseCode'] = "0";
+                  $msg['responseMessage'] = "Some Error occur! Please try again";
+                }
+            }
+        }catch(\Exception $e) {
+            $msg['responseCode'] = "0";
+            $msg['responseMessage'] =$e->getMessage();
+        }
+        finally {
+            $result = json_encode($msg);
+            echo $result;
+        }
+    }
+    
+    public function getAnswer(){
+        try{
+            $msg = array();
+            $offerDetails = array();
+            $quesId = $_POST['quesId'];
+            $answer = $_POST['answer'];
+            $required = array('quesId','answer');
+
+            $error = false;
+            foreach($required as $field) {
+              if (empty($_POST[$field])) {
+                $error = true;
+                $fieldName = $field;
+                break;
+              }
+            }
+
+            if($error) {
+                $msg['responseCode'] = "0";
+                $msg['responseMessage'] = "$fieldName required.";
+            }else{
+                
+                $qmDetail = TblQuestion::where('id',$quesId)->select('ques_master_id')->first();
+                $qmId = $qmDetail->ques_master_id;
+              // echo $qmId; die;
+                $data = new TblAnswer();
+                $data->ques_master_id = $qmId;
+                $data->ques_id = $quesId;
+                $data->answer = $answer;
+                $data->save();
+                
+                $answerId = $data->id;
+                
+                if($answerId){                                        
+                  $msg['responseCode'] = "200";
+                  $msg['responseMessage'] = "Answer Successfully post.";
+                }else{
+                  $msg['responseCode'] = "0";
+                  $msg['responseMessage'] = "Some Error occur! Please try again";
+                }
+            }
+        }catch(\Exception $e) {
+            $msg['responseCode'] = "0";
+            $msg['responseMessage'] =$e->getMessage();
+        }
+        finally {
+            $result = json_encode($msg);
+            echo $result;
+        }
+    }
+    
+    public function quesAnswer(){
+        try{
+            $msg = array();
+            $data = array();
+            $i = 0;
+            $shippingId = $_POST['shippingId'];
+            $required = array('shippingId');
+
+            $error = false;
+            foreach($required as $field) {
+              if (empty($_POST[$field])) {
+                $error = true;
+                $fieldName = $field;
+                break;
+              }
+            }
+
+            if($error) {
+                $msg['responseCode'] = "0";
+                $msg['responseMessage'] = "$fieldName required.";
+            }else{
+                $quesDetail = TblQuesMaster::select('tq.question','tq.created_at as quesTime','u.first_name as cfname','u.last_name as clname','ta.answer','ta.created_at as ansTime','uc.first_name as ufname','uc.last_name as ulname')
+                                    ->leftJoin('tbl_questions as tq','tq.ques_master_id','=','tbl_ques_masters.id')
+                                    ->leftJoin('users as u','u.id','=','tbl_ques_masters.carrier_id')
+                                    ->leftJoin('tbl_answers as ta','ta.ques_id','=','tq.id')
+                                    ->leftJoin('users as uc','uc.id','=','tbl_ques_masters.user_id')
+                                    ->where('tbl_ques_masters.shipping_id', $shippingId)->get();
+                
+                $quesData = $quesDetail->toArray();
+                if(count($quesData) > 0){
+                    foreach($quesDetail as $detail){
+                        $data[$i]['partnerName'] = $detail['cfname']. ' '.$detail['clname'];
+                        $data[$i]['quesTime'] = $detail['quesTime'];
+                        $data[$i]['question'] = $detail['question'];
+                        $data[$i]['userName'] = $detail['ufname']. ' '.$detail['ulname'];
+                        $data[$i]['ansTime'] = $detail['ansTime'];
+                        $data[$i]['answer'] = $detail['answer'];
+                        $i++;
+                    }
+                    
+                    $msg['responseCode'] = "0";
+                    $msg['responseMessage'] = "Details get successfully";
+                    $msg['data'] = $data;
+                }
+                else{
+                  $msg['responseCode'] = "0";
+                  $msg['responseMessage'] = "Some Error occur! Please try again";
+                  $msg['data'] = $data;
+                }
+            }
+        }catch(\Exception $e) {
+            $msg['responseCode'] = "0";
+            $msg['responseMessage'] =$e->getMessage();
+        }
+        finally {
+            $result = json_encode($msg);
+            echo $result;
+        }
+    }
+    
+    public function deleteShipment(){
+        try{
+            $msg = array();
+            $offerDetails = array();
+            $shippingId = $_POST['shippingId'];
+            $required = array('shippingId');
+
+            $error = false;
+            foreach($required as $field) {
+              if (empty($_POST[$field])) {
+                $error = true;
+                $fieldName = $field;
+                break;
+              }
+            }
+
+            if($error) {
+                $msg['responseCode'] = "0";
+                $msg['responseMessage'] = "$fieldName required.";
+            }else{
+                
+                ShippingDetail::where('id',$shippingId)->update(['status'=>0]);
+                                                     
+                  $msg['responseCode'] = "200";
+                  $msg['responseMessage'] = "Shipment Successfully deleted.";
+                
+            }
         }catch(\Exception $e) {
             $msg['responseCode'] = "0";
             $msg['responseMessage'] =$e->getMessage();
