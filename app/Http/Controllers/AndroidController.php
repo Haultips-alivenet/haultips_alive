@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
+use Edujugon\PushNotification\PushNotification;
 use Tymon\JWTAuth\Exceptions\JWTException;
 use Tymon\JWTAuth\Facades\JWTAuth;
 use Session;
@@ -45,6 +46,7 @@ use App\UserDetail;
 use App\TblAnswer;
 use App\TblQuestion;
 use App\TblQuesMaster;
+use App\PartnerKyc;
 use DB;
 use Hash;
 
@@ -140,9 +142,10 @@ class AndroidController extends AppController
          try{
             $otp = $_POST['otp'];
             $userId = $_POST['userId'];
+            $deviceToken = $_POST['deviceId'];
             $msg = array();
 
-            $required = array('userId', 'otp');
+            $required = array('userId', 'otp', 'deviceId');
 
             $error = false;
             foreach($required as $field) {
@@ -159,17 +162,18 @@ class AndroidController extends AppController
             }else {       
                   $userData = UserVerification::where('user_id',$userId)->where('otp',$otp)->first();
                   $verifiedData = User::where('id',$userId)->first();
-                  
+                  $userImage = UserDetail::where('user_id',$userId)->select('image')->first();
                   if($userData){
                         $verificationId = $userData->id;
                         UserVerification::where('id',$verificationId)->delete();
-                        User::where('id',$userId)->update(['otp_verified'=>1 , 'status'=>1]);
+                        User::where('id',$userId)->update(['otp_verified'=>1 , 'status'=>1, 'device_token'=>$deviceToken]);
                         $status = ($verifiedData->first_name != '')?'yes':'No';
                         $msg['responseCode'] = "200";
                         $msg['responseMessage'] = "Mobile number successfully verified.";
                         $msg['userId'] = $userId;
                         $msg['isRegistered'] = $status;
                         $msg['userData'] = $verifiedData;
+                        $msg['userImage'] = ($userImage)?$userImage->image : 'user_icon.png';
                   }else{
                       $msg['responseCode'] = "0";
                      $msg['responseMessage'] = "Failed.Invalid OTP";
@@ -220,13 +224,29 @@ class AndroidController extends AppController
                                     'email'=>$email,
                                     'password'=>bcrypt($password)
                                     ]);
+                            $userImage = UserDetail::where('user_id',$userId)->select('image')->first();
+                            if($userImage){
+                                UserDetail::where('user_id',$userId)
+                                ->update([
+                                    'image'=>'user_icon.png'
+                                    ]);
+                            }else{
+                                $data = new UserDetail;
+                                $data->user_id = $userId;
+                                $data->image = 'user_icon.png';
+                                $data->save();
+                            }
 
+                            $getUserData = User::where('id',$userId)->first();
+                            
                             $msg['responseCode'] = "200";
                             $msg['responseMessage'] = "Registration is done successfully";
                             $msg['userId'] = $userId;
-                            $msg['firstName'] = $firstName;
-                            $msg['lastName'] = $lastName;
-                            $msg['email'] = $email;
+                            $msg['firstName'] = $getUserData->first_name;
+                            $msg['lastName'] = $getUserData->last_name;
+                            $msg['email'] = $getUserData->email;
+                            $msg['mobileNumber'] = $getUserData->mobile_number;  
+                            $msg['userImage'] = ($userImage)?$userImage->image : 'user_icon.png';
                         } 
                   }else{
                       $msg['responseCode'] = "0";
@@ -288,11 +308,27 @@ class AndroidController extends AppController
                                     'carrier_type_id'=>$carrierType,
                                     'city'=>$city,
                                     'state'=>$state,
-                                    'total_vehicle '=>$totalVehicle,
+                                    'total_vehicle'=>$totalVehicle,
                                     'attached_vehicle'=>$attachedVehicle
                                     ]);
+                            $userImage = UserDetail::where('user_id',$userId)->select('image')->first();
+                            if($userImage){
+                                UserDetail::where('user_id',$userId)
+                                ->update([
+                                    'image'=>'user_icon.png',
+                                    'location'=>$state,
+                                    'city'=>$city
+                                    ]);
+                            }else{
+                                $data = new UserDetail;
+                                $data->user_id = $userId;
+                                $data->image = 'user_icon.png';
+                                $data->location = $state;
+                                $data->city = $city;
+                                $data->save();
+                            }
 
-                            if($carrierType == 2){
+                            if($carrierType == 2 || $carrierType == 3){
                                 $vehicleData = $_POST['vehicleCategory'];
                                 foreach($vehicleData as $vData){
                                     $userVehicleDetail = new UserVehicleDetail;
@@ -305,12 +341,16 @@ class AndroidController extends AppController
                                
                             }
                             
+                            $getUserData = User::where('id',$userId)->first();
+                            
                             $msg['responseCode'] = "200";
                             $msg['responseMessage'] = "Registration is done successfully";
                             $msg['userId'] = $userId;
-                            $msg['firstName'] = $firstName;
-                            $msg['lastName'] = $lastName;
-                            $msg['email'] = $email;
+                            $msg['firstName'] = $getUserData->first_name;
+                            $msg['lastName'] = $getUserData->last_name;
+                            $msg['email'] = $getUserData->email;
+                            $msg['mobileNumber'] = $getUserData->mobile_number;
+                            $msg['userImage'] = ($userImage)?$userImage->image : 'user_icon.png';
                         } 
                   }else{
                       $msg['responseCode'] = "0";
@@ -1334,6 +1374,28 @@ class AndroidController extends AppController
                                             'status'=>1,
                                             'order_id'=>$orderId
                                         ]); 
+                   
+                   $shippingData = ShippingDetail::where('id',$shippingId)->select('category_id')->first();
+                   if($shippingData->category_id == 2 || $shippingData->category_id == 3){
+                       $carrierType = array('1','3');
+                   }elseif($shippingData->category_id == 1 || $shippingData->category_id == 4){
+                       $carrierType = array('2','3');
+                   }
+                   
+                   $notificationData = User::whereIn('carrier_type_id',$carrierType)->where('user_type_id',2)->select('device_token')->get();
+                   foreach($notificationData as $nData){
+                       $push = new PushNotification('fcm');
+                        $response =  $push->setMessage([
+                                'notification' => [
+                                        'title'=>'Shipment Post',
+                                        'body'=>'A new Shipment has arrived for delivery from Haulitps.',
+                                        'sound' => 'default'
+                                        ]
+                                ])                            
+                             ->setDevicesToken($nData->device_token)
+                             ->send();
+                   }
+                   
 
                 $msg['responseCode'] = "200";
                 $msg['responseMessage'] = "Shipment Succesfully Post";
@@ -1561,7 +1623,7 @@ class AndroidController extends AppController
                 $msg['responseCode'] = "0";
                 $msg['responseMessage'] = "userId required.";
             }else{           
-                    $data = PayInfo::where('user_id',$userId)->select('name as userName', 'number as accountNumber', 'code as ifscCode')->get();                    
+                    $data = PayInfo::where('user_id',$userId)->select('id','name as userName', 'number as accountNumber', 'code as ifscCode')->get();                    
                     $info = $data->toArray();
                     if(count($info) > 0){
                         $msg['responseCode'] = "200";
@@ -1571,6 +1633,35 @@ class AndroidController extends AppController
                         $msg['responseCode'] = "200";
                         $msg['responseMessage'] = "Information get successfully";  
                         $msg['details'] = 'No Data found'; 
+                    }                      
+                }
+        }catch(\Exception $e) {
+            $msg['responseCode'] = "0";
+            $msg['responseMessage'] =$e->getMessage();
+        }
+        finally {
+            $result = json_encode($msg);
+            echo $result;
+        }
+    }
+    
+    public function deleteBankInfo(){
+        try{
+            $msg = array();
+            $bankInfoId = $_POST['bankInfoId'];
+            
+            if(empty($bankInfoId)) {
+                $msg['responseCode'] = "0";
+                $msg['responseMessage'] = "bankInfoId required.";
+            }else{           
+                    $data = PayInfo::where('id',$bankInfoId)->delete();                    
+                    
+                    if($data){
+                        $msg['responseCode'] = "200";
+                        $msg['responseMessage'] = "Information successfully Deleted"; 
+                    }else{
+                        $msg['responseCode'] = "0";
+                        $msg['responseMessage'] = "Some Error occur ! Please Try again";  
                     }                      
                 }
         }catch(\Exception $e) {
@@ -1707,9 +1798,13 @@ class AndroidController extends AppController
             }else{   
                 
                 $pic=Input::file('image');
+                if($pic){
                 $extension = $pic->getClientOriginalExtension(); // getting image extension
                 $userImage = time() . rand(111, 999) . '.' . $extension; // renameing image                
                 $pic->move(public_path().'/uploads/user/',$userImage);
+                }else{
+                    $userImage = "user_icon.png";
+                }
                 
                 User::where('id',$userId)
                     ->update([
@@ -2445,6 +2540,21 @@ class AndroidController extends AppController
                 $rejectOther = ShippingQuote::where('shipping_id',$shippingId)->update(['quote_status'=>2]);
                 $acceptBid = ShippingQuote::where('id',$quoteId)->update(['quote_status'=>1]);
                 
+                $carrierData = ShippingQuote::select('u.device_token','u.first_name','u.last_name')
+                                ->leftJoin('users as u','u.id','=','shipping_quotes.carrier_id')
+                                ->where('shipping_quotes.id',$quoteId)->first();
+                
+                $push = new PushNotification('fcm');
+                $response =  $push->setMessage([
+                        'notification' => [
+                                'title'=>'Accept your Offer',
+                                'body'=>'Your Offer has been accepted by the'.$carrierData->first_name.' '.$carrierData->last_name,
+                                'sound' => 'default'
+                                ]
+                        ])                            
+                     ->setDevicesToken($carrierData->device_token)
+                     ->send();
+                                
                 if($acceptBid){                                        
                   $msg['responseCode'] = "200";
                   $msg['responseMessage'] = "Offer Accepted successfully";
@@ -2485,6 +2595,22 @@ class AndroidController extends AppController
             }else{
                 
                 $rejectOffer = ShippingQuote::where('id',$quoteId)->update(['quote_status'=>2]);
+                
+                $carrierData = ShippingQuote::select('u.device_token','u.first_name','u.last_name')
+                                ->leftJoin('users as u','u.id','=','shipping_quotes.carrier_id')
+                                ->where('shipping_quotes.id',$quoteId)->first();
+                
+                $push = new PushNotification('fcm');
+                $response =  $push->setMessage([
+                        'notification' => [
+                                'title'=>'Accept your Offer',
+                                'body'=>'Your Offer has been rejected by the'.$carrierData->first_name.' '.$carrierData->last_name,
+                                'sound' => 'default'
+                                ]
+                        ])                            
+                     ->setDevicesToken($carrierData->device_token)
+                     ->send();
+                
                 
                 if($rejectOffer){                                        
                   $msg['responseCode'] = "200";
@@ -2754,6 +2880,285 @@ class AndroidController extends AppController
         }
     }
     
+    public function test(){
+        
+        $push = new PushNotification('fcm');
+        $response =  $push->setMessage([
+                'notification' => [
+                        'title'=>'This is the title',
+                        'body'=>'background',
+                        'sound' => 'default'
+                        ]
+                ])
+           //  ->setApiKey('AAAAZLnw4BA:APA91bEt7-Hts8J2v8yecvCwOtscsEZLW9p92Ew0E6dxF-QNandDuY_Qde0OPP1m4aCXqgD4EXjaqlXIBpK2bGWBodjXsW8Lh8VUJnXbbFFZPa0ij4VWvjy9dO4QCaPejBuqBY_0HfUZ')
+             ->setDevicesToken('eoXQObvvoNU:APA91bF0HF1lK0qwGWm_lssH6zEqm3GA-kAPPAq6M0RlAH5E3HwsbAOqGrP4qNM6APHebLdD7WW7KjttBviXKpBKIUjg2N5QmPxlwJVja3MJFmfDLZFQgqz-ItJnrbKRAVSxmj4EK17s')
+             ->send();
+      print_r($response); die;
+    }
+    
+    public function partnerProfileEdit(){
+        try{
+            $msg = array();
+            $userId = $_POST['userId'];
+            $fName = $_POST['fName'];
+            $lName = $_POST['lName'];
+            $email = $_POST['email'];
+            $street = $_POST['street'];    
+            $city = $_POST['city']; 
+            $location = $_POST['address']; 
+            $pincode = $_POST['pincode']; 
+            $country = $_POST['country']; 
+            $carrierType = $_POST['carrierType'];
+            $totalVehicle = ($_POST['totalVehicle'])? $_POST['totalVehicle'] : '';
+            $attachedVehicle = ($_POST['attachedVehicle'])? $_POST['attachedVehicle'] : '';
+            
+            $required = array('userId','fName','lName','email');
+
+            $error = false;
+            foreach($required as $field) {
+              if (empty($_POST[$field])) {
+                $error = true;
+                $fieldName = $field;
+                break;
+              }
+            }
+
+            if($error) {
+                $msg['responseCode'] = "0";
+                $msg['responseMessage'] = "$fieldName required.";
+            }else{   
+                
+                $pic=Input::file('image'); 
+                if($pic){
+                $extension = $pic->getClientOriginalExtension(); // getting image extension
+                $userImage = time() . rand(111, 999) . '.' . $extension; // renameing image                
+                $pic->move(public_path().'/uploads/user/',$userImage);
+                }else{
+                    $userImage = "user_icon.png";
+                }
+                
+                User::where('id',$userId)
+                    ->update([
+                        'first_name'=>$fName,
+                        'last_name'=>$lName,
+                        'email'=>$email,
+                        'carrier_type_id'=>$carrierType,                        
+                        'total_vehicle'=>$totalVehicle,
+                        'attached_vehicle'=>$attachedVehicle
+                        ]);
+                
+                $userDetails = UserDetail::where('user_id',$userId)->first();
+               
+                if($userDetails){
+                    UserDetail::where('user_id',$userId)
+                    ->update([
+                        'image'=>$userImage,
+                        'street'=>$street,
+                        'location'=>$location,
+                        'city'=>$city,
+                        'pincode'=>$pincode,
+                        'country'=>$country
+                        ]);
+                }else{
+                    $data = new UserDetail;
+                    $data->user_id = $userId;
+                    $data->image = $userImage;
+                    $data->street = $street;
+                    $data->location = $location;
+                    $data->city = $city;
+                    $data->pincode = $pincode;
+                    $data->country = $country;
+                    $data->save();
+                }
+                
+                if($carrierType == 2 || $carrierType == 3){
+                    $vehicleData = $_POST['vehicleCategory'];
+                    $vehicleDetails = UserVehicleDetail::where('user_id',$userId)->delete();
+                    
+                    foreach($vehicleData as $vData){
+                        $userVehicleDetail = new UserVehicleDetail;
+                        $userVehicleDetail->user_id  = $userId;
+                        $userVehicleDetail->vehicle_category_id = $categoryId;
+                        $userVehicleDetail->vehicle_subcategory_id = $vData['subCategoryId'];
+                        $userVehicleDetail->vehicle_length_id = $vData['vehicleLength'];
+                        $userVehicleDetail->save();
+                    }                    
+                }
+                    
+                    
+                $msg['responseCode'] = "200";
+                $msg['responseMessage'] = "Data saved successfully";    
+                }
+        }catch(\Exception $e) {
+            $msg['responseCode'] = "0";
+            $msg['responseMessage'] =$e->getMessage();
+        }
+        finally {
+            $result = json_encode($msg);
+            echo $result;
+        }
+    }
+    
+    public function kycUpdate(){
+        try{
+            $msg = array();
+            $userId = $_POST['userId'];
+            
+            $required = array('userId');
+
+            $error = false;
+            foreach($required as $field) {
+              if (empty($_POST[$field])) {
+                $error = true;
+                $fieldName = $field;
+                break;
+              }
+            }
+
+            if($error) {
+                $msg['responseCode'] = "0";
+                $msg['responseMessage'] = "$fieldName required.";
+            }else{   
+                
+                $rcpic=Input::file('rc');  
+                if($rcpic){
+                $extension = $rcpic->getClientOriginalExtension(); // getting image extension
+                $rcImage = time() . rand(111, 999) . '.' . $extension; // renameing image                
+                $rcpic->move(public_path().'/admin/kyc/',$rcImage);
+                }else{
+                    $rcImage = '';
+                }
+                $pic=Input::file('panCard');    
+                if($pic){
+                $extension = $pic->getClientOriginalExtension(); // getting image extension
+                $panCardImage = time() . rand(111, 999) . '.' . $extension; // renameing image                
+                $pic->move(public_path().'/admin/kyc/',$panCardImage);
+                }else{
+                    $panCardImage ="";
+                }
+                
+                $bcpic=Input::file('businessCard');   
+                if($bcpic){
+                $extension = $bcpic->getClientOriginalExtension(); // getting image extension
+                $businessCardImage = time() . rand(111, 999) . '.' . $extension; // renameing image                
+                $bcpic->move(public_path().'/admin/kyc/',$businessCardImage);
+                }else{
+                    $businessCardImage = '';
+                }
+                $kycDetails = PartnerKyc::where('user_id',$userId)->first();
+               
+                if($kycDetails){
+                    PartnerKyc::where('user_id',$userId)
+                    ->update([
+                        'rc_photo'=>$rcImage,
+                        'pancart'=>$panCardImage,
+                        'business_card'=>$businessCardImage
+                        ]);
+                }else{
+                    $data = new PartnerKyc;
+                    $data->user_id = $userId;
+                    $data->rc_photo = $rcImage;
+                    $data->pancart = $panCardImage;
+                    $data->business_card = $businessCardImage;
+                    $data->save();
+                }
+                
+                User::where('id',$userId)
+                    ->update([
+                        'documents_status'=>0
+                        ]);
+                
+                $msg['responseCode'] = "200";
+                $msg['responseMessage'] = "Kyc updated successfully";    
+                }
+        }catch(\Exception $e) {
+            $msg['responseCode'] = "0";
+            $msg['responseMessage'] =$e->getMessage();
+        }
+        finally {
+            $result = json_encode($msg);
+            echo $result;
+        }
+    }
+    
+    public function viewKYC(){
+        try{
+            $msg = array();
+            $userId = $_POST['userId'];
+            
+            $required = array('userId');
+
+            $error = false;
+            foreach($required as $field) {
+              if (empty($_POST[$field])) {
+                $error = true;
+                $fieldName = $field;
+                break;
+              }
+            }
+
+            if($error) {
+                $msg['responseCode'] = "0";
+                $msg['responseMessage'] = "$fieldName required.";
+            }else{   
+               
+                $kycDetails = PartnerKyc::where('user_id',$userId)->first();
+               
+                if($kycDetails){
+                    $msg['responseCode'] = "200";
+                    $msg['responseMessage'] = "Kyc Data get successfully";
+                    $msg['data'] = $kycDetails;
+                }else{
+                    $msg['responseCode'] = "200";
+                    $msg['responseMessage'] = "Kyc Data get successfully";
+                    $msg['data'] = "No Data found.";
+                }
+                
+                  
+            }
+        }catch(\Exception $e) {
+            $msg['responseCode'] = "0";
+            $msg['responseMessage'] =$e->getMessage();
+        }
+        finally {
+            $result = json_encode($msg);
+            echo $result;
+        }
+    }
+    
+    public function partnerProfileView(){
+        try{
+            $msg = array();
+            $i = 0;
+            $userId = $_POST['userId'];
+            
+            if(empty($userId)) {
+                $msg['responseCode'] = "0";
+                $msg['responseMessage'] = "userId required.";
+            }else{           
+                    $userdetails = User::select('first_name', 'last_name','email','mobile_number','ud.*','vc.vehicle_category_id','vc.vehicle_subcategory_id','vc.vehicle_length_id')                            
+                                    ->leftJoin('user_details as ud','ud.user_id','=','users.id')
+                                    ->leftJoin('user_vehicle_details as vc','vc.user_id','=','users.id')
+                                    ->where('users.id',$userId)->first();                
+                   
+                    if($userdetails){
+                        $msg['responseCode'] = "200";
+                        $msg['responseMessage'] = "Information get successfully"; 
+                        $msg['details'] = $userdetails; 
+                    }else{
+                        $msg['responseCode'] = "200";
+                        $msg['responseMessage'] = "Information get successfully";  
+                        $msg['details'] = 'No Data found';
+                    }                      
+                }
+        }catch(\Exception $e) {
+            $msg['responseCode'] = "0";
+            $msg['responseMessage'] =$e->getMessage();
+        }
+        finally {
+            $result = json_encode($msg);
+            echo $result;
+        }
+    }
 }
     
-   
