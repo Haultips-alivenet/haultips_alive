@@ -15,7 +15,7 @@ use App\AdminBedroom;
 use App\AdminBox;
 use DB;
 
-class UserHomeController extends FrontController
+class FindDeliveriesController extends FrontController
 {
     /**
      * Display a listing of the resource.
@@ -26,7 +26,7 @@ class UserHomeController extends FrontController
     {
        
       //  return view('welcome');
-        return view('user.index');
+        return view('user.finddeliveries');
        
     }
 

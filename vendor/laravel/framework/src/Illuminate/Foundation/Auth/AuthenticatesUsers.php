@@ -5,7 +5,7 @@ namespace Illuminate\Foundation\Auth;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Lang;
-
+use Session;
 trait AuthenticatesUsers
 {
     use RedirectsUsers;
@@ -115,9 +115,12 @@ trait AuthenticatesUsers
      */
     public function getLogout()
     {
+        $tempArr = Session::get('currentUser');
+        $user_type_id=$tempArr["user_type_id"];
         Auth::logout();
-
-        return redirect(property_exists($this, 'redirectAfterLogout') ? $this->redirectAfterLogout : '/');
+        Session::flush();
+        $logoutPath = ($user_type_id == 1) ? 'admin/login' : '/';
+        return redirect($logoutPath);
     }
 
     /**
