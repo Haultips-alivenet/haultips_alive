@@ -36,6 +36,15 @@
             <div class="col-lg-push-3 col-md-push-3 col-lg-6 col-md-6">
                 <div class="snup_bx _cus wow zoomIn">
                     <h2>Sign up</h2>
+                     {{--    Error Display--}}
+                        @if($errors->any())
+                        <ul class="alert">
+                            @foreach($errors->all() as $error)
+                            <li style="color:red;"><b>{{ $error }}</b></li>
+                            @endforeach
+                        </ul>
+                        @endif
+                    {{--    Error Display ends--}}
                    <div class="clearfix"></div>
                     <div class="_cus_bx">
                         
@@ -72,84 +81,84 @@
                             <div class="form-group">
                               <div class="col-lg-6" >
                                 <select name="city" id="city" class="selectpicker form-control" >
-                                <option value="select a city">select a city</option>
-                                <option>Andaman & Nicobar Islands</option>
-                                <option>Andhra Pradesh</option>
-                                <option>Arunachal Pradesh</option>
-                                <option>Assam</option>
-                                <option>Bihar</option>
-                                <option>Chandigarh</option>
-                                <option>Chhatisgarh</option>
-                                <option>Dadra & Nagar Haveli</option>
-                                <option>Daman & Diu</option>
-                                <option>Delhi</option>
-                                <option>Goa</option>
-                                <option>Gujarat</option>
-                                <option>Haryana</option>
-                                <option>Himachal Pradesh</option>
-                                <option>Jammu & Kashmir</option>
-                                <option>Jharkhand</option>
-                                <option>Karnataka</option>
-                                <option>Kerala</option>
-                                <option>Lakshadweep</option>
-                                <option>Madhya Pradesh</option>
-                                <option>Maharashtra</option>
-                                <option>Manipur</option>
-                                <option>Meghalaya</option>
-                                <option>Mizoram</option>
-                                <option>Nagaland</option>
-                                <option>Odisha (Orissa)</option>
-                                <option>Puducherry (Pondicherry)</option>
-                                <option>Punjab</option>
-                                <option>Rajasthan</option>
-                                <option>Sikkim</option>
-                                <option>Tamil Nadu</option>
-                                <option>Telangana</option>
-                                <option>Tripura</option>
-                                <option>Uttar Pradesh</option>
-                                <option>Uttarakhand</option>
-                                <option>West Bengal</option>
+                                <option value="">select a city</option>
+                                <option value="Andaman & Nicobar Islands">Andaman & Nicobar Islands</option>
+                                <option value="Andhra Pradesh">Andhra Pradesh</option>
+                                <option value="Arunachal Pradesh">Arunachal Pradesh</option>
+                                <option value="Assam">Assam</option>
+                                <option value="Bihar">Bihar</option>
+                                <option value="Chandigarh">Chandigarh</option>
+                                <option value="Chhatisgarh">Chhatisgarh</option>
+                                <option value="Dadra & Nagar Haveli">Dadra & Nagar Haveli</option>
+                                <option value="Daman & Diu">Daman & Diu</option>
+                                <option value="Delhi">Delhi</option>
+                                <option value="Goa">Goa</option>
+                                <option value="Gujarat">Gujarat</option>
+                                <option value="Haryana">Haryana</option>
+                                <option value="Himachal Pradesh">Himachal Pradesh</option>
+                                <option value="Jammu & Kashmir">Jammu & Kashmir</option>
+                                <option value="Jharkhand">Jharkhand</option>
+                                <option value="Karnataka">Karnataka</option>
+                                <option value="Kerala">Kerala</option>
+                                <option value="Lakshadweep">Lakshadweep</option>
+                                <option value="Madhya Pradesh">Madhya Pradesh</option>
+                                <option value="Maharashtra">Maharashtra</option>
+                                <option value="Manipur">Manipur</option>
+                                <option value="Meghalaya">Meghalaya</option>
+                                <option value="Mizoram">Mizoram</option>
+                                <option value="Nagaland">Nagaland</option>
+                                <option value="Odisha">Odisha (Orissa)</option>
+                                <option value="Puducherry (Pondicherry)">Puducherry (Pondicherry)</option>
+                                <option value="Punjab">Punjab</option>
+                                <option value="Rajasthan">Rajasthan</option>
+                                <option value="Sikkim">Sikkim</option>
+                                <option value="Tamil Nadu">Tamil Nadu</option>
+                                <option value="Telangana">Telangana</option>
+                                <option value="Tripura">Tripura</option>
+                                <option value="Uttar Pradesh">Uttar Pradesh</option>
+                                <option value="Uttarakhand">Uttarakhand</option>
+                                <option value="West Bengal">West Bengal</option>
                                 </select>
                               </div> 
                               <div class="col-lg-6">
                                    <select name="state" id="state" class="selectpicker form-control">
-                                <option value="select a city">select a state</option>
-                                <option>Andaman & Nicobar Islands</option>
-                                <option>Andhra Pradesh</option>
-                                <option>Arunachal Pradesh</option>
-                                <option>Assam</option>
-                                <option>Bihar</option>
-                                <option>Chandigarh</option>
-                                <option>Chhatisgarh</option>
-                                <option>Dadra & Nagar Haveli</option>
-                                <option>Daman & Diu</option>
-                                <option>Delhi</option>
-                                <option>Goa</option>
-                                <option>Gujarat</option>
-                                <option>Haryana</option>
-                                <option>Himachal Pradesh</option>
-                                <option>Jammu & Kashmir</option>
-                                <option>Jharkhand</option>
-                                <option>Karnataka</option>
-                                <option>Kerala</option>
-                                <option>Lakshadweep</option>
-                                <option>Madhya Pradesh</option>
-                                <option>Maharashtra</option>
-                                <option>Manipur</option>
-                                <option>Meghalaya</option>
-                                <option>Mizoram</option>
-                                <option>Nagaland</option>
-                                <option>Odisha (Orissa)</option>
-                                <option>Puducherry (Pondicherry)</option>
-                                <option>Punjab</option>
-                                <option>Rajasthan</option>
-                                <option>Sikkim</option>
-                                <option>Tamil Nadu</option>
-                                <option>Telangana</option>
-                                <option>Tripura</option>
-                                <option>Uttar Pradesh</option>
-                                <option>Uttarakhand</option>
-                                <option>West Bengal</option>
+                                <option value="">select a state</option>
+                                <option value="Andaman & Nicobar Islands">Andaman & Nicobar Islands</option>
+                                <option value="Andhra Pradesh">Andhra Pradesh</option>
+                                <option value="Arunachal Pradesh">Arunachal Pradesh</option>
+                                <option value="Assam">Assam</option>
+                                <option value="Bihar">Bihar</option>
+                                <option value="Chandigarh">Chandigarh</option>
+                                <option value="Chhatisgarh">Chhatisgarh</option>
+                                <option value="Dadra & Nagar Haveli">Dadra & Nagar Haveli</option>
+                                <option value="Daman & Diu">Daman & Diu</option>
+                                <option value="Delhi">Delhi</option>
+                                <option value="Goa">Goa</option>
+                                <option value="Gujarat">Gujarat</option>
+                                <option value="Haryana">Haryana</option>
+                                <option value="Himachal Pradesh">Himachal Pradesh</option>
+                                <option value="Jammu & Kashmir">Jammu & Kashmir</option>
+                                <option value="Jharkhand">Jharkhand</option>
+                                <option value="Karnataka">Karnataka</option>
+                                <option value="Kerala">Kerala</option>
+                                <option value="Lakshadweep">Lakshadweep</option>
+                                <option value="Madhya Pradesh">Madhya Pradesh</option>
+                                <option value="Maharashtra">Maharashtra</option>
+                                <option value="Manipur">Manipur</option>
+                                <option value="Meghalaya">Meghalaya</option>
+                                <option value="Mizoram">Mizoram</option>
+                                <option value="Nagaland">Nagaland</option>
+                                <option value="Odisha (Orissa)">Odisha (Orissa)</option>
+                                <option value="Puducherry (Pondicherry)">Puducherry (Pondicherry)</option>
+                                <option value="Rajasthan">Punjab</option>
+                                <option value="">Rajasthan</option>
+                                <option value="Sikkim">Sikkim</option>
+                                <option value="Tamil Nadu">Tamil Nadu</option>
+                                <option value="Telangana">Telangana</option>
+                                <option value="Tripura">Tripura</option>
+                                <option value="Uttar Pradesh">Uttar Pradesh</option>
+                                <option value="Uttarakhand">Uttarakhand</option>
+                                <option value="West Bengal">West Bengal</option>
                                 </select>
 
 
@@ -253,11 +262,11 @@ $('#newPartneraaa').validate({
                 },
                  state:{
                     required : true,
-                    minlength:2
+                   
                 },
                  city:{
                     required : true,
-                    minlength:2
+                    
                 },
                  total_vehicle:{
                     required : true,
@@ -326,13 +335,13 @@ $('#newPartneraaa').validate({
         function gettrucklength(id){
            $.ajax({ 
         type: 'get',
-        url: '{{url('gettrucklength')}}',
+        url: '{{url('getlength')}}',
         data: 'id='+id,
         dataType: 'json',
         //cache: false,
 
         success: function(data) {
-        
+       // alert(data);
         console.log(data.truck_lengths);
        var _options='';
         
@@ -360,7 +369,7 @@ $('#newPartneraaa').validate({
     
    $.ajax({ 
         type: 'get',
-        url: '{{url('gettruckcapacity')}}',
+        url: '{{url('getcapacity')}}',
         data: 'id='+id,
         dataType: 'json',
         //cache: false,

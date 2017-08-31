@@ -12,6 +12,8 @@ use App\VehicleCategory;
 use App\library\Smsapi;
 use Mail;
 use App\User;
+use App\UserVehicleDetails;
+use App\UserVerification;
 use App\TruckLengths;
 use App\AdminBedroom;
 use App\AdminBox;
@@ -106,6 +108,126 @@ class LoginController extends FrontController
             return redirect(url('user/login'));
     }
     public function partner_registration(Request $request){
-        print_r($_POST);die;
+      // print_r($_POST);die;
+        $this->validate($request, [
+               'firstName' => 'required|min:3|max:255|Regex:/^[a-z-.]+( [a-z-.]+)*$/i',
+               'lastName' => 'required|min:3|max:255|Regex:/^[a-z-.]+( [a-z-.]+)*$/i',
+               'email' => 'required|email|unique:users|max:100',
+               'mobile' => 'required|min:10|max:10|Regex: /^[0-9]{1,45}$/',
+               'password' => 'required|min:6|max:12',
+               'cpassword' => 'required|min:6|same:password',
+               'state' => 'required|max:255|Regex:/^[a-z-.]+( [a-z-.]+)*$/i',
+               'city' => 'required|max:255|Regex:/^[a-z-.]+( [a-z-.]+)*$/i',
+               'total_vehicle' => 'required',
+               'attached_vehicle' => 'required',
+               //'carrer_type2' => 'required'
+            ]);
+         
+            $firstName = $request->firstName;
+            $lastName = $request->lastName;
+            $email = $request->email;
+            $mobile = $request->mobile;
+            $password = bcrypt($request->password);
+            //$password = md5($request->password);
+            $userType = $request->userType;
+            $carrer_type1 = $request->carrer_type1;
+            $carrer_type2 = $request->carrer_type2;
+            $state = $request->state;
+            $city = $request->city;
+            $total_vehicle = $request->total_vehicle;
+            $attached_vehicle = $request->attached_vehicle;
+            if($carrer_type1 && $carrer_type2){
+                $carrer_type='3';
+            } else if($carrer_type1){
+                 $carrer_type='1';
+            } else if($carrer_type2){
+                $carrer_type='2';
+            }
+              try{
+                    DB::beginTransaction();
+            $user= new User;
+            $user->user_type_id = $userType;
+            $user->first_name = $firstName;
+            $user->last_name = $lastName;
+            $user->email = $email;
+            $user->password = $password;
+            $user->mobile_number = $mobile;
+            $user->country_code = '+91';
+            $user->carrier_type_id = $carrer_type;
+            $user->state = $state;
+            $user->city = $city;
+            $user->total_vehicle = $total_vehicle;
+            $user->attached_vehicle = $attached_vehicle;
+            
+            $userSucess = $user->save();  
+            $insertedId = $user->id;
+
+           
+            //save with transporter
+             $trucktype = $request->trucktype;
+            
+            if($carrer_type2==2) {
+             for($i=0;$i<count($trucktype);$i++){
+                
+                    $a='trucklength_'.$trucktype[$i];
+                     $trucklength = $request->$a;
+                      for($j=0;$j<count($trucklength);$j++){  
+                          $b='truckcapacity_'.$trucklength[$j];
+                           $truckcapacity = $request->$b;
+                            for($k=0;$k<count($truckcapacity);$k++){  
+                               
+                                $data[] = array(
+                                    'user_id' => $insertedId, 
+                                    'vehicle_category_id' => '1',
+                                    'vehicle_subcategory_id' => $trucktype[$i],
+                                    'vehicle_length_id' => $trucklength[$j],
+                                    'vehicle_capacity_id' => $truckcapacity[$k],
+                                   
+                                  );
+                            }
+                      }
+                      
+                    }
+                  //  print_r($data);die;
+                  $u= UserVehicleDetails::insert($data);
+            }
+                    DB::commit();
+                    $success = true;
+            }
+            catch(\Exception $e){
+
+                $success = false;
+                DB::rollback();
+            }
+            
+            $string = '1234567890';
+            $string_shuffled = str_shuffle($string);
+            $otp = substr($string_shuffled, 1, 5);
+            $otpMsg = 'Your Otp is '.$otp;
+            
+            $userverify= new UserVerification;
+            $userverify->user_id = $insertedId;
+            $userverify->otp = $otp;
+            $userverify->email = $email;
+            
+            $userSucess1 = $userverify->save();
+            
+            if($userSucess == 1){
+                $smsObj = new Smsapi();
+                $smsObj->sendsms_api('+91'.$mobile,$otpMsg);  
+                
+                $user = User::findOrFail($insertedId);
+                Mail::send('layouts.adminAppointment', ['user' => $user], function ($m) use ($user) {
+                $m->from('richalive158@gmail.com', 'Your Application');
+
+            $m->to($user->email, $user->name)->subject('Your Reminder!');
+        });
+                
+                
+                Session::flash('success', 'User created successfully');                
+            }else{
+               Session::flash('success', 'Error occur ! Please try again.');
+            }            
+            return redirect(url('user/login'));
     }
 }

@@ -95,4 +95,21 @@ class UserHomeController extends FrontController
     {
         //
     }
+    public function gettrucklength(Request $request){
+        
+       $data["truck_lengths"]  = DB::table('truck_lengths')
+                    ->where('truck_type_id',$request->id)
+                    ->select('truck_length','id')
+                    ->get();
+      echo json_encode($data);
+    }
+     public function gettruckcapacity(Request $request){
+        
+       $data["truck_capacity"]  = DB::table('truck_capacities')
+                    ->where('truck_length_id',$request->id)
+                    ->select('truck_capacity','id')
+                    ->get();
+      echo json_encode($data);
+       //print_r($data["truck_capacity"]);
+    }
 }

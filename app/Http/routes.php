@@ -21,7 +21,8 @@ Route::resource('user/partner', 'Front\LoginController@partner');
 #Customer Registration
 Route::resource('user/customer-registration', 'Front\LoginController@customer_registration');
 Route::resource('user/partner-registration', 'Front\LoginController@partner_registration');
-
+Route::get('getlength ', 'Front\UserHomeController@gettrucklength');
+Route::get('getcapacity ', 'Front\UserHomeController@gettruckcapacity');
 
 
 

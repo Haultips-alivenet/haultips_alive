@@ -33,7 +33,7 @@ class AuthController extends Controller
         if($user->user_type_id=='1'){            
             return redirect('admin/dashboard') ;
         }elseif($user->user_type_id=='2'){
-            return redirect()->route('carrier/dashboard') ;
+            return redirect(url('/'));
         }elseif($user->user_type_id=='3'){
             //return redirect()->route('user/dashboard') ;
              return redirect(url('/'));
