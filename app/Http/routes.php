@@ -11,10 +11,21 @@
 |
 */
 Route::get('/', 'Front\UserHomeController@index');
-//Route::get('/', function () {
-//    return view('welcome');
-//});
+Route::resource('user/dashboard', 'Front\UserHomeController@index');
+#User
+Route::resource('user/find/deliveries', 'Front\FindDeliveriesController');
+Route::resource('user/login', 'Front\LoginController');
+Route::resource('user/signup', 'Front\LoginController@signup');
+Route::resource('user/customer', 'Front\LoginController@customer');
+Route::resource('user/partner', 'Front\LoginController@partner');
+#Customer Registration
+Route::resource('user/customer-registration', 'Front\LoginController@customer_registration');
+Route::resource('user/partner-registration', 'Front\LoginController@partner_registration');
 
+
+
+
+#Admin
 Route::get('/admin/login', function () {
     return view('admin/login');
 });
