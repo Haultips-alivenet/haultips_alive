@@ -137,6 +137,7 @@ return [
         Illuminate\Validation\ValidationServiceProvider::class,
         Illuminate\View\ViewServiceProvider::class,
         Illuminate\Html\HtmlServiceProvider::class,
+        Edujugon\PushNotification\Providers\PushNotificationServiceProvider::class,
         /*
          * Application Service Providers...
          */
@@ -200,6 +201,7 @@ return [
         'Twilio'    => 'Aloha\Twilio\Support\Laravel\Facade',
         'JWTAuth'   => Tymon\JWTAuth\Facades\JWTAuth::class,
         'JWTFactory' => Tymon\JWTAuth\Facades\JWTFactory::class,
+        'PushNotification' => Edujugon\PushNotification\Facades\PushNotification::class,
     ],
 
 ];

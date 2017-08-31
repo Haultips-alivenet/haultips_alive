@@ -25,6 +25,7 @@ class AuthController extends Controller
     
 //    protected $redirectPath = '/login';
     protected $loginPath = 'admin/login';
+    protected $redirectAfterLogout = 'admin/login';
     
     public function authenticated($request , $user){
         

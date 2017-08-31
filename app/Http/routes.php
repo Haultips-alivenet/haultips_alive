@@ -88,9 +88,9 @@ Route::resource('admin/transaction/history', 'TransactionHistoryController');
 
 
 #shipment/report
+Route::resource('shipment/reportList/{id}', 'ShipmentReportController@index');
 Route::get('shipment/detailsReport/{id}', 'ShipmentReportController@details_report');
 Route::resource('shipment/{id}/report', 'ShipmentReportController');
-Route::resource('shipment/reportList/{id}', 'ShipmentReportController@index');
 
 
 
@@ -141,3 +141,24 @@ Route::post('webservices/viewProfile', 'AndroidController@viewProfile');
 Route::post('webservices/userQuestions', 'AndroidController@userQuestions');
 Route::post('webservices/findDelivery', 'AndroidController@findDelivery');
 Route::post('webservices/findDetail', 'AndroidController@findDetail');
+Route::post('webservices/categoryFilter', 'AndroidController@categoryFilter');
+Route::post('webservices/minimumBid', 'AndroidController@minimumBid');
+Route::post('webservices/submitOffer', 'AndroidController@submitOffer');
+Route::post('webservices/myOffers', 'AndroidController@myOffers');
+Route::post('webservices/myOfferDetail', 'AndroidController@myOfferDetail');
+Route::post('webservices/partnerNotification', 'AndroidController@partnerNotification');
+Route::post('webservices/partnerTransactionDetail', 'AndroidController@partnerTransactionDetail');
+Route::post('webservices/quotationOfferDetail', 'AndroidController@quotationOfferDetail');
+Route::post('webservices/acceptOffer', 'AndroidController@acceptOffer');
+Route::post('webservices/rejectOffer', 'AndroidController@rejectOffer');
+Route::post('webservices/payment', 'AndroidController@payment');
+Route::post('webservices/askQuestion', 'AndroidController@askQuestion');
+Route::post('webservices/quesAnswer', 'AndroidController@quesAnswer');
+Route::post('webservices/getAnswer', 'AndroidController@getAnswer');
+Route::post('webservices/deleteShipment', 'AndroidController@deleteShipment');
+Route::post('webservices/partnerProfileEdit', 'AndroidController@partnerProfileEdit');
+Route::post('webservices/kycUpdate', 'AndroidController@kycUpdate');
+Route::post('webservices/viewKYC', 'AndroidController@viewKYC');
+Route::post('webservices/partnerProfileView', 'AndroidController@partnerProfileView');
+Route::post('webservices/deleteBankInfo', 'AndroidController@deleteBankInfo');
+Route::post('webservices/test', 'AndroidController@test');
