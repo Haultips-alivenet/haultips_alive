@@ -1797,13 +1797,15 @@ class AndroidController extends AppController
                 $msg['responseMessage'] = "$fieldName required.";
             }else{   
                 
+                $userDetails = UserDetail::where('user_id',$userId)->first();
+                
                 $pic=Input::file('image');
                 if($pic){
                 $extension = $pic->getClientOriginalExtension(); // getting image extension
                 $userImage = time() . rand(111, 999) . '.' . $extension; // renameing image                
                 $pic->move(public_path().'/uploads/user/',$userImage);
                 }else{
-                    $userImage = "user_icon.png";
+                    $userImage = (!empty($userDetails->image))? $userDetails->image : "user_icon.png";
                 }
                 
                 User::where('id',$userId)
@@ -1962,9 +1964,10 @@ class AndroidController extends AppController
                         $catType = array('1','4');
                     }
                      
-                    $shippingData = ShippingDetail::select(DB::raw('shipping_details.id, table_name, shipping_details.created_at, spd.pickup_address, spd.pickup_date,  sdd.delivery_date, spd.latitude as pickupLat, spd.longitutde as pickupLong, sdd.delivery_address, sdd.latitude as deliveryLat, sdd.longitutde as deliveryLong'))
+                    $shippingData = ShippingDetail::select(DB::raw('shipping_details.id, table_name, vc.category_name, shipping_details.created_at, spd.pickup_address, spd.pickup_date,  sdd.delivery_date, spd.latitude as pickupLat, spd.longitutde as pickupLong, sdd.delivery_address, sdd.latitude as deliveryLat, sdd.longitutde as deliveryLong'))
                                     ->leftJoin('shipping_pickup_details as spd','spd.shipping_id','=','shipping_details.id')
-                                    ->leftJoin('shipping_delivery_details as sdd','sdd.shipping_id','=','shipping_details.id');
+                                    ->leftJoin('shipping_delivery_details as sdd','sdd.shipping_id','=','shipping_details.id')
+                                    ->leftJoin('vehicle_categories as vc','vc.id','=','shipping_details.category_id');
                     
                     if($categoryId != ''){
                         $shippingData = $shippingData->whereIn('shipping_details.category_id', $categoryId);
@@ -1997,6 +2000,7 @@ class AndroidController extends AppController
                             $data[$i]['shippingId'] = $detail['id'];
                             $data[$i]['image'] = $image[0];
                             $data[$i]['title'] = $shippingData->delivery_title;
+                            $data[$i]['categoryName'] = $detail->category_name;
                             $data[$i]['pickupAddress'] = $detail['pickup_address'];
                             $data[$i]['deliveryAddress'] = $detail['delivery_address'];
                             $data[$i]['minimumBid'] = ($miid) ? $miid->minimumBid : '0'; 
@@ -2232,6 +2236,22 @@ class AndroidController extends AppController
                                     'lowest_quote_price'=>$minimumBid
                                 ]);
                 }
+                
+                $offerNotification = ShippingDetail::select('u.device_token','u.first_name','u.last_name')
+                                ->leftJoin('users as u','u.id','=','shipping_details.user_id')
+                                ->where('shipping_details.id',$shippingId)->first();
+                
+                $push = new PushNotification('fcm');
+                $response =  $push->setMessage([
+                        'notification' => [
+                                'title'=>'Get Offer',
+                                'body'=>'A new Quotation has arrived on your post from Haulitps.',
+                                'sound' => 'default'
+                                ]
+                        ])                            
+                     ->setDevicesToken($offerNotification->device_token)
+                     ->send();
+                
                 $msg['responseCode'] = "200";
                 $msg['responseMessage'] = "Quotation post successfully";
                 $msg['quotationId'] = $quotationId;
@@ -2540,6 +2560,7 @@ class AndroidController extends AppController
                 $rejectOther = ShippingQuote::where('shipping_id',$shippingId)->update(['quote_status'=>2]);
                 $acceptBid = ShippingQuote::where('id',$quoteId)->update(['quote_status'=>1]);
                 
+                #Accept offer Notification
                 $carrierData = ShippingQuote::select('u.device_token','u.first_name','u.last_name')
                                 ->leftJoin('users as u','u.id','=','shipping_quotes.carrier_id')
                                 ->where('shipping_quotes.id',$quoteId)->first();
@@ -2548,12 +2569,32 @@ class AndroidController extends AppController
                 $response =  $push->setMessage([
                         'notification' => [
                                 'title'=>'Accept your Offer',
-                                'body'=>'Your Offer has been accepted by the'.$carrierData->first_name.' '.$carrierData->last_name,
+                                'body'=>'Your Offer has been accepted by the '.$carrierData->first_name.' '.$carrierData->last_name,
                                 'sound' => 'default'
                                 ]
                         ])                            
                      ->setDevicesToken($carrierData->device_token)
                      ->send();
+                
+                #Reject offer Notification
+                $rejectUsers = ShippingQuote::select('u.device_token','u.first_name','u.last_name')
+                                ->leftJoin('users as u','u.id','=','shipping_quotes.carrier_id')
+                                ->where('shipping_quotes.shipping_id',$shippingId)
+                                ->where('shipping_quotes.id','!=',$quoteId)->get();
+                
+                foreach($rejectUsers as $rejectData){
+                    $response =  $push->setMessage([
+                        'notification' => [
+                                'title'=>'Reject your Offer',
+                                'body'=>'Your Offer has been rejected by the '.$rejectData->first_name.' '.$rejectData->last_name,
+                                'sound' => 'default'
+                                ]
+                        ])                            
+                     ->setDevicesToken($rejectData->device_token)
+                     ->send();
+                }
+                
+                
                                 
                 if($acceptBid){                                        
                   $msg['responseCode'] = "200";
@@ -2604,7 +2645,7 @@ class AndroidController extends AppController
                 $response =  $push->setMessage([
                         'notification' => [
                                 'title'=>'Accept your Offer',
-                                'body'=>'Your Offer has been rejected by the'.$carrierData->first_name.' '.$carrierData->last_name,
+                                'body'=>'Your Offer has been rejected by the '.$carrierData->first_name.' '.$carrierData->last_name,
                                 'sound' => 'default'
                                 ]
                         ])                            
@@ -2928,13 +2969,15 @@ class AndroidController extends AppController
                 $msg['responseMessage'] = "$fieldName required.";
             }else{   
                 
+                 $userDetails = UserDetail::where('user_id',$userId)->first();
+                
                 $pic=Input::file('image'); 
                 if($pic){
                 $extension = $pic->getClientOriginalExtension(); // getting image extension
                 $userImage = time() . rand(111, 999) . '.' . $extension; // renameing image                
                 $pic->move(public_path().'/uploads/user/',$userImage);
                 }else{
-                    $userImage = "user_icon.png";
+                    $userImage = (!empty($userDetails->image))? $userDetails->image : "user_icon.png";
                 }
                 
                 User::where('id',$userId)
@@ -2947,7 +2990,7 @@ class AndroidController extends AppController
                         'attached_vehicle'=>$attachedVehicle
                         ]);
                 
-                $userDetails = UserDetail::where('user_id',$userId)->first();
+               
                
                 if($userDetails){
                     UserDetail::where('user_id',$userId)
