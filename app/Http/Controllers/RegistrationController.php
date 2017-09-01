@@ -69,7 +69,8 @@ class RegistrationController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request)
-    {          
+    {     
+        date_default_timezone_set("Asia/Kolkata");
         $this->validate($request, [
                'firstName' => 'required|min:3|max:255|Regex:/^[a-z-.]+( [a-z-.]+)*$/i',
                'lastName' => 'required|min:3|max:255|Regex:/^[a-z-.]+( [a-z-.]+)*$/i',

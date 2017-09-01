@@ -23,7 +23,10 @@ class DashboardController extends Controller
         $lastName = $userData['last_name'];
         return view('admin.dashboards.dashboard',['firstName'=>$firstName,'lastName'=>$lastName]);
     }
-
+    public function login(){
+        echo "gfg";die;
+        return view('admin/login');
+    }
     /**
      * Show the form for creating a new resource.
      *

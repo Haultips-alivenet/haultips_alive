@@ -61,7 +61,7 @@ class CategoryController extends Controller
         $this->validate($request, [
                'categoryName' => 'required|min:3|unique:vehicle_categories,category_name|max:255|Regex:/^[a-z-.]+( [a-z-.]+)*$/i'
             ]);
-            $destinationPath="public\admin\images\category";
+           $destinationPath=public_path()."/admin/images/category"; 
             $cname=$request->categoryName;
             $file = $request->file('categoryImage');
             $filename=$file->getClientOriginalName();
@@ -129,7 +129,7 @@ class CategoryController extends Controller
         $category = VehicleCategory::find($id); 
         $category->category_name = $cname;
         if($file) {
-            $destinationPath="public\admin\images\category";
+           $destinationPath=public_path()."/admin/images/category"; 
             $filename=$file->getClientOriginalName();
             $t=time();
             $filename=$t.'_'.$filename; 

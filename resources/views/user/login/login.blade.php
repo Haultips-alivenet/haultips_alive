@@ -12,6 +12,15 @@
             <div class="col-lg-offset-3 col-md-offset-3  col-lg-6 col-md-6">
                 <div class="snup_bx _login wow zoomIn">
                     <h2>Log in</h2>
+                     @if($errors->any())
+                        <div class="alert alert-danger">
+                            <ul>
+                                @foreach($errors->all() as $error)
+                                    <li> {{$error}} </li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    @endif
                      @if(Session::has('success'))
                             <div class="alert alert-success">
                                 <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
@@ -26,6 +35,7 @@
                             <div class="form-group ">
                                
                                   {!! Form :: text('email','',['placeholder'=>'Enter your username or email address','class'=>'user form-control','id'=>'user']) !!}
+                                  {!! Form :: hidden('user','user',['id'=>'user']) !!}
                             </div>
                             <div class="form-group">
                                 

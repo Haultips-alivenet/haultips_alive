@@ -81,7 +81,7 @@ class PartnerRegistrationController extends Controller
      */
     public function store(Request $request)
     {    
-       // print_r($_POST);die;
+        date_default_timezone_set("Asia/Kolkata");
         $this->validate($request, [
                'firstName' => 'required|min:3|max:255|Regex:/^[a-z-.]+( [a-z-.]+)*$/i',
                'lastName' => 'required|min:3|max:255|Regex:/^[a-z-.]+( [a-z-.]+)*$/i',
@@ -100,7 +100,7 @@ class PartnerRegistrationController extends Controller
             $lastName = $request->lastName;
             $email = $request->email;
             $mobile = $request->mobile;
-            $password = md5($request->password);
+            $password = bcrypt($request->password);
             $userType = $request->userType;
             $carrer_type1 = $request->carrer_type1;
             $carrer_type2 = $request->carrer_type2;

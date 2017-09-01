@@ -5,7 +5,9 @@
 
 @section('body')
 <div id="page-wrapper">
+    <input type="button" value="Back" onclick="history.back()">
     <div class="graphs">
+ 
  <table class="table table-bordered"> 
      <tr>
          <td style="width: 20%;">Name</td>

@@ -8,6 +8,7 @@
 error_reporting(0);
 ?>
  <div id="page-wrapper">
+     <input type="button" value="Back" onclick="history.back()">
     <div class="graphs">
  <table class="table table-bordered"> 
      <tbody>

@@ -58,7 +58,7 @@ trait AuthenticatesUsers
             $this->incrementLoginAttempts($request);
         }
 
-        return redirect($this->loginPath())
+        return redirect($this->loginPath($request->user))
             ->withInput($request->only($this->loginUsername(), 'remember'))
             ->withErrors([
                 $this->loginUsername() => $this->getFailedLoginMessage(),
@@ -128,9 +128,14 @@ trait AuthenticatesUsers
      *
      * @return string
      */
-    public function loginPath()
+    public function loginPath($user)
     {
-        return property_exists($this, 'loginPath') ? $this->loginPath : '/auth/login';
+        if($user=='user'){
+            $path='user/login';
+        } else {
+            $path = property_exists($this, 'loginPath') ? $this->loginPath : '/auth/login';
+        }
+        return $path;
     }
 
     /**
