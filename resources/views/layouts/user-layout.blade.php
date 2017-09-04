@@ -9,7 +9,7 @@
     <meta name="author" content="">
     
 
-    <title>Online Truck Booking | Packers and Movers - HAULTIPS</title>
+    <title>@yield('title')</title>
     <meta name="description" content="HAULTIPS, A leading Delhi based transport company offers online truck booking and transportation services in Delhi. Call 9871120400 to book a truck online now." />
     <meta name="keywords" content="online truck booking, online truck booking services, haultips, book a truck online" />
 

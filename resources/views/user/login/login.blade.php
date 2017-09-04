@@ -1,6 +1,6 @@
 @extends('layouts.user-layout')
 @section('title')
-    Admin Panel | Haultips
+    Online Truck Booking | Packers and Movers - HAULTIPS
 @endsection
 
 @section('body')

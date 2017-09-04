@@ -24,9 +24,9 @@ class UserHomeController extends FrontController
      */
     public function index()
     {
-       
-      //  return view('welcome');
-        return view('user.index');
+             
+     $categories = VehicleCategory::where('status',1)->where('parent_id',0)->select('id','category_name','category_image')->get();
+        return view('user.index',['categories'=>$categories]);
        
     }
 
@@ -110,6 +110,13 @@ class UserHomeController extends FrontController
                     ->select('truck_capacity','id')
                     ->get();
       echo json_encode($data);
-       //print_r($data["truck_capacity"]);
+    }
+    
+    public function subCategory(Request $request){
+        $catId = $request->id; 
+        $category = VehicleCategory::where('status',1)->where('id',$catId)->select('category_name')->first();
+        $subCategories = VehicleCategory::where('status',1)->where('parent_id',$catId)->select('id','category_name','category_image')->get();
+        
+        return view('user/subCategory/index', ['category'=>$category, 'subCategories'=>$subCategories]);
     }
 }

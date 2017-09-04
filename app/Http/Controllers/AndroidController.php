@@ -1944,11 +1944,11 @@ class AndroidController extends AppController
         try{
             $msg = array();
             $data = array();
-            $i = 0;
+            $i = 0;            
             $condition = '';
             $userId = $_POST['userId'];
             $categoryId = $_POST['categoryId'];
-            $orderBy = $_POST['orderBy'];
+            $orderBy = $_POST['orderBy'];            
             
             if(empty($userId)) {
                 $msg['responseCode'] = "0";
@@ -1969,7 +1969,8 @@ class AndroidController extends AppController
                                     ->leftJoin('shipping_delivery_details as sdd','sdd.shipping_id','=','shipping_details.id')
                                     ->leftJoin('vehicle_categories as vc','vc.id','=','shipping_details.category_id');
                     
-                    if($categoryId != ''){
+                    if($categoryId != ''){                        
+                       // $categoryId = explode(",",$categoryId);
                         $shippingData = $shippingData->whereIn('shipping_details.category_id', $categoryId);
                     }
                     
@@ -2111,8 +2112,8 @@ class AndroidController extends AppController
                          $data['material'] = (empty($shippingDetail->material_id)) ? 'N/A' : ShippingDetail::getCategoryName($shippingDetail->material_id, 'id', 'name','materials');
                          $data['deliveryTitle'] = $shippingDetail->delivery_title;
                          $data['itemImage'] = $shippingDetail->item_image;
-                         $data['deliveryTitle'] = $shippingDetail->weight;
-                         $data['itemImage'] = $shippingDetail->remarks;
+                         $data['weight'] = $shippingDetail->weight;
+                         $data['remarks'] = $shippingDetail->remarks;
                      }
                         $msg['responseCode'] = "200";
                         $msg['responseMessage'] = "Information get successfully"; 

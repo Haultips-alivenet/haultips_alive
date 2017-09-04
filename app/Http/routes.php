@@ -23,7 +23,7 @@ Route::resource('user/customer-registration', 'Front\LoginController@customer_re
 Route::resource('user/partner-registration', 'Front\LoginController@partner_registration');
 Route::get('getlength ', 'Front\UserHomeController@gettrucklength');
 Route::get('getcapacity ', 'Front\UserHomeController@gettruckcapacity');
-
+Route::get('subCategory/{id}', 'Front\UserHomeController@subCategory');
 
 
 #Admin

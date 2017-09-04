@@ -1,6 +1,6 @@
 @extends('layouts.user-layout')
 @section('title')
-    Admin Panel | Haultips
+    Online Truck Booking | Packers and Movers - HAULTIPS
 @endsection
 
 @section('body')
@@ -58,34 +58,17 @@
                 <div class="_bx_left">
                     <h2 class="heading-title">What Need to Delivered?</h2>
                     <ul>
-                        <li>
-                            <div class="bx_img "><img src="public/user/img/track-booking.png" alt="" class="wow  bounce"></div>
-                            <div class="discription">
-                                <h4>Truck Booking</h4>
-                                <div class="readmore"> <a href="#">Read More <img src="public/user/img/readmore.png" alt=""></a></div>
-                            </div>
-                        </li>
-                        <li>
-                            <div class="bx_img"><img src="public/user/img/packer-mover.png" alt="" class="wow  bounce"></div>
-                            <div class="discription">
-                                <h4>Packers & Movers</h4>
-                                <div class="readmore"> <a href="#">Read More <img src="public/user/img/readmore.png" alt=""></a></div>
-                            </div>
-                        </li>
-                        <li>
-                            <div class="bx_img"><img src="public/user/img/vehicle-shifting.png" alt="" class="wow  bounce"></div>
-                            <div class="discription">
-                                <h4>Vehicle Shifting</h4>
-                                <div class="readmore"> <a href="#">Read More <img src="public/user/img/readmore.png" alt=""></a></div>
-                            </div>
-                        </li>
-                        <li>
-                            <div class="bx_img"><img src="public/user/img/part-load.png" alt="" class="wow  bounce"></div>
-                            <div class="discription">
-                                <h4>Part Load</h4>
-                                <div class="readmore"> <a href="#">Read More <img src="public/user/img/readmore.png" alt=""></a></div>
-                            </div>
-                        </li>
+                        <?php foreach($categories as $category){ ?>
+                            <li>
+                                <a href="{{URL :: asset('subCategory/'.$category->id)}}">
+                                    <div class="bx_img "><img src="{{ asset('public/user/img/'.$category->category_image)}}" alt="" class="wow  bounce"></div>
+                                    <div class="discription">
+                                        <h4>{{$category->category_name}}</h4>
+                                        <div class="readmore">Read More <img src="{{ asset('public/user/img/readmore.png')}}" alt=""></div>
+                                    </div>
+                                </a>
+                            </li>
+                        <?php } ?>
                     </ul>
                 </div>
 
