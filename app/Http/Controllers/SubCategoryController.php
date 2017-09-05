@@ -83,7 +83,8 @@ class SubCategoryController extends Controller
                'categoryName' => 'required|max:255',
                'subCategoryName' => 'required|min:3|unique:vehicle_categories,category_name|max:255|Regex:/^[a-z-.]+( [a-z-.]+)*$/i'
             ]);
-            $destinationPath="public\admin\images\category";
+           // $destinationPath="public\admin\images\category";
+            $destinationPath=public_path()."/admin/images/category"; 
             $subcategory=$request->subCategoryName;
             $category_id=$request->categoryName;
             $file = $request->file('subcategoryImage');
@@ -156,7 +157,8 @@ class SubCategoryController extends Controller
         $category->category_name = $cname;
         $category->parent_id = $c_id;
         if($file) {
-            $destinationPath="public\admin\images\category";
+            //$destinationPath="public\admin\images\category";
+            $destinationPath=public_path()."/admin/images/category"; 
             $filename=$file->getClientOriginalName();
             $t=time();
             $filename=$t.'_'.$filename; 

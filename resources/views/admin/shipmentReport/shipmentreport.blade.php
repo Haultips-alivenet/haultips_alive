@@ -4,7 +4,7 @@
 @endsection
 
 @section('body')
-<?php //print_r($category); ?>
+<?php //print_r(@$shiping_details); ?>
     <div id="page-wrapper">
         <div class="graphs">
             <h3 class="blank1"><?php if($id==1) { echo "Truck Booking"; } else if($id==2) { echo "Packers & Movers"; } else if($id==3) { echo "Vehicle Shifting"; } else if($id==4) { echo "Part Load"; }?></h3>
@@ -73,6 +73,8 @@
                                         <th>Estimated Price</th>
                                          <th>Payments</th>
                                         <th>Status</th>
+                                        <th>Bid Status</th>
+                                        <th>Delivered Status</th>
                                         <th>Action</th>
                                     </tr>
                                 </thead>
@@ -82,13 +84,20 @@
                                         @foreach(@$shiping_details as $value) 
                                             <tr>
                                                 <?php if($value->status==0){ $status="Inactive"; } else if($value->status==1) { $status="Active"; } else if($value->status==2) { $status="Processing"; } else if($value->status==3) { $status="Complete"; } ?>
+                                                <?php $bidstatus = "No Bid";
+                                                    if($value->quote_status != ''){
+                                                        $bidstatus = ($value->quote_status=='1')? "Accepted" : "Pending";
+                                                    }?>
+                                                <?php if($value->payments_status==0) { $payments_status="UnDelivered"; } else if($value->payments_status==1) { $payments_status="Delivered";  }?>
                                                 <td><?= $i++ ?></td>
                                                 <td>{{$value->categoty_name}}</td>
                                                 <td>{{$value->subcategory_name}}</td>
                                                 <td>{{$value->estimated_price}}</td>
                                                 <td>{{$value->method}}</td>
                                                 <td>{{$status}}</td>
-                                                <td><a href="{{URL :: asset('shipment/detailsReport/'.$value->id)}}"  class="btn btn-xs btn-link">View</a></td>
+                                                <td>{{$bidstatus}}</td>
+                                                <td>{{$payments_status}}
+                                                <td><a href="{{URL :: asset('shipment/detailsReport/'.$value->id)}}"  class="btn btn-xs btn-link">View</a>/<a href="{{URL :: asset('shipment/BidsReport/'.$value->id)}}"  class="btn btn-xs btn-link">Bids View</a></td>
                                               
                                             </tr>
                                         @endforeach

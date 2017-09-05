@@ -4,3 +4,6 @@ Homestead.yaml
 Homestead.json
 .env
 /nbproject/private/
+resources/views/admin/partner/create.blade.php
+*.bak
+resources/views/admin/partner/create.blade.php

@@ -80,7 +80,7 @@ class PartnerRegistrationController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request)
-    {    
+    {   print_r($_POST);die;
         date_default_timezone_set("Asia/Kolkata");
         $this->validate($request, [
                'firstName' => 'required|min:3|max:255|Regex:/^[a-z-.]+( [a-z-.]+)*$/i',
@@ -452,11 +452,11 @@ class PartnerRegistrationController extends Controller
             $userSucess = $kyc->save(); 
         }
         $status=$request->status;
-        if($status==1){
+        //if($status==1){
         $user = User::find($user_id); 
         $user->documents_status = $status;
         $statusupdate = $user->save(); 
-        }
+       // }
          if($userSucess == 1){
             Session::flash('success', 'Documents Uploaded successfully!');            
         }else{

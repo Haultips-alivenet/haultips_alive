@@ -35,10 +35,10 @@ class ShipmentReportController extends Controller
                              ->leftjoin('vehicle_categories as v','v.id', '=', 's.category_id')
                              ->leftjoin('vehicle_categories as v1','v1.id', '=', 's.subcategory_id')
                               ->leftjoin('payment_methods as p','p.id', '=', 's.payment_method_id')
+                              ->leftjoin('shipping_quotes as q','q.shipping_id', '=', 's.id')
                             ->where('s.subcategory_id',$request->category)
                             ->where('s.status',1)
-                            ->select('s.id','s.estimated_price','s.status','v.category_name as categoty_name','v1.category_name as subcategory_name','p.method')
-                            
+                            ->select('s.id','s.estimated_price','s.status','s.payments_status','v.category_name as categoty_name','v1.category_name as subcategory_name','p.method','q.quote_status')
                             ->paginate(10);
        
          } else {
@@ -46,11 +46,13 @@ class ShipmentReportController extends Controller
                              ->leftjoin('vehicle_categories as v','v.id', '=', 's.category_id')
                              ->leftjoin('vehicle_categories as v1','v1.id', '=', 's.subcategory_id')
                               ->leftjoin('payment_methods as p','p.id', '=', 's.payment_method_id')
-                            ->where('s.category_id',$id)
-                            ->where('s.status',1)
-                            ->select('s.id','s.estimated_price','s.status','v.category_name as categoty_name','v1.category_name as subcategory_name','p.method')
-                            ->paginate(10);
-         }
+                              ->leftjoin('shipping_quotes as q','q.shipping_id', '=', 's.id')
+                            ->where('s.category_id',$id)                            
+                            ->where('s.status',1)     
+                            // ->where('q.quote_status',0)->orWhere('q.quote_status','1')
+                            ->select('s.id','s.estimated_price','s.status','s.payments_status','v.category_name as categoty_name','v1.category_name as subcategory_name','p.method','q.quote_status')
+                           ->paginate(10);
+        }
         $data["page"] = $data["shiping_details"]->toArray(); 
         $data["id"]=$id;
        return view('admin.shipmentReport.shipmentreport',$data); 
@@ -75,6 +77,17 @@ class ShipmentReportController extends Controller
         $data["table_name"]=$data["shipping_details"]->table_name;
         return view('admin/shipmentReport/view',$data);
     }
-
+    public function bids_report($id){
+        
+        
+        
+        $data["shipping_quotes"] =   DB::table('shipping_quotes as s')
+                                    ->leftjoin('users as u','s.carrier_id','=','u.id')
+                                    ->where('shipping_id',$id)
+                                    ->select('s.quote_price','s.quote_status','s.lowest_quote_price','u.first_name','u.last_name')
+                                    ->get();
+        
+        return view('admin/shipmentReport/bidview',$data);
+    }
     
 }

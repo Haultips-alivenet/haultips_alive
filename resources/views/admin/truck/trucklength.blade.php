@@ -168,9 +168,12 @@
 
 @section('script')
 <script>
-  
-  
-    $.validator.addMethod("uniqueUserName", function(value, element) {
+    $.validator.addMethod("lettersonly", function(value, element) {
+        return this.optional(element) || /^[a-z0-9\-\s]+$/i.test(value);
+    }, "Length must contain only letters, numbers, or dashes.");
+
+ 
+        $.validator.addMethod("uniqueUserName", function(value, element) {
         var response = false;
         var trucktype=$('#trucktype').val();
        
@@ -203,7 +206,8 @@ $('#newCategory').validate({
                 trucklength:{
                     
                     required : true,
-                    minlength:2
+                    minlength:2,
+                    lettersonly: true
                   //  uniqueUserName: true
                 }
                 

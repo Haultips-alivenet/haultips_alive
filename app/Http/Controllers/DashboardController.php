@@ -7,7 +7,10 @@ use Illuminate\Http\Request;
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
 use Auth;
+use App\User;
+use App\ShippingDetail;
 use Session;
+use DB;
 
 class DashboardController extends Controller
 {
@@ -19,14 +22,46 @@ class DashboardController extends Controller
     public function index()
     {
         $userData = Session::get('currentUser');
-        $firstName = $userData['first_name'];
-        $lastName = $userData['last_name'];
-        return view('admin.dashboards.dashboard',['firstName'=>$firstName,'lastName'=>$lastName]);
+        //$firstName = $userData['first_name'];
+        //$lastName = $userData['last_name'];
+        $data["user"] =   DB::table('users')
+                          ->where('user_type_id',3)
+                          ->select('id')
+                          ->get();
+        $data["partner"]= DB::table('users')
+                          ->where('user_type_id',2)
+                          ->select('id')
+                          ->get();
+        $data["delivered"] =   DB::table('shipping_details')
+                           ->where('payments_status',1)
+                           ->select('id')
+                           ->get();
+        $data["shipments"]= DB::table('shipping_details')
+                           ->select('id')
+                           ->get();
+        $data["truckbooking"] = DB::table('shipping_details')
+                           ->where('payments_status',1)
+                           ->where('category_id',1)
+                           ->select('id')
+                           ->get();
+         $data["vehicle"] = DB::table('shipping_details')
+                           ->where('payments_status',1)
+                           ->where('category_id',3)
+                           ->select('id')
+                           ->get();
+        $data["packers"] = DB::table('shipping_details')
+                           ->where('payments_status',1)
+                           ->where('category_id',2)
+                           ->select('id')
+                           ->get();
+        $data["Partload"] = DB::table('shipping_details')
+                           ->where('payments_status',1)
+                           ->where('category_id',4)
+                           ->select('id')
+                           ->get();
+        return view('admin.dashboards.dashboard',$data);
     }
-    public function login(){
-        echo "gfg";die;
-        return view('admin/login');
-    }
+  
     /**
      * Show the form for creating a new resource.
      *

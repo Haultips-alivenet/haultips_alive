@@ -22,7 +22,7 @@
                      <?php if($categoryupdate) { ?>
                         <div class="tab-pane active" id="horizontal-form">
                       
-                          {!! Form::model($categoryupdate,['route'=>['admin.subcategory.update',$categoryupdate->id],'files'=>true, 'method'=>'patch','class'=>'form-horizontal'])  !!}
+                          {!! Form::model($categoryupdate,['route'=>['admin.subcategory.update',$categoryupdate->id],'files'=>true, 'method'=>'patch','class'=>'form-horizontal','id'=>'newCategoryupdate'])  !!}
                             
                             <div id="msgStatus"></div>
                              <div class="form-group" style="display:none">
@@ -184,6 +184,10 @@
 
 @section('script')
 <script>
+     $.validator.addMethod("lettersonly", function(value, element) {
+        return this.optional(element) || /^[a-z0-9\-\s]+$/i.test(value);
+    }, "Length must contain only letters, numbers, or dashes.");
+
 $('#newCategory').validate({
 
             rules: {
@@ -193,10 +197,12 @@ $('#newCategory').validate({
                 },
                 subCategoryName:{
                     required : true,
-                    minlength:2
+                    minlength:2,
+                    lettersonly: true
                 },
                 subcategoryImage:{
-                    required : true
+                    required : true,
+                    extension: "jpg|png|jpeg|gif"
                     
                 }
                 
@@ -213,7 +219,50 @@ $('#newCategory').validate({
                     minlength : 'Sub Category Name should be 2 digits'
                 },
                  subcategoryImage :{
-                    required : "Select Image For Sub Category"
+                    required : "Select Image For Sub Category",
+                    extension : "Select Image Only"
+                    
+                }
+               
+            }
+            
+           
+
+        });
+        
+$('#newCategoryupdate').validate({
+
+            rules: {
+                categoryupdate:{
+                    required : true
+                    
+                },
+                subcategoryupdate:{
+                    required : true,
+                    minlength:2,
+                    lettersonly: true
+                },
+                subcategoryImageupdate:{
+                    
+                    extension: "jpg|png|jpeg|gif"
+                    
+                }
+                
+            },
+
+            messages: {
+                
+                categoryupdate :{
+                    required : "Select Category Name"
+                    
+                },
+                 subcategoryupdate :{
+                    required : "Enter Sub Category Name",
+                    minlength : 'Sub Category Name should be 2 digits'
+                },
+                 subcategoryImageupdate :{
+                    
+                    extension : "Select Image Only"
                     
                 }
                

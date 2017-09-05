@@ -21,7 +21,7 @@
                      <?php if($categoryupdate) { ?>
                         <div class="tab-pane active" id="horizontal-form">
                       
-                          {!! Form::model($categoryupdate,['route'=>['admin.category.update',$categoryupdate->id],'files'=>true, 'method'=>'patch','class'=>'form-horizontal'])  !!}
+                          {!! Form::model($categoryupdate,['route'=>['admin.category.update',$categoryupdate->id],'files'=>true, 'method'=>'patch','class'=>'form-horizontal','id'=>'newCategoryupdate'])  !!}
                             
                             <div id="msgStatus"></div>
                              <div class="form-group" style="display:none">
@@ -150,12 +150,21 @@
 
 @section('script')
 <script>
+     $.validator.addMethod("lettersonly", function(value, element) {
+        return this.optional(element) || /^[a-z0-9\-\s]+$/i.test(value);
+    }, "Length must contain only letters, numbers, or dashes.");
+
 $('#newCategory').validate({
 
             rules: {
                 categoryName:{
                     required : true,
-                    minlength:2
+                    minlength:2,
+                    lettersonly: true
+                },
+                categoryImage : {
+                    required : true,
+                    extension: "jpg|png|jpeg|gif"
                 }
                 
             },
@@ -165,6 +174,41 @@ $('#newCategory').validate({
                 categoryName :{
                     required : "Enter Category Name",
                     minlength : 'Category Name should be 2 digits'
+                },
+                 categoryImage :{
+                    required : "Select Category Image",
+                    extension : "Select Image Only"
+                }
+               
+            }
+            
+           
+
+        });
+        $('#newCategoryupdate').validate({
+
+            rules: {
+                categoryNameupdate:{
+                    required : true,
+                    minlength:2,
+                   // lettersonly: true
+                },
+                categoryImageupdate : {
+                   
+                    extension: "jpg|png|jpeg|gif"
+                }
+                
+            },
+
+            messages: {
+                
+                categoryNameupdate :{
+                    required : "Enter Category Name",
+                    minlength : 'Category Name should be 2 digits'
+                },
+                 categoryImageupdate :{
+                   
+                    extension : "Select Image Only"
                 }
                
             }

@@ -108,6 +108,21 @@ $('#docupload').validate({
                 status:{
                     required : true
                     
+                },
+                rc_photo:{
+                    required : true,
+                    extension: "jpg|png|jpeg|gif"
+                    
+                },
+                pancard:{
+                    required : true,
+                    extension: "jpg|png|jpeg|gif"
+                    
+                },
+                businesscard:{
+                    required : true,
+                    extension: "jpg|png|jpeg|gif"
+                    
                 }
                
                 
@@ -117,6 +132,21 @@ $('#docupload').validate({
                 
                 status :{
                     required : "Select Status"
+                    
+                },
+                rc_photo :{
+                    required : "Select RC Photo",
+                    extension : "Select Image Only"
+                    
+                },
+                pancard :{
+                    required : "Select Pan Card",
+                    extension : "Select Image Only"
+                    
+                },
+                businesscard :{
+                    required : "Select Business Card",
+                    extension : "Select Image Only"
                     
                 }
                

@@ -35,16 +35,22 @@ License URL: http://creativecommons.org/licenses/by/3.0/
          <!-- Meters graphs -->
          {!! HTML::script('public/admin/js/jquery-1.10.2.min.js')!!}   
         <!-- Placed js at the end of the document so the pages load faster -->  
+        <style type="text/css">
+            html, body, body section, #page-wrapper{height: 100%;}
+
+        </style>
 </head> 
    
  <body class="sign-in-up">
     <section>
         <div id="page-wrapper" class="sign-in-wrapper">
-            <div class="graphs">
+            <div class="graphs _graphs login_table">
                 <div class="sign-in-form">
+                <div class="inner_login">
                     <div class="sign-in-form-top">
-                            <p><a href="index.html">Sign In to  Admin</a></p>
+                            <p><a href="#">Sign In to  Admin</a></p>
                     </div>
+                    <div class="signin">
                     @if($errors->any())
                         <div class="alert alert-danger">
                             <ul>
@@ -54,7 +60,6 @@ License URL: http://creativecommons.org/licenses/by/3.0/
                             </ul>
                         </div>
                     @endif
-                    <div class="signin">
                         {!! Form::open(array('url'=>'/auth/login','id'=>'login-form')) !!}
                             {!! csrf_field() !!}
                             <div class="log-input">
@@ -81,12 +86,13 @@ License URL: http://creativecommons.org/licenses/by/3.0/
                     {!!Form::close()!!}
                         
                     <div class="signin-rit">
-                        <span class="checkbox1">
+                        <!-- <span class="checkbox1">
                             <label class="checkbox"><input type="checkbox" name="checkbox" checked="">Forgot Password ?</label>
-                        </span>
+                        </span> -->
                         <div class="clearfix"> </div>
                     </div> 
                     </div>
+                </div>
                 </div>
             </div>
         </div>

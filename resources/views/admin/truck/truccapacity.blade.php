@@ -22,7 +22,7 @@
                      <?php if($truckupdate) { ?>
                         <div class="tab-pane active" id="horizontal-form">
                       
-                          {!! Form::model($truckupdate,['route'=>['admin.truckcapacity.update',$truckupdate->id],'files'=>true, 'method'=>'patch','class'=>'form-horizontal'])  !!}
+                          {!! Form::model($truckupdate,['route'=>['admin.truckcapacity.update',$truckupdate->id],'files'=>true, 'method'=>'patch','class'=>'form-horizontal','id'=>'newCategoryupdate'])  !!}
                             
                           
                              
@@ -173,7 +173,10 @@
 
 @section('script')
 <script>
-  
+     $.validator.addMethod("lettersonly", function(value, element) {
+        return this.optional(element) || /^[a-z0-9\-\s]+$/i.test(value);
+    }, "Length must contain only letters, numbers, or dashes.");
+
     function gettrucklength(id){
          var i;
          var _options ="";
@@ -232,7 +235,8 @@ $('#newCategory').validate({
                    
                 },
                 truckcapacity:{
-                     required : true
+                     required : true,
+                     lettersonly: true
                 }
                 
             },
@@ -248,6 +252,45 @@ $('#newCategory').validate({
                     minlength : 'Truck Length should be 2 digits'
                 },
                 truckcapacity :{
+                    required : "Enter Truck Capacity",
+                    minlength : 'Truck Capacity should be 2 digits'
+                }
+               
+            }
+            
+           
+
+        });
+        
+        $('#newCategoryupdate').validate({
+
+            rules: {
+                trucktypeupdate:{
+                    required : true
+                    
+                },
+                trucklengthupdate:{
+                    required : true
+                   
+                },
+                truckcapacityupdate:{
+                     required : true,
+                     lettersonly: true
+                }
+                
+            },
+
+            messages: {
+                
+                trucktypeupdate :{
+                    required : "Select Truck Type"
+                    
+                },
+                 trucklengthupdate :{
+                    required : "Select Truck Length",
+                    minlength : 'Truck Length should be 2 digits'
+                },
+                truckcapacityupdate :{
                     required : "Enter Truck Capacity",
                     minlength : 'Truck Capacity should be 2 digits'
                 }

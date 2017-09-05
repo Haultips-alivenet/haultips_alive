@@ -11,7 +11,7 @@
                                         <div class="r3_counter_box">
                                                 <i class="lnr lnr-user"></i>
                                                 <div class="stats">
-                                                  <h5>45 <span>%</span></h5>
+                                                  <h5>{{count($user)}}</h5>
                                                   <div class="grow">
                                                         <p>Total Customer</p>
                                                   </div>
@@ -22,7 +22,7 @@
                                         <div class="r3_counter_box">
                                                 <i class="lnr lnr-users"></i>
                                                 <div class="stats">
-                                                  <h5>50 <span>%</span></h5>
+                                                  <h5>{{count($partner)}}</h5>
                                                   <div class="grow grow1">
                                                         <p>Total Partner</p>
                                                   </div>
@@ -33,7 +33,7 @@
                                         <div class="r3_counter_box">
                                                 <i class="fa fa-eye"></i>
                                                 <div class="stats">
-                                                  <h5>70 <span>%</span></h5>
+                                                 <h5>{{count($delivered)}}</h5>
                                                   <div class="grow grow3">
                                                         <p>Delivered</p>
                                                   </div>
@@ -44,7 +44,7 @@
                                         <div class="r3_counter_box">
                                                 <i class="fa fa-usd"></i>
                                                 <div class="stats">
-                                                  <h5>70 <span>%</span></h5>
+                                                 <h5>{{count($shipments)}}</h5>
                                                   <div class="grow grow2">
                                                         <p>Shipment</p>
                                                   </div>
@@ -61,7 +61,7 @@
                         <div class="switch-right-grid box">
                         <img src="images/truck_booking.jpg" alt="">
                                 <div class="switch-right-grid1">
-                                <aside class="code">45</aside>
+                                <aside class="code">{{count($truckbooking)}}</aside>
                                         <h3>Truck Booking Deliveries</h3>
                                         <p>Duis aute irure dolor in reprehenderit.</p>
 
@@ -74,7 +74,7 @@
                         <img src="images/vehicle_shifting.jpg" alt="">
                                 <div class="switch-right-grid1 ">
 
-                                        <aside class="code">45</aside>
+                                        <aside class="code">{{count($vehicle)}}</aside>
                                         <h3>Vehicle Shifting Deliveries</h3>
                                         <p>Duis aute irure dolor in reprehenderit.</p>
 
@@ -86,7 +86,7 @@
                         <div class="switch-right-grid box3">
                         <img src="images/packers_movers.jpg" alt="">
                                 <div class="switch-right-grid1">
-                                <aside class="code">45</aside>
+                                <aside class="code">{{count($packers)}}</aside>
                                         <h3>Packers & Movers Deliveries</h3>
                                         <p>Duis aute irure dolor in reprehenderit.</p>
 
@@ -98,7 +98,7 @@
                         <div class="switch-right-grid box4">
                         <img src="images/part_loader.jpg" alt="">
                                 <div class="switch-right-grid1">
-                                <aside class="code">45</aside>
+                               <aside class="code">{{count($Partload)}}</aside>
                                         <h3>Part Load Deliveries</h3>
                                         <p>Duis aute irure dolor in reprehenderit.</p>
 

@@ -18,7 +18,7 @@ error_reporting(0);
      </tr>  
      <tr>
          <td style="width: 20%;">PICKUP DATE</td>
-         <td><?php echo date('d-m-Y',strtotime($pickup->pickup_date)); ?></td>
+         <td><?php echo date('d-M-Y',strtotime($pickup->pickup_date)); ?></td>
      </tr> 
      <tr>
          <td style="width: 20%;">DELIVERY ADDRESS</td>
@@ -26,7 +26,7 @@ error_reporting(0);
      </tr>  
      <tr>
          <td style="width: 20%;">DELIVERY DATE</td>
-         <td>{{date('d-m-Y',strtotime($delivery->delivery_date))}}</td>
+         <td>{{date('d-M-Y',strtotime($delivery->delivery_date))}}</td>
      </tr> 
      <?php for($i=1;$i<count($tables_columns); $i++) {  
         
@@ -86,14 +86,30 @@ error_reporting(0);
                  $tables_value->$tables_columns[$i] = (empty($tables_value->$tables_columns[$i])) ? 'N/A' : App\ShippingDetail::getCategoryName($tables_value->$tables_columns[$i], 'id', 'name','materials'); 
             }
         }
-         
+        if($c_name=="item_image") { 
+           //$tables_value->$tables_columns[$i] = "<img src='".asset('public/uploads/userimages/'.$tables_value->$tables_columns[$i])."' alt='foo' width='50' height='30'/>";
+        }
+        if($c_name!="created_at" && $c_name!="updated_at" && $c_name!="status") {
       ?>
      <tr>
          <td style="width: 20%;"><?php echo strtoupper($name); ?></td>
-         <td>{{$tables_value->$tables_columns[$i]}}</td>
+         <td>
+         <?php  if($c_name=="item_image") {
+             $img=explode(",",$tables_value->$tables_columns[$i]);
+             for($k=0;$k<count($img);$k++) { 
+             ?>
+             <img src="{{asset('public/uploads/userimages/'.$img[$k])}}" alt='foo' width='50' height='30'/>
+             <?php } ?>
+        
+          
+        <?php } else { ?>
+         {{$tables_value->$tables_columns[$i]}}
+         
+         </td>
+         <?php } ?>
      </tr>
      
-     <?php } ?>
+     <?php } } ?>
      
  </tbody> 
  </table>

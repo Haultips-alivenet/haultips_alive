@@ -36,7 +36,7 @@ License URL: http://creativecommons.org/licenses/by/3.0/
          {!! HTML::script('public/admin/js/jquery-1.10.2.min.js')!!}   
         <!-- Placed js at the end of the document so the pages load faster -->  
 </head> 
-<body class="sticky-header left-side-collapsed"  onload="initMap()">
+<body class="sticky-header" >
     <section>
     <!-- left side start-->
         <div class="left-side sticky-left-side">
@@ -54,10 +54,10 @@ License URL: http://creativecommons.org/licenses/by/3.0/
                 <!--sidebar nav start-->
                 <ul class="nav nav-pills nav-stacked custom-nav">
                     <li class="active">
-                        <a href="{{ url('admin/dashboard') }}"><i class="lnr lnr-power-switch"></i><span>Dashboard</span></a>
+                        <a href="{{ url('admin/dashboard') }}"><i class="fa fa-dashboard"></i><span>Dashboard</span></a>
                     </li>
                     <li class="menu-list">
-                        <a href="#"><i class="lnr lnr-cog"></i>
+                        <a href="#"><i class="fa fa-user"></i>
                         <span>User</span></a>
                         <ul class="sub-menu-list">
                             <li><a href="{{ url('admin/users/create') }}">New User</a> </li>
@@ -65,7 +65,7 @@ License URL: http://creativecommons.org/licenses/by/3.0/
                         </ul>
                     </li>
                     <li class="menu-list">
-                        <a href="#"><i class="lnr lnr-cog"></i>
+                        <a href="#"><i class="fa fa-users"></i>
                         <span>Partner</span></a>
                         <ul class="sub-menu-list">
                             <li><a href="{{ url('admin/partner/create') }}">New Partner</a> </li>
@@ -73,7 +73,7 @@ License URL: http://creativecommons.org/licenses/by/3.0/
                         </ul>
                     </li>
                     <li class="menu-list">
-                        <a href="#"><i class="lnr lnr-cog"></i>
+                        <a href="#"><i class="lnr lnr-database"></i>
                         <span>Categories</span></a>
                         <ul class="sub-menu-list">
                            
@@ -83,10 +83,10 @@ License URL: http://creativecommons.org/licenses/by/3.0/
                             <li><a href="{{url('admin/truckcapacity/create')}}">Add Truck Capacity</a></li>
                         </ul>
                     </li>
-                    <li><a href="{{url('admin/transaction/history')}}"><i class="lnr lnr-spell-check"></i> <span>Transaction History</span></a></li>
+                    <li><a href="{{url('admin/transaction/history')}}"><i class="fa fa-exchange"></i> <span>Transaction History</span></a></li>
                     
                     <li class="menu-list">
-                        <a href="#"><i class="lnr lnr-cog"></i>
+                        <a href="#"><i class="fa fa-truck"></i>
                         <span>Shipment</span></a>
                          <ul class="sub-menu-list">
                             <li><a href="{{url('shipment/1/report')}}">Truck Booking</a></li> 
@@ -96,13 +96,13 @@ License URL: http://creativecommons.org/licenses/by/3.0/
                          </ul>
                     </li>
                      
-                     <li><a href="{{url('admin/cost/create')}}"><i class="lnr lnr-spell-check"></i> <span>Cost Estimation</span></a></li>       
+                     <li><a href="{{url('admin/cost/create')}}"><i class="fa fa-tags"></i> <span>Cost Estimation</span></a></li>       
                      <li class="menu-list">
-                        <a href="#"><i class="lnr lnr-cog"></i>
-                        <span>Shipment Details </span></a>
+                        <a href="#"><i class="fa fa-asterisk"></i>
+                        <span>Equipments</span></a>
                          <ul class="sub-menu-list">
-                            <li><a href="{{url('admin/adminshipment/create')}}">Add Shipment Master</a></li> 
-                            <li><a href="{{url('admin/adminshipment/shipList')}}">Shipment Master List</a></li> 
+                            <li><a href="{{url('admin/adminshipment/create')}}">Add Equipments</a></li> 
+                            <li><a href="{{url('admin/adminshipment/shipList')}}">Equipments List</a></li> 
                          </ul>
                     </li>   
                 </ul>
@@ -168,8 +168,9 @@ License URL: http://creativecommons.org/licenses/by/3.0/
     {!! HTML::script('public/admin/js/jquery.nicescroll.js')!!} 
     {!! HTML::script('public/admin/js/scripts.js')!!} 
     {!! HTML::script('public/admin/js/bootstrap.min.js')!!}
-    {!! Html::script('public/admin/js/jquery.validate.min.js') !!}
-    {!! Html::script('public/admin/js/additional-methods.min.js') !!}
+     {!! Html::script('public/admin/js/jquery.validate.min.js') !!}
+    {!! Html::script('public/admin/js/additional-methods.min.js') !!} 
+   
     @yield('script')
  </body>
 </html>
