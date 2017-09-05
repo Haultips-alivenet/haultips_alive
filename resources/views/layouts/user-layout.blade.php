@@ -23,6 +23,7 @@
         <!-- Custom CSS -->
         {!! Html::style('public/user/css/animate.css') !!}
          {!! Html::style('public/user/css/style.css') !!}
+         {!! Html::style('public/user/css/bootstrap-select.min.css') !!}
           {!! HTML::script('public/admin/js/jquery-1.10.2.min.js')!!}   
   </head>
 <body>
@@ -218,6 +219,7 @@ India - 201007</address>
      {!! Html::script('public/user/js/wow_main.js') !!}
      {!! Html::script('public/user/js/custome.js') !!}
      {!! Html::script('public/user/js/bootstrap-slider.js') !!}
+     {!! Html::script('public/user/js/bootstrap-select.min.js') !!}
      {!! Html::script('public/admin/js/additional-methods.min.js') !!}
     @yield('script')
     <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->

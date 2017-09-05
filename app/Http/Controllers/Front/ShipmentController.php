@@ -1,21 +1,14 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Front;
 
 use Illuminate\Http\Request;
 
 use App\Http\Requests;
-use App\Http\Controllers\Controller;
-use Edujugon\PushNotification\PushNotification;
-use Tymon\JWTAuth\Exceptions\JWTException;
-use Tymon\JWTAuth\Facades\JWTAuth;
+use App\Http\Controllers\FrontController;
 use Session;
 use Input;
 use App\library\Smsapi;
-use App\User;
-use App\UserVerification;
-use App\UserVehicleDetail;
-use App\VehicleCategorie;
 use App\AdminBedroom;
 use App\AdminDinningRoom;
 use App\AdminGarage;
@@ -40,17 +33,9 @@ use App\ShippingDeliveryDetail;
 use App\ShippingPickupDetail;
 use App\TruckLength;
 use App\TruckCapacity;
-use App\ShippingQuote;
-use App\PayInfo;
-use App\UserDetail;
-use App\TblAnswer;
-use App\TblQuestion;
-use App\TblQuesMaster;
-use App\PartnerKyc;
 use DB;
-use Hash;
 
-class AndroidController extends AppController
+class ShipmentController extends FrontController
 {
     /**
      * Display a listing of the resource.
@@ -62,535 +47,6 @@ class AndroidController extends AppController
     public function index(Request $request)
     {
        
-    }
-    
-    public function login(Request $request){
-        $credentials = $request->only('email','password');
-        try{
-            if(! $token = JWTAuth::attempt($credentials)){
-                $msg['responseCode'] = "0";
-                $msg['responseMessage'] = "User credentials are not valid.";
-                return $msg;
-            }
-        } catch(JWTException $ex){
-            $msg['responseCode'] = "0";
-            $msg['responseMessage'] = "Something went worng.";
-            return $msg;
-        }
-        $msg['responseCode'] = "200";
-        $msg['productImages'] = compact('token');
-        return $msg;
-    }
-
-     public function sendOtp(Request $request)
-    {
-         try{
-             //if($_POST['token'] == Session::get('token')){
-                $mobileNumber = $_POST['mobileNumber'];     
-                $msg = array();
-                $otpMsg = '';
-                if($mobileNumber != "" || !empty($mobileNumber)){
-
-                    $string = '1234567890';
-                    $string_shuffled = str_shuffle($string);
-                    $otp = substr($string_shuffled, 1, 5);
-
-                    $mobileData=User::where('mobile_number',$mobileNumber)->select('id')->get();
-                    $mobileExists = $mobileData->toArray();
-
-                    $user = new User;
-                    $user->mobile_number = $mobileNumber;
-
-                    if(empty($mobileExists)){               
-                        $user->save();
-                        $userId= $user->id;
-                    }else{
-                        $userId = $mobileExists[0]['id'];
-                    }
-                   // $token = JWTAuth::fromUser($user); 
-
-                    $userVerification =new UserVerification;
-                    $userVerification->user_id = $userId;
-                    $userVerification->otp = $otp;
-                    $userVerification->save();
-
-                    $otpMsg = 'Your Otp is '.$otp;
-
-                   // $smsObj = new Smsapi();
-                  //  $smsObj->sendsms_api('+91'.$mobileNumber,$otpMsg);            
-
-                    $msg['responseCode'] = "200";
-                    $msg['responseMessage'] = "Otp is fetched successfully";
-                    $msg['userId'] = $userId;
-                    $msg['otp'] = $otp;  
-                }else{
-                    $msg['responseCode'] = "0";
-                    $msg['responseMessage'] = "Failed.Please enter mobile number with country code";
-                } 
-//         }else{
-//                    $msg['responseCode'] = "0";
-//                    $msg['responseMessage'] = "Token Mismatch";
-//                } 
-         } catch (\Exception $e) {
-            $msg['responseCode'] = "0";
-            $msg['responseMessage'] =$e->getMessage();
-        }
-         return $msg;    
-    }
-    
-     public function otpVerification(){
-         try{
-            $otp = $_POST['otp'];
-            $userId = $_POST['userId'];
-            $deviceToken = $_POST['deviceId'];
-            $msg = array();
-
-            $required = array('userId', 'otp', 'deviceId');
-
-            $error = false;
-            foreach($required as $field) {
-              if (empty($_POST[$field])) {
-                $error = true;
-                $fieldName = $field;
-                break;
-              }
-            }
-
-            if($error) {
-                $msg['responseCode'] = "0";
-                $msg['responseMessage'] = "$fieldName required.";
-            }else {       
-                  $userData = UserVerification::where('user_id',$userId)->where('otp',$otp)->first();
-                  $verifiedData = User::where('id',$userId)->first();
-                  $userImage = UserDetail::where('user_id',$userId)->select('image')->first();
-                  if($userData){
-                        $verificationId = $userData->id;
-                        UserVerification::where('id',$verificationId)->delete();
-                        User::where('id',$userId)->update(['otp_verified'=>1 , 'status'=>1, 'device_token'=>$deviceToken]);
-                        $status = ($verifiedData->first_name != '')?'yes':'No';
-                        $msg['responseCode'] = "200";
-                        $msg['responseMessage'] = "Mobile number successfully verified.";
-                        $msg['userId'] = $userId;
-                        $msg['isRegistered'] = $status;
-                        $msg['userData'] = $verifiedData;
-                        $msg['userImage'] = ($userImage)?$userImage->image : 'user_icon.png';
-                  }else{
-                      $msg['responseCode'] = "0";
-                     $msg['responseMessage'] = "Failed.Invalid OTP";
-                  }
-            }                    
-        } catch (\Exception $e) {
-            $msg['responseCode'] = "0";
-            $msg['responseMessage'] =$e->getMessage();
-        }
-        return $msg;
-    }
-    
-    public function userRegistration(Request $request){
-        try{
-            $msg = array();
-            $userId = $_POST['userId'];
-            $firstName = $_POST['firstName'];
-            $lastName = $_POST['lastName'];
-            $email = $_POST['email'];
-            $password = $_POST['password'];
-            $cpassword = $_POST['cpassword'];
-            $required = array('userId','firstName','lastName','email','password','cpassword');
-
-            $error = false;
-            foreach($required as $field) {
-              if (empty($_POST[$field])) {
-                $error = true;
-                $fieldName = $field;
-                break;
-              }
-            }
-
-            if($error) {
-                $msg['responseCode'] = "0";
-                $msg['responseMessage'] = "$fieldName required.";
-            }else {       
-                  if($password === $cpassword){
-                     $userEmail = User::where('email',$email)->first();
-                     if($userEmail){
-                        $msg['responseCode'] = "0";
-                        $msg['responseMessage'] = "Failed. Email already exist";
-                        }else{
-                            User::where('id',$userId)
-                                ->update([
-                                    'user_type_id'=>3,
-                                    'first_name'=>$firstName,
-                                    'last_name'=>$lastName,
-                                    'email'=>$email,
-                                    'password'=>bcrypt($password)
-                                    ]);
-                            $userImage = UserDetail::where('user_id',$userId)->select('image')->first();
-                            if($userImage){
-                                UserDetail::where('user_id',$userId)
-                                ->update([
-                                    'image'=>'user_icon.png'
-                                    ]);
-                            }else{
-                                $data = new UserDetail;
-                                $data->user_id = $userId;
-                                $data->image = 'user_icon.png';
-                                $data->save();
-                            }
-
-                            $getUserData = User::where('id',$userId)->first();
-                            
-                            $msg['responseCode'] = "200";
-                            $msg['responseMessage'] = "Registration is done successfully";
-                            $msg['userId'] = $userId;
-                            $msg['firstName'] = $getUserData->first_name;
-                            $msg['lastName'] = $getUserData->last_name;
-                            $msg['email'] = $getUserData->email;
-                            $msg['mobileNumber'] = $getUserData->mobile_number;  
-                            $msg['userImage'] = ($userImage)?$userImage->image : 'user_icon.png';
-                        } 
-                  }else{
-                      $msg['responseCode'] = "0";
-                      $msg['responseMessage'] = "Password and Confirm Password Should be same.";
-                  }
-            } 
-        } catch (\Exception $e) {
-            $msg['responseCode'] = "0";
-            $msg['responseMessage'] =$e->getMessage();
-        }
-        return $msg;
-    }
-    
-    public function partnerRegistration(Request $request){
-        try{
-            
-            $msg = array();
-            $userId = $_POST['userId'];
-            $firstName = $_POST['firstName'];
-            $lastName = $_POST['lastName'];
-            $email = $_POST['email'];
-            $password = $_POST['password'];
-            $cpassword = $_POST['cpassword'];
-            $city = $_POST['city'];
-            $state = $_POST['state'];
-            $categoryId = $_POST['categoryId'];
-            $carrierType = $_POST['carrierType'];
-            $totalVehicle = ($_POST['totalVehicle'])? $_POST['totalVehicle'] : '';
-            $attachedVehicle = ($_POST['attachedVehicle'])? $_POST['attachedVehicle'] : '';
-              
-            $required = array('userId','firstName','lastName','email','password','cpassword');
-
-            $error = false;
-            foreach($required as $field) {
-              if (empty($_POST[$field])) {
-                $error = true;
-                $fieldName = $field;
-                break;
-              }
-            }
-
-            if($error) {
-                $msg['responseCode'] = "0";
-                $msg['responseMessage'] = "$fieldName required.";
-            }else {       
-                  if($password === $cpassword){
-                     $userEmail = User::where('email',$email)->first();
-                     if($userEmail){
-                        $msg['responseCode'] = "0";
-                        $msg['responseMessage'] = "Failed. Email already exist";
-                        }else{
-                            
-                            User::where('id',$userId)
-                                ->update([
-                                    'user_type_id'=>2,
-                                    'first_name'=>$firstName,
-                                    'last_name'=>$lastName,
-                                    'email'=>$email,
-                                    'password'=>bcrypt($password),
-                                    'carrier_type_id'=>$carrierType,
-                                    'city'=>$city,
-                                    'state'=>$state,
-                                    'total_vehicle'=>$totalVehicle,
-                                    'attached_vehicle'=>$attachedVehicle
-                                    ]);
-                            $userImage = UserDetail::where('user_id',$userId)->select('image')->first();
-                            if($userImage){
-                                UserDetail::where('user_id',$userId)
-                                ->update([
-                                    'image'=>'user_icon.png',
-                                    'location'=>$state,
-                                    'city'=>$city
-                                    ]);
-                            }else{
-                                $data = new UserDetail;
-                                $data->user_id = $userId;
-                                $data->image = 'user_icon.png';
-                                $data->location = $state;
-                                $data->city = $city;
-                                $data->save();
-                            }
-
-                            if($carrierType == 2 || $carrierType == 3){
-                                $vehicleData = explode(",",$_POST['vehicleCategory']);
-                                foreach($vehicleData as $vData){
-                                    $sData = explode("-",$vData);
-                                    $userVehicleDetail = new UserVehicleDetail;
-                                    $userVehicleDetail->user_id  = $userId;
-                                    $userVehicleDetail->vehicle_category_id = $categoryId;
-                                    $userVehicleDetail->vehicle_subcategory_id = $sData[0];
-                                    $userVehicleDetail->vehicle_length_id = $sData[1];
-                                    $userVehicleDetail->save();
-                                }
-                               
-                            }
-                            
-                            $getUserData = User::where('id',$userId)->first();
-                            
-                            $msg['responseCode'] = "200";
-                            $msg['responseMessage'] = "Registration is done successfully";
-                            $msg['userId'] = $userId;
-                            $msg['firstName'] = $getUserData->first_name;
-                            $msg['lastName'] = $getUserData->last_name;
-                            $msg['email'] = $getUserData->email;
-                            $msg['mobileNumber'] = $getUserData->mobile_number;
-                            $msg['userImage'] = ($userImage)?$userImage->image : 'user_icon.png';
-                        } 
-                  }else{
-                      $msg['responseCode'] = "0";
-                      $msg['responseMessage'] = "Password and Confirm Password Should be same.";
-                  }
-            } 
-        } catch (\Exception $e) {
-            $msg['responseCode'] = "0";
-            $msg['responseMessage'] =$e->getMessage();
-        }
-        return $msg;
-    }
-    
-    public function token(Request $request){
-        try{
-            $token = $request->session()->token();
-           // Session::set('token', $value);
-            $msg['responseCode'] = "200";
-            $msg['responseMessage'] = "Token get successfully";
-            $msg['token'] = $token;            
-        }catch(\Exception $e) {
-            $msg['responseCode'] = "0";
-            $msg['responseMessage'] =$e->getMessage();
-        }
-        return $msg;
-    }
-    
-    public function getCategories(Request $request){
-        try{
-            $msg = array();
-            $categories = VehicleCategorie::where('status',1)->where('parent_id',0)->select('id','category_name','category_image')->get();
-            $msg['responseCode'] = "200";
-            $msg['responseMessage'] = "Categories get successfully";
-            $msg['categories'] = $categories;            
-        }catch(\Exception $e) {
-            $msg['responseCode'] = "0";
-            $msg['responseMessage'] =$e->getMessage();
-        }
-        return $msg;
-    }
-    
-    public function getSubCategories(Request $request){
-        try{
-            $msg = array();
-            $catId = $_POST['categoryId'];
-            $categories = VehicleCategorie::where('status',1)->where('parent_id',$catId)->select('id','category_name','category_image')->get();
-            $msg['responseCode'] = "200";
-            $msg['responseMessage'] = "Sub Categories get successfully";
-            $msg['subCategories'] = $categories;            
-        }catch(\Exception $e) {
-            $msg['responseCode'] = "0";
-            $msg['responseMessage'] =$e->getMessage();
-        }
-        return $msg;
-    }
-    
-    public function getDiningData(Request $request){
-        try{
-            $msg = array();
-            $categories = AdminDinningRoom::where('status','1')->select('id','name')->get();
-            $msg['responseCode'] = "200";
-            $msg['responseMessage'] = "Dining Data get successfully";
-            $msg['diningRoom'] = $categories;            
-        }catch(\Exception $e) {
-            $msg['responseCode'] = "0";
-            $msg['responseMessage'] =$e->getMessage();
-        }
-        return $msg;
-    }
-    
-    public function getLivingRoomData(Request $request){
-        try{
-            $msg = array();
-            $categories = AdminLivingRoom::where('status','1')->select('id','name')->get();
-            $msg['responseCode'] = "200";
-            $msg['responseMessage'] = "Living Room Data get successfully";
-            $msg['livingRoon'] = $categories;            
-        }catch(\Exception $e) {
-            $msg['responseCode'] = "0";
-            $msg['responseMessage'] =$e->getMessage();
-        }
-        return $msg;
-    }
-    
-    public function getKitchenData(Request $request){
-        try{
-            $msg = array();
-            $categories = AdminKitchen::where('status','1')->select('id','name')->get();
-            $msg['responseCode'] = "200";
-            $msg['responseMessage'] = "Kitchen Data get successfully";
-            $msg['kitchen'] = $categories;            
-        }catch(\Exception $e) {
-            $msg['responseCode'] = "0";
-            $msg['responseMessage'] =$e->getMessage();
-        }
-        return $msg;
-    }
-    
-    public function getHomeOfficeData(Request $request){
-        try{
-            $msg = array();
-            $categories = AdminHomeOffice::where('status','1')->select('id','name')->get();
-            $msg['responseCode'] = "200";
-            $msg['responseMessage'] = "Home Office Data get successfully";
-            $msg['homeOffice'] = $categories;            
-        }catch(\Exception $e) {
-            $msg['responseCode'] = "0";
-            $msg['responseMessage'] =$e->getMessage();
-        }
-        return $msg;
-    }
-    
-    public function getGarageData(Request $request){
-        try{
-            $msg = array();
-            $categories = AdminGarage::where('status','1')->select('id','name')->get();
-            $msg['responseCode'] = "200";
-            $msg['responseMessage'] = "Garage Data get successfully";
-            $msg['garage'] = $categories;            
-        }catch(\Exception $e) {
-            $msg['responseCode'] = "0";
-            $msg['responseMessage'] =$e->getMessage();
-        }
-        return $msg;
-    }
-    
-    public function getOutdoorData(Request $request){
-        try{
-            $msg = array();
-            $categories = AdminOutdoor::where('status','1')->select('id','name')->get();
-            $msg['responseCode'] = "200";
-            $msg['responseMessage'] = "Outdoor Data get successfully";
-            $msg['outdoor'] = $categories;            
-        }catch(\Exception $e) {
-            $msg['responseCode'] = "0";
-            $msg['responseMessage'] =$e->getMessage();
-        }
-        return $msg;
-    }
-    
-    public function getMiscellaneousData(Request $request){
-        try{
-            $msg = array();
-            $categories = AdminMiscellaneous::where('status','1')->select('id','name')->get();
-            $msg['responseCode'] = "200";
-            $msg['responseMessage'] = "Miscellaneous Data get successfully";
-            $msg['miscellaneous'] = $categories;            
-        }catch(\Exception $e) {
-            $msg['responseCode'] = "0";
-            $msg['responseMessage'] =$e->getMessage();
-        }
-        return $msg;
-    }
-    
-    public function getBoxesData(Request $request){
-        try{
-            $msg = array();
-            $categories = AdminBox::where('status','1')->select('id','name')->get();
-            $msg['responseCode'] = "200";
-            $msg['responseMessage'] = "Miscellaneous Box Data get successfully";
-            $msg['miscellaneousBox'] = $categories;            
-        }catch(\Exception $e) {
-            $msg['responseCode'] = "0";
-            $msg['responseMessage'] =$e->getMessage();
-        }
-        return $msg;
-    }
-    
-    public function getEquipmentData(Request $request){
-        try{
-            $msg = array();
-            $categories = AdminEquipment::where('status','1')->select('id','name')->get();
-            $msg['responseCode'] = "200";
-            $msg['responseMessage'] = "Equipment Data get successfully";
-            $msg['equipments'] = $categories;            
-        }catch(\Exception $e) {
-            $msg['responseCode'] = "0";
-            $msg['responseMessage'] =$e->getMessage();
-        }
-        return $msg;
-    }
-    
-    public function getGeneralShipmentData(Request $request){
-        try{
-            $msg = array();
-            $categories = AdminGeneralShipment::where('status','1')->select('id','name')->get();
-            $msg['responseCode'] = "200";
-            $msg['responseMessage'] = "General Shipment Data get successfully";
-            $msg['generalShipment'] = $categories;            
-        }catch(\Exception $e) {
-            $msg['responseCode'] = "0";
-            $msg['responseMessage'] =$e->getMessage();
-        }
-        return $msg;
-    }
-    
-    public function getMaterial(Request $request){
-        try{
-            $msg = array();
-            $categories = Material::where('status','1')->select('id','name','image')->get();
-            $msg['responseCode'] = "200";
-            $msg['responseMessage'] = "Materials get successfully";
-            $msg['materials'] = $categories;            
-        }catch(\Exception $e) {
-            $msg['responseCode'] = "0";
-            $msg['responseMessage'] =$e->getMessage();
-        }
-        return $msg;
-    }
-    
-    public function getTruckLength(Request $request){
-        try{
-            $msg = array();
-            $truckType = $_POST['subCatId'];
-            $categories = TruckLength::where('truck_type_id',$truckType)->where('status','1')->select('id','truck_length')->get();
-            $msg['responseCode'] = "200";
-            $msg['responseMessage'] = "Truck Length get successfully";
-            $msg['truckLength'] = $categories;            
-        }catch(\Exception $e) {
-            $msg['responseCode'] = "0";
-            $msg['responseMessage'] =$e->getMessage();
-        }
-        return $msg;
-    }
-    
-     public function getTruckCapacity(Request $request){
-        try{
-            $msg = array();
-            $lengthId = $_POST['lengthId'];
-            $categories = TruckCapacity::where('truck_length_id',$lengthId)->where('status','1')->select('id','truck_capacity')->get();
-            $msg['responseCode'] = "200";
-            $msg['responseMessage'] = "Truck Capacity get successfully";
-            $msg['truckCapacity'] = $categories;            
-        }catch(\Exception $e) {
-            $msg['responseCode'] = "0";
-            $msg['responseMessage'] =$e->getMessage();
-        }
-        return $msg;
     }
     
     public function homeCategory(){
@@ -818,92 +274,11 @@ class AndroidController extends AppController
         }
     }
     
-    public function otherCategory(){
-        try{
-
-            $category_id = $_POST['catId'];
-            $custid = $_POST['userId'];
-            $subCatId = $_POST['subCatId'];
-            $title = $_POST['deliveryTitle'];
-            $preShipId = $_POST['shippingId'];
-            $imageCount = $_POST['imageCount'];
-            $required = array('catId','userId','subCatId','deliveryTitle','imageCount');
-
-            $error = false;
-            foreach($required as $field) {
-              if (empty($_POST[$field])) {
-                $error = true;
-                $fieldName = $field;
-                break;
-              }
-            }
-
-            if($error) {
-                $msg['responseCode'] = "0";
-                $msg['responseMessage'] = "$fieldName required.";
-            }else{
-
-                $otherImages = '';                
-                for($i=1;$i<=$imageCount;$i++){
-                    $pic=Input::file('image'.$i);
-
-                    $extension = $pic->getClientOriginalExtension(); // getting image extension
-                    $name = time() . rand(111, 999) . '.' . $extension; // renameing image                
-                    $pic->move(public_path().'/uploads/userimages/',$name);
-                    
-                    if($otherImages != ''){
-                        $otherImages.= ','.$name;
-                    }else{
-                        $otherImages = $name;
-                    }
-                }
-                
-                if ($preShipId=='') {
-
-                    $shipping= new ShippingDetail;
-                    $shipping->user_id = $custid;
-                    $shipping->category_id = $category_id;
-                    $shipping->subcategory_id = $subCatId;
-                    $shipping->table_name = 'shipment_listing_others';
-                    $shipping->status = 0;
-                    $shipping->save(); 
-                    $shippingId= $shipping->id;
-                    
-                    $shipmentList= new ShipmentListingOther;
-                    $shipmentList->shipping_id = $shippingId;
-                    $shipmentList->delivery_title = $title;
-                    $shipmentList->additional_detail = $_POST['additionalDetail'];
-                    $shipmentList->item_image = $otherImages;
-                    $shipmentList->save();
-                }
-                else{
-
-                    ShipmentListingOther::where('shipping_id ',$preShipId)
-                                       ->update([
-                                            'delivery_title'=>$title,
-                                            'additional_detail'=>$_POST['additionalDetail'],
-                                            'item_image'=>$otherImages                                            
-                                        ]);         
-                   $shippingId = $preShipId;
-                }
-
-                $msg['responseCode'] = "200";
-                $msg['responseMessage'] = "Data successfully Saved";
-                $msg['shippingId'] = $shippingId;
-            }
-        }
-
-        catch (Exception $e){
-
-            $msg['responseCode'] = "0";
-            $msg['responseMessage'] = "Some Error Occur";
-            $msg['technicalError'] = $e->getMessage();
-        }
-
-        finally {
-            $result = json_encode($msg);
-            echo $result;
-        }
+    public function office(){
+        $general = AdminGeneralShipment::where('status','1')->select('id','name')->get();
+        $equipment = AdminEquipment::where('status','1')->select('id','name')->get();
+        $miscellaneous = AdminMiscellaneous::where('status','1')->select('id','name')->get();
+        return View('user.shipment.office',['general'=>$general, 'equipment'=>$equipment, 'miscellaneous'=>$miscellaneous]);
     }
     
     public function houseHoldGoodsCategory(){
@@ -2209,7 +1584,7 @@ class AndroidController extends AppController
             $minimumBid = $_POST['minimumBid'];            
             $quotationId = $_POST['quotationId'];  
             $required = array('shippingId','userId','quotation','minimumBid');
-            
+
             $error = false;
             foreach($required as $field) {
               if (empty($_POST[$field])) {
@@ -2222,49 +1597,42 @@ class AndroidController extends AppController
             if($error) {
                 $msg['responseCode'] = "0";
                 $msg['responseMessage'] = "$fieldName required.";
-            }else{  
-                $kycStatus = User::select('documents_status','status')->where('id',$userId)->first();
-                if($kycStatus->documents_status == 1 && $kycStatus->status == 1){
-                    if($quotationId == ''){
-                        $quote = new ShippingQuote;
-                        $quote->shipping_id = $shippingId;
-                        $quote->carrier_id = $userId;
-                        $quote->quote_price = $quotation;
-                        $quote->lowest_quote_price = $minimumBid;
-                        $quote->quote_status = 0;
-                        $quote->save();
-                        $quotationId= $quote->id;
-                    }else{
-                        ShippingQuote::where('id',$quotationId)
-                                ->update([
-                                        'quote_price'=>$quotation,
-                                        'lowest_quote_price'=>$minimumBid
-                                    ]);
-                    }
-
-                    $offerNotification = ShippingDetail::select('u.device_token','u.first_name','u.last_name')
-                                    ->leftJoin('users as u','u.id','=','shipping_details.user_id')
-                                    ->where('shipping_details.id',$shippingId)->first();
-
-                    $push = new PushNotification('fcm');
-                    $response =  $push->setMessage([
-                            'notification' => [
-                                    'title'=>'Get Offer',
-                                    'body'=>'A new Quotation has arrived on your post from Haulitps.',
-                                    'sound' => 'default'
-                                    ]
-                            ])                            
-                         ->setDevicesToken($offerNotification->device_token)
-                         ->send();
-
-                    $msg['responseCode'] = "200";
-                    $msg['responseMessage'] = "Quotation post successfully";
-                    $msg['quotationId'] = $quotationId;
+            }else{           
+                if($quotationId == ''){
+                    $quote = new ShippingQuote;
+                    $quote->shipping_id = $shippingId;
+                    $quote->carrier_id = $userId;
+                    $quote->quote_price = $quotation;
+                    $quote->lowest_quote_price = $minimumBid;
+                    $quote->quote_status = 0;
+                    $quote->save();
+                    $quotationId= $quote->id;
+                }else{
+                    ShippingQuote::where('id',$quotationId)
+                            ->update([
+                                    'quote_price'=>$quotation,
+                                    'lowest_quote_price'=>$minimumBid
+                                ]);
                 }
-                else{
-                    $msg['responseCode'] = "0";
-                    $msg['responseMessage'] = ($kycStatus->status == 0) ? "User Not Verified" : "Kyc Details Not Verified";
-                }
+                
+                $offerNotification = ShippingDetail::select('u.device_token','u.first_name','u.last_name')
+                                ->leftJoin('users as u','u.id','=','shipping_details.user_id')
+                                ->where('shipping_details.id',$shippingId)->first();
+                
+                $push = new PushNotification('fcm');
+                $response =  $push->setMessage([
+                        'notification' => [
+                                'title'=>'Get Offer',
+                                'body'=>'A new Quotation has arrived on your post from Haulitps.',
+                                'sound' => 'default'
+                                ]
+                        ])                            
+                     ->setDevicesToken($offerNotification->device_token)
+                     ->send();
+                
+                $msg['responseCode'] = "200";
+                $msg['responseMessage'] = "Quotation post successfully";
+                $msg['quotationId'] = $quotationId;
             }
         }catch(\Exception $e) {
             $msg['responseCode'] = "0";
@@ -2959,7 +2327,6 @@ class AndroidController extends AppController
             $location = $_POST['address']; 
             $pincode = $_POST['pincode']; 
             $country = $_POST['country']; 
-            $categoryId = 1;
             $carrierType = $_POST['carrierType'];
             $totalVehicle = ($_POST['totalVehicle'])? $_POST['totalVehicle'] : '';
             $attachedVehicle = ($_POST['attachedVehicle'])? $_POST['attachedVehicle'] : '';
@@ -3026,21 +2393,17 @@ class AndroidController extends AppController
                 }
                 
                 if($carrierType == 2 || $carrierType == 3){
-                    $blankData = trim($_POST['vehicleCategory'], '"');
-                   // echo($blankData); die;
-                    if($blankData != "" || !empty($blankData)){
-                        $vehicleDetails = UserVehicleDetail::where('user_id',$userId)->delete();
-                        $vehicleData = explode(",",$_POST['vehicleCategory']);
-                        foreach($vehicleData as $vData){
-                            $sData = explode("-",$vData);
-                            $userVehicleDetail = new UserVehicleDetail;
-                            $userVehicleDetail->user_id  = $userId;
-                            $userVehicleDetail->vehicle_category_id = $categoryId;
-                            $userVehicleDetail->vehicle_subcategory_id = $sData[0];
-                            $userVehicleDetail->vehicle_length_id = $sData[1];
-                            $userVehicleDetail->save();
-                        }  
-                    }
+                    $vehicleData = $_POST['vehicleCategory'];
+                    $vehicleDetails = UserVehicleDetail::where('user_id',$userId)->delete();
+                    
+                    foreach($vehicleData as $vData){
+                        $userVehicleDetail = new UserVehicleDetail;
+                        $userVehicleDetail->user_id  = $userId;
+                        $userVehicleDetail->vehicle_category_id = $categoryId;
+                        $userVehicleDetail->vehicle_subcategory_id = $vData['subCategoryId'];
+                        $userVehicleDetail->vehicle_length_id = $vData['vehicleLength'];
+                        $userVehicleDetail->save();
+                    }                    
                 }
                     
                     
@@ -3194,22 +2557,15 @@ class AndroidController extends AppController
                 $msg['responseCode'] = "0";
                 $msg['responseMessage'] = "userId required.";
             }else{           
-                    $userdetails = User::select('first_name', 'last_name','email','mobile_number','total_vehicle','attached_vehicle','ud.*')                            
+                    $userdetails = User::select('first_name', 'last_name','email','mobile_number','ud.*','vc.vehicle_category_id','vc.vehicle_subcategory_id','vc.vehicle_length_id')                            
                                     ->leftJoin('user_details as ud','ud.user_id','=','users.id')
-                                    ->where('users.id',$userId)->first();   
-                    
-                    $vechileData = UserVehicleDetail::select('vehicle_category_id','vehicle_subcategory_id','vehicle_length_id')
-                                        ->where('user_id',$userId)->get(); 
-                    
-                    $userType = User::select('carrier_type_id')->where('id',$userId)->first(); 
-                    $type = ['1'=>'Packers & Movers','2'=>'Transporter','3'=>'Both'];
-                    $userdetails['userType'] = $type[$userType->carrier_type_id]; 
+                                    ->leftJoin('user_vehicle_details as vc','vc.user_id','=','users.id')
+                                    ->where('users.id',$userId)->first();                
                    
                     if($userdetails){
                         $msg['responseCode'] = "200";
                         $msg['responseMessage'] = "Information get successfully"; 
                         $msg['details'] = $userdetails; 
-                        $msg['vechileDetail'] = $vechileData;
                     }else{
                         $msg['responseCode'] = "200";
                         $msg['responseMessage'] = "Information get successfully";  

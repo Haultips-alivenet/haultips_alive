@@ -24,7 +24,8 @@
                             <?php foreach($subCategories as $subCategory){ ?>
                                 <div class="col-md-3 border-right">
                                     <div class="_p_m_bx">
-                                        <a href="{{URL :: asset($subCategory->category_name)}}" class="wow  bounce">
+                                       <?php $urlName = $str=preg_replace('/\s+/', '', $subCategory->category_name); ?>
+                                        <a href="{{URL :: asset(strtolower($urlName))}}" class="wow  bounce">
                                           <span>  <img src="{{ asset('public/user/img/'.$subCategory->category_image)}}" alt=""></span>
                                             <p>{{$subCategory->category_name}}</p>
                                         </a>
