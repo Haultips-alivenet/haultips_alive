@@ -12,6 +12,11 @@
 */
 Route::get('/', 'Front\UserHomeController@index');
 Route::resource('user/dashboard', 'Front\UserHomeController@index');
+Route::resource('user/home', 'Front\UserHomeController@userdashboard');
+Route::resource('user/faq', 'Front\UserHomeController@faq');
+Route::resource('user/notification', 'Front\UserHomeController@notification');
+Route::resource('user/changepassword', 'Front\UserHomeController@changepassword');
+Route::resource('user/transactionhistory', 'Front\UserHomeController@transactionhistory');
 #User
 Route::resource('user/find/deliveries', 'Front\FindDeliveriesController');
 Route::resource('user/login', 'Front\LoginController');
@@ -104,6 +109,7 @@ Route::resource('admin/transaction/history', 'TransactionHistoryController');
 
 #shipment/report
 Route::get('shipment/detailsReport/{id}', 'ShipmentReportController@details_report');
+Route::get('shipment/BidsReport/{id}', 'ShipmentReportController@bids_report');
 Route::resource('shipment/{id}/report', 'ShipmentReportController');
 Route::resource('shipment/reportList/{id}', 'ShipmentReportController@index');
 

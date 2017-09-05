@@ -32,7 +32,7 @@ error_reporting(0);
      
      @else
      <tr>
-         <td style="width: 100%;">No Bids</td>
+          <tr><td colspan="3"><i>No Bids Found</i></td></tr>
         
      </tr> 
     @endif

@@ -7,3 +7,5 @@ Homestead.json
 resources/views/admin/partner/create.blade.php
 *.bak
 resources/views/admin/partner/create.blade.php
+app/Http/Controllers/PartnerRegistrationController_old.php
+app/Http/routes_1.php

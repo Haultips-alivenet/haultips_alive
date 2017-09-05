@@ -7,7 +7,7 @@
 <?php //print_r($category); ?>
     <div id="page-wrapper">
         <div class="graphs">
-            <h3 class="blank1">Admin</h3>
+            <h3 class="blank1">Equipments</h3>
                 <div class="tab-content">
                     {{--    Error Display--}}
                         @if($errors->any())
@@ -31,7 +31,7 @@
                             <div id="msgStatus"></div>
                              
                             <div class="form-group">
-                                <label for="name" class="col-sm-2 control-label">Shipment Type</label>
+                                <label for="name" class="col-sm-2 control-label">Equipments Type</label>
                                 <div class="col-sm-8">
                                     <select name="type" id="costtype" class="form-control select2" >
                                         <option value=""  >Select Type</option> 

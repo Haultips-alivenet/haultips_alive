@@ -2018,6 +2018,11 @@ border: 1px solid rgb(170, 170, 170);
 .modal-footer > .Continue {
     padding: 5px;
 }
+.scrollbar {
+    height: 380px;
+    background: #fff;
+    overflow-y: scroll;
+}
 ._open_sel_bx .checkbox > input{ right: 0; }
 ._open_sel_bx .checkbox label::before{ right: -29rem !important;  left: auto;}
 ._open_sel_bx .checkbox label::after{ right: -29rem !important; left: auto;}
@@ -2026,6 +2031,210 @@ border: 1px solid rgb(170, 170, 170);
     margin-left: -20px;
 }
 ._inner_bx label{ font-weight: 400; margin-bottom: 15px; }
+._dash_lft{
+    box-shadow: 2px 0 10px rgba(204, 204, 204, 0.8);
+    display: inline-block;
+    padding: 10px;
+    position: relative;
+    width: 100%;
+    z-index: 4;
+}
+
+._dash_rft{
+    box-shadow: 2px 0 10px rgba(204, 204, 204, 0.8);
+    display: inline-block;
+    padding: 20px;
+    position: relative;
+    width: 100%;
+    z-index: 4;
+    background: #fff;
+    margin-top: 50px;
+}
+._dash_mbx {
+    padding-top: 20px;
+    width: 45rem;
+}
+._dash_m {
+    margin-top: 50px;
+}
+._dash_lft > ul {
+    margin: 0;
+    padding: 0;
+}
+._dash_lft li {
+    display: block;
+}
+._dash_lft li a {
+    border-bottom: 1px solid rgba(221, 221, 221, 0.5);
+    display: block;
+    padding: 15px 10px;
+    position: relative;
+    transition: all 0.3s linear 0s;
+}
+._dash_lft span {
+    float: right;
+    font-size: 20px;
+}
+._dash_lft span {
+    border-right: 1px solid rgb(204, 204, 204);
+    display: block;
+    float: left;
+    font-size: 20px;
+    line-height: 16px;
+    margin-right: 10px;
+    padding-right: 10px;
+    vertical-align: middle;
+    width: 30px;
+    transition: all 0.3s linear 0s;
+
+}
+._dash_lft a:hover {
+    background: rgb(14, 97, 89) none repeat scroll 0 0;
+    color: rgb(255, 255, 255);
+}
+.pro_im span {
+    display: inline-block;
+    padding-right: 10px !important;
+    text-align: center;
+}
+.pro_im img {
+    border: 1px solid rgb(170, 170, 170);
+    border-radius: 60px;
+    height: 40px;
+    width: 40px;
+    padding: 3px;
+}
+.pro_im > a {
+    margin-top: 8px !important;
+}
+.toggle > ul {
+    display: none;
+}
+._open_sel_bx .form-group > label {
+    display: block;
+}
+._open_sel_bx .form-group > .btn-group.bootstrap-select {
+    width: 100%;
+}
+._open_sel_bx .form-group .btn.btn-default {
+    border-radius: 0;
+    color: rgb(51, 51, 51);
+    height: 45px;
+}
+._open_sel_bx .form-group .bootstrap-select.btn-group .dropdown-menu li {
+    padding: 7px 10px;
+}
+._open_sel_bx .form-group .bootstrap-select.btn-group .dropdown-menu li a{
+   font-weight: normal;
+}
+.tab-content.panels-faq {
+  padding: 0;
+  border: 0;
+}
+
+.panel.panel-help {
+  box-shadow: 0 1px 5px rgba(85, 85, 85, 0.15);
+  padding-bottom: 0;
+  border-radius: 2px;
+  overflow: hidden;
+  background-color: #fff;
+  margin: 0 0 16px;
+}
+.panel.panel-help a[href^="#"],
+.panel.panel-help a[href^="#"]:hover,
+.panel.panel-help a[href^="#"]:focus {
+  outline: none;
+  cursor: pointer;
+  text-decoration: none;
+}
+.panel.panel-help .panel-heading {
+  padding: 0 16px;
+  line-height: 48px;
+  border-top-right-radius: 2px;
+  border-top-left-radius: 2px;
+  color: rgba(0, 0, 0, 0.87);
+}
+.panel.panel-help .panel-heading h2 {
+  margin: 0;
+  padding: 14px 0 14px;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 20px;
+  letter-spacing: 0;
+  text-transform: none;
+}
+.panel.panel-help .panel-body {
+  background-color: #fff;
+  border-top: 1px solid #ddd;
+  border-radius: 2px;
+  border-top-right-radius: 0;
+  border-top-left-radius: 0;
+  margin-top: 0;
+}
+.panel.panel-help .panel-body p {
+  margin: 0 0 16px;
+}
+.panel.panel-help .panel-body p:last-of-type {
+  margin: 0;
+}
+._panel .panel-heading {
+    padding:0 15px;
+    position: relative;
+}
+._panel .panel-group {
+    border-bottom: 1px solid rgba(221, 221, 221, 0.8);
+    box-shadow: 0 0 8px rgba(221, 221, 221, 0.3);
+    margin-bottom: 5px;
+    padding: 1px 10px;
+}
+._dash_lft span {
+    border-right: 0 none;
+}
+.toggle span.pull-right {
+    position: absolute;
+    right: -20px;
+    top: 15px;
+}
+._panel .panel-heading h2{ font-size: 20px;}
+._panel .panel-body {
+    padding: 5px 0 15px 15px;
+    text-align: justify;
+}
+._d_p {
+    position: absolute;
+    right: 0;
+    top: 0;
+}
+._d_p .fa-calendar {
+    background: rgb(14, 97, 89) none repeat scroll 0 0;
+    color: rgb(255, 255, 255);
+    padding: 7px 10px;
+}
+._d_p .fa-calendar {
+    background: rgb(14, 97, 89) none repeat scroll 0 0;
+    color: rgb(255, 255, 255);
+    margin: 0 0 0 10px;
+    padding: 7px 10px;
+}
+._dash_rft table tr > th {
+    font-weight: normal;
+    padding: 8px 10px;
+    text-align: center;
+}
+._dash_rft .table {
+    background: #fff;
+    border: 1px solid #ebedee;
+    margin-bottom: 0;
+    box-shadow: 0 0 0 1px rgba(14,41,57,.12), 0 2px 1px rgba(239, 244, 249, 1), inset 0 -1px 2px rgba(14,41,57,.15);
+}
+._dash_rft table tr > td {
+    font-size: 13px;
+    padding: 5px 10px;
+}
+._dash_rft table > thead > tr > th {
+    border-right: 1px solid rgb(221, 221, 221);
+}
+
 @media (max-width: 1280px) {
 
 ._any_tm_rft_txt { padding: 10% 10%; }

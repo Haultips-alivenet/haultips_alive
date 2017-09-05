@@ -7,7 +7,7 @@
 <?php  error_reporting(0); ?>
     <div id="page-wrapper">
         <div class="graphs">
-            <h3 class="blank1">Admin</h3>
+            <h3 class="blank1">Equipments</h3>
                 <div class="xs tabls">
                     <div class="panel panel-warning" >
                         
@@ -32,7 +32,7 @@
                                     {!! Form::close() !!}
                         
                         <div class="panel-heading">
-                            <h2>Category List</h2>
+                            <h2>Equipments List</h2>
                             <div class="panel-ctrls"><span class="button-icon has-bg"><i class="ti ti-angle-down"></i></span></div>
                         </div>
                         @if(Session::has('success'))
@@ -64,7 +64,7 @@
                                             </tr>
                                         @endforeach
                                     @else
-                                        <tr><td><i>No User Found</i></td></tr>
+                                        <tr><td><i>No Equipments Found</i></td></tr>
                                     @endif
                                 </tbody>
                             </table>

@@ -6,7 +6,12 @@
 @section('body')
 
 <style>
-    
+    ._box{
+       color: #333;
+        padding: 20px;
+        display: none;
+        margin-top: 20px;
+    }
     .inner_box{
        color: #333;
         padding: 20px;
@@ -20,16 +25,17 @@
       padding:10px;
       margin-bottom:5px;
     }
-    
+    ._box{
+       margin-left:10px;
+       border:1px solid #0d0;
+    }
     .inner_box{ border-top:1px dashed #ddd;}
     </style>
     <div id="page-wrapper">
         <div class="graphs">
             <h3 class="blank1">New Partner</h3>
-            <hr>
-            <div class="grid_3 fulldiv">
-            <div class="col-md-8">
-                <div class="tab-content">
+            <br>
+                <div class="grid_3 fulldiv">
                     {{--    Error Display--}}
                         @if($errors->any())
                         <ul class="alert">
@@ -110,36 +116,25 @@
                             </div>
                             <div class="form-group">
                                 <label class="col-sm-2 control-label"></label>
-                               
-                                
-                                 <div class="col-sm-3">
-                                  <?php $i=1; foreach($carrier_types as $types) {?>
-                                 <div class="check-bottom">
+                                <?php $i=1; foreach($carrier_types as $types) {?>
+                                <div class="col-sm-3">
                                     <input class="carrer_group" type="checkbox" name="carrer_type<?php echo $i; ?>" id="carrer_type<?php echo $i; ?>"  value="{{$types->id}}">
-
-                                <label for="carrer_type<?php echo $i; ?>"><span></span> {{$types->carrier_type}}</label>
-
-                                </div>
+                                
+                                 {{$types->carrier_type}}
                                 </div>
                                 <?php $i++; } ?>
                             </div>
-                           <div class="col-sm-2"></div>
-                            <div class="col-sm-8">
-                                <div id="transport_div" style="display: none">                
-                               <?php foreach($categoryname as $types) { ?> 
-
-                                <div class="check-bottom">
-                                    <input type="checkbox" name="trucktype[]" id="trucktype{{$types->id}}" onclick="gettrucklength({{$types->id}});" value="{{$types->id}}">
-                                    <label for="trucktype{{$types->id}}"> <span style="bottom:2px;"></span> {{$types->category_name}}</label>
+                            <div class="form-group">
+                            <label class="col-sm-2 control-label"></label>
+                            <div class="col-sm-8 checkbox_align" id="transport_div" style="display: none">                
+                               <?php foreach($categoryname as $types) { ?>                
+                                <div class="checkbox">
+                                     <label><input type="checkbox" name="trucktype[]" id="trucktype" onclick="gettrucklength({{$types->id}});" value="{{$types->id}}">  {{$types->category_name}}</label>
                                 </div>
-
-
                                 <div class="_box {{$types->id}}" id="trucklength_div{{$types->id}}"></div>
-
-
                               <?php } ?>
-                            </div>   
-                            </div>           
+                            </div>              
+                            </div>              
                             
                             
                             <div class="col-sm-8 col-sm-offset-2">
@@ -149,8 +144,6 @@
 					
                     </div>
                 </div>
-                </div>
-        </div>
         </div>
     </div>
     
@@ -171,107 +164,107 @@ $('#carrer_type2').click(function(){
 this.checked?$('#transport_div').show():$('#transport_div').hide(); //time for show
 });
 
-//$('#newUser').validate({
-//
-//            rules: {
-//                firstName:{
-//                    required : true,
-//                    minlength:2
-//                },
-//                lastName:{
-//                    required : true,
-//                    minlength:2
-//                },
-//                email:{
-//                    required : true,
-//                    email : true
-//                },
-//
-//                mobile:{
-//                    required : true,
-//                    minlength:10,
-//                    number:true
-//                },
-//
-//                password:{
-//                    required : true
-//                },
-//
-//                cpassword:{
-//                    required : true
-//                },
-//                 state:{
-//                    required : true,
-//                    minlength:2
-//                },
-//                 city:{
-//                    required : true,
-//                    minlength:2
-//                },
-//                 total_vehicle:{
-//                    required : true,
-//                    minlength:1,
-//                    number:true
-//                },
-//                 attached_vehicle:{
-//                    required : true,
-//                    minlength:1,
-//                    number:true
-//                },
-//                carrer_type1: {
-//                    require_from_group: [1, ".carrer_group"]
-//                  },
-//                  carrer_type2: {
-//                    require_from_group: [1, ".carrer_group"]
-//                  }
-//               
-//            },
-//
-//            messages: {
-//                
-//                firstName :{
-//                    required : "Enter your First name",
-//                    minlength : 'First Name should be 2 digits'
-//                },
-//                lastName :{
-//                    required : "Enter your Last name",
-//                    minlength : 'Last Name should be 2 digits'
-//                },
-//                email :{
-//                    required : "Enter your email",
-//                    email : "Enter Valid email"
-//                },
-//                mobile :{
-//                    required : 'Enter your Mobile Number',
-//                    minlength : 'Mobile Number should be 10 digits'
-//                },                
-//                password :{
-//                    required : "Enter your Password",
-//                },                
-//                cpassword :{
-//                    required : "Enter your Confirm Password",
-//                },
-//                state :{
-//                    required : "Enter your State",
-//                    minlength : 'State should be 2 digits'
-//                },
-//                city :{
-//                    required : "Enter your City",
-//                    minlength : 'City should be 2 digits'
-//                },
-//                total_vehicle :{
-//                    required : "Enter your Total Vehicle",
-//                    minlength : 'Total Vehicle should be 1 digits'
-//                },
-//                attached_vehicle :{
-//                    required : "Enter your Attached Vehicle",
-//                    minlength : 'Attached Vehicle should be 1 digits'
-//                }
-//            }
-//            
-//           
-//
-//        });
+$('#newUser').validate({
+
+            rules: {
+                firstName:{
+                    required : true,
+                    minlength:2
+                },
+                lastName:{
+                    required : true,
+                    minlength:2
+                },
+                email:{
+                    required : true,
+                    email : true
+                },
+
+                mobile:{
+                    required : true,
+                    minlength:10,
+                    number:true
+                },
+
+                password:{
+                    required : true
+                },
+
+                cpassword:{
+                    required : true
+                },
+                 state:{
+                    required : true,
+                    minlength:2
+                },
+                 city:{
+                    required : true,
+                    minlength:2
+                },
+                 total_vehicle:{
+                    required : true,
+                    minlength:1,
+                    number:true
+                },
+                 attached_vehicle:{
+                    required : true,
+                    minlength:1,
+                    number:true
+                },
+                carrer_type1: {
+                    require_from_group: [1, ".carrer_group"]
+                  },
+                  carrer_type2: {
+                    require_from_group: [1, ".carrer_group"]
+                  }
+               
+            },
+
+            messages: {
+                
+                firstName :{
+                    required : "Enter your First name",
+                    minlength : 'First Name should be 2 digits'
+                },
+                lastName :{
+                    required : "Enter your Last name",
+                    minlength : 'Last Name should be 2 digits'
+                },
+                email :{
+                    required : "Enter your email",
+                    email : "Enter Valid email"
+                },
+                mobile :{
+                    required : 'Enter your Mobile Number',
+                    minlength : 'Mobile Number should be 10 digits'
+                },                
+                password :{
+                    required : "Enter your Password",
+                },                
+                cpassword :{
+                    required : "Enter your Confirm Password",
+                },
+                state :{
+                    required : "Enter your State",
+                    minlength : 'State should be 2 digits'
+                },
+                city :{
+                    required : "Enter your City",
+                    minlength : 'City should be 2 digits'
+                },
+                total_vehicle :{
+                    required : "Enter your Total Vehicle",
+                    minlength : 'Total Vehicle should be 1 digits'
+                },
+                attached_vehicle :{
+                    required : "Enter your Attached Vehicle",
+                    minlength : 'Attached Vehicle should be 1 digits'
+                }
+            }
+            
+           
+
+        });
         function gettrucklength(id){
            $.ajax({ 
         type: 'get',
@@ -288,8 +281,8 @@ this.checked?$('#transport_div').show():$('#transport_div').hide(); //time for s
         for(i=0; i<data.truck_lengths.length; i++){
            
            _options +='<div class="inner">';
-               _options +='<div class="check-bottom">';
-               _options +='<input type="checkbox" name="trucklength_'+id+'[]" id="trucklength'+ data.truck_lengths[i].id+'" onclick="gettruckcapacity('+ data.truck_lengths[i].id+');" value="'+ data.truck_lengths[i].id+'"> '+ '<label for="trucklength'+ data.truck_lengths[i].id+'"><span style="bottom:8px;"></span><button class="btn alert-success">'+data.truck_lengths[i].truck_length+'</button>' +'</label>';
+               _options +='<div class="checkbox">';
+               _options +='<label><input type="checkbox" name="trucklength_'+id+'[]" id="trucklength'+ data.truck_lengths[i].id+'" onclick="gettruckcapacity('+ data.truck_lengths[i].id+');" value="'+ data.truck_lengths[i].id+'"> '+ data.truck_lengths[i].truck_length +'</label>';
               _options +='</div>';
                _options +='<div class="inner_box '+data.truck_lengths[i].id+'" id="truckcapacity_div'+ data.truck_lengths[i].id+'">';
               
@@ -317,7 +310,7 @@ this.checked?$('#transport_div').show():$('#transport_div').hide(); //time for s
         success: function(data) {
        var _options='';
        for(i=0; i<data.truck_capacity.length; i++){
-                 _options +='<div class="check-bottom"><input type="checkbox" name="truckcapacity_'+id+'[]" id="truckcapacity'+ data.truck_capacity[i].id+'" value="'+ data.truck_capacity[i].id+'"> '+ '<label for="truckcapacity'+ data.truck_capacity[i].id+'"><span style="bottom:8px;"></span><button class="btn alert-info">'+data.truck_capacity[i].truck_capacity+'</button>' +'</label></div>';
+                 _options +='<label><input type="checkbox" name="truckcapacity_'+id+'[]" id="truckcapacity'+ data.truck_capacity[i].id+'" value="'+ data.truck_capacity[i].id+'"> '+ data.truck_capacity[i].truck_capacity +'</label>';
               
              
        }
