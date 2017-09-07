@@ -53,10 +53,10 @@ class ShipmentController extends FrontController
         $general = AdminGeneralShipment::where('status','1')->select('id','name')->get();
         $equipment = AdminEquipment::where('status','1')->select('id','name')->get();
         $miscellaneous = AdminMiscellaneous::where('status','1')->select('id','name')->get();
-        echo $request->action_type; die;
+       
         if($request->mode == 'office-details'){ 
-           print_r(Input::file('image'));
-            echo'<pre>'; print_r($request->mode); die;
+           $result = json_encode('$request->mode');
+            return $result;
         }else{  
             return View('user.shipment.office',['general'=>$general, 'equipment'=>$equipment, 'miscellaneous'=>$miscellaneous]);
         }

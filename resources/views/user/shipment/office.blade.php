@@ -6,7 +6,7 @@
 @section('body')
 
 
-<section class="_inner_pages">
+<section class="_inner_pages containerfirstphase">
     <div class="container">
         <div class="row">
             <div class="_inner_bx">          
@@ -16,14 +16,13 @@
 
                 <div class="clearfix"></div>
                {!! Form::open(array('url'=>'office','class'=>'form-horizontal','id'=>'office-shipment', 'method'=>'POST', 'files'=>true,)) !!}
-               <div class="col-md-8">ajax-loader
-                   <div class="inputbox-mandat-loading-1"><img src="{{ asset('public/admin/images/ajax-loader')}}" alt=""></div>    
-                   
+               <div class="col-md-8">
                    <div class="col-md-6">                             
                             <div class="form-group">
                                 <label for="">Delivery Title</label>
                                 <input type="text" name="title" value=""  id="title" class="office-data">
                              </div>
+                       <div id='errname' style='display:none'>Please Enter delivery title</div>
                         </div>
                 <div class="select_opt">
                     <div class="row">
@@ -157,6 +156,7 @@
                 <ul class="img_up_list">
                     
                 </ul>
+                <div id='errAttchment' style='display:none'>Image should be jpg or png</div>
                 <div class="clearfix"></div>
 
                 <div class="form-group _fl_upd">
@@ -182,6 +182,7 @@
                 <div class="_add_btn_btm">
                     <button class="btn btn-border">Back</button>                    
                     <button type="button" class="btn btn-color" onclick="validate_office('next')">Continue</button>
+                    <div class="inputbox-mandat-loading-1" style="display:none"><img src="{{ asset('public/admin/images/ajax-loader.gif')}}" alt=""></div>    
                 </div>
             </div>
     
@@ -195,6 +196,88 @@
                {!! Form::close() !!}
     </div>
     </div>
+    </div>
+</section>
+
+
+<section class="_inner_pages containersecondphase" style="display:none">
+    <div class="container">
+        <div class="row">
+        <div class="_inner_bx">
+      
+            <div class="col-md-9">
+            <h2>Pickup Details</h2>                     
+                </div> 
+
+
+                <div class="col-md-9" style="margin-top: 25px;">
+                      
+                     <div class="form-group row">
+                        <div class="col-md-6">
+                        <label for="">Pickup Date</label>
+                           <div class="row">
+                               <div class="col-md-12">
+                                   
+                                <div class='input-group date datetimepicker6' >
+                               <input type="text" class="form-control datetimepicker6 ">
+                                   <span class="input-group-addon" style="background: transparent; border-radius: 0;" ><img src="{{ asset('public/user/img/date-time-icon.png')}}" alt=""></span>
+                               </div>
+
+                               </div>
+                               
+                           </div>
+                        </div>
+
+                        <div class="col-md-6">
+                        <label for="">Delivery Date</label>
+                        <div class="row">
+                               <div class="col-md-12">
+                               <div class='input-group date datetimepicker7' >
+                               <input type="text" class="form-control datetimepicker7">
+                                   <span class="input-group-addon" style="background: transparent; border-radius: 0;"><img src="{{ asset('public/user/img/date-time-icon.png')}}" alt=""></span>
+                               </div>
+                               
+                               </div>
+                              
+                           </div>
+                        </div>
+                       </div>
+<div class="clearfix"></div>
+
+               <div class="form-group row">
+              <div class="col-md-12">
+              <label for="">Pickup Address</label>
+
+              <textarea name="" id="" cols="30" rows="10" class="form-control _fm_c_t"></textarea>
+
+
+              </div>
+              </div>
+<div class="form-group row">
+              <div class="col-md-12">
+              <label for="">Delivery Address</label>
+
+              <textarea name="" id="" cols="30" rows="10" class="form-control _fm_c_t"></textarea>
+
+              </div>
+              </div>
+
+
+<div class="form-group">
+<input type="text" class="btn btn-color" value="Submit">
+</div>
+
+               </div> 
+                    
+                        
+                   
+                </div> 
+
+          
+
+
+                <div class="clearfix"></div>
+                
     </div>
 </section>
 
@@ -228,113 +311,59 @@ $(function() {
         });
 });
 
-function validate_office(action_type){ 
-    var actionUrl  = $("#office-shipment").attr('action');
-      $(".inputbox-mandat-loading-1").show();
-      var file_data = $("#uploadFile").prop("files")[0];
-      var ajaxData = new FormData();
+function validate_office(action_type){  alert(action_type);
     
-       if(file_data!='' && file_data!=null && file_data!='undefined'  && file_data!=undefined){
-          ajaxData.append("file", file_data);
-       }
-       
-       ajaxData.append("mode", 'office-details');
-       ajaxData.append("action_type", action_type);
+     var title = $('#title').val();
+     var image = $('#uploadFile').val();
+     var c=0;
+     
+        if(title==''){
+            $('html, body').animate({ scrollTop: 100 }, 1000);
+            $('#errname').show();
+                c = c+1;
+            }else{
+                $('#errname').hide();
+            }
         
-        $('.office-data').each(function(){
-            ajaxData.append($(this).attr('name'), encodeURIComponent($(this).val()));
-        });
+        if(image!=''){
+                var fileInput = $('#fileUpload')[0]; 
+                var ext = fileInput.files[0].type;     
+                if($.inArray(ext, ['image/jpg','image/jpeg','image/png']) == -1){
+                    $('html, body').animate({ scrollTop: 450 }, 1000);
+                    $('#errAttchment').show();
+                    c = c+1;
+                }else{
+                    $('#errAttchment').hide();
+                } 
+        }
 
-    $.ajax({
-        type : 'post',
-        async : true,
-        cache: false,
-        contentType: false,
-        processData: false,
-        url : actionUrl,//set the dynamic url for ajax
-        data: ajaxData,
-        error : function(result) {
-
-        },
-        success: function(result){ 
-           
-            $(".inputbox-mandat-loading-1").hide();
-            $(".inputbox-mandat-loading-2").hide();
-    
-            var serverResult = JSON.parse(result);   
-            var errorsyntax = 'error-quicksetup-registration-'; 
-            var inputsyntax = 'quicksetup-registration-'; 
-            $('#websiteHeadingMessage').show();
-            $('#error-quicksetup-registration-alias').text('');
-            $('#error-quicksetup-registration-alias').hide();
-            if(serverResult['status'] == 0){
-             
-             var focusSet = 0;
-             
-              $('.quicksetup-registration-value-1').each(function(){
-                    var elementObj = $(this);
-                    var elementObjId = elementObj.attr('id');
-                    var actualNameTemp = elementObjId.split('-');
-                    var actualName = actualNameTemp.pop();
-
-                     if(serverResult['field'] == 'dataerror' && 
-                        serverResult['data'][actualName]!=undefined &&
-                        serverResult['data'][actualName]!=null && 
-                        serverResult['data'][actualName]!=''){
-
-                        $('#'+errorsyntax+actualName).text(serverResult['data'][actualName]);
-                        $('#'+errorsyntax+actualName).show();
-                        if(focusSet ==0){
-                         $('#'+inputsyntax+actualName).focus();    
-                         focusSet = 1;
-                        }
-                        
-                    }else{
-                        $('#'+errorsyntax+actualName).text('');
-                        $('#'+errorsyntax+actualName).hide();
-                    }
-              });
-              if(serverResult['field'] == 'dataerror' && 
-                 serverResult['data']['wedsite_banner']!=undefined &&
-                 serverResult['data']['wedsite_banner']!=null && 
-                 serverResult['data']['wedsite_banner']!=''){
-             
-                    $('#'+errorsyntax+'wedsite_banner').text(serverResult['data']['wedsite_banner']);
-                    $('#'+errorsyntax+'wedsite_banner').show();
-                    if(focusSet ==0){
-                        $('#'+inputsyntax+'wedsite_banner').focus();    
-                        focusSet = 1;
-                    }
-                        
-                 }else{
-                        $('#'+errorsyntax+'wedsite_banner').text('');
-                        $('#'+errorsyntax+'wedsite_banner').hide();
-                 }
-                 
-               if(serverResult['field'] == 'dataerror' && 
-                  serverResult['websiteurlhtml']!=undefined &&
-                  serverResult['websiteurlhtml']!=null && 
-                  serverResult['websiteurlhtml']!=''){
-                  
-                  $('#error-quicksetup-registration-alias').text('This website name is already in use.');
-                  $('#error-quicksetup-registration-alias').show();  
-                  $('.suggested-wedsite-url').show();  
-                  $('#websiteHeadingMessage').hide();
-                  if($('#quicksetup-registration-groom_first_name').val() != '' && $('#quicksetup-registration-bride_first_name').val() != ''){
-                    $('#quicksetup-registration-alias').val($('#quicksetup-registration-groom_first_name').val().toLowerCase()+'-weds-'+$('#quicksetup-registration-bride_first_name').val().toLowerCase());   
-                    $('#quicksetup-registration-alias-reflection').text($('#quicksetup-registration-alias').val().toLowerCase());
-                    setCookie('quicksetup-registration-alias',$('#quicksetup-registration-alias').val(),1);
-                  }
-                  $('.suggested-wedsite-url').html(serverResult['websiteurlhtml']);
-                }
-               quicksetupprenext(serverResult['action_type']);
-         }
-       } 
-    });
-
+        if(c>0){alert('action_type');
+                return false;
+                
+        }else{
+                $('.inputbox-mandat-loading-1').css({ display: "block" });
+                quicksetupprenext(action_type);
+        }
 }
 
-</script>
+function quicksetupprenext(action_type){
+        
+        if(action_type == 'next'){
+            $(".containerfirstphase").slideUp(200);
+            $(".containerfirstphase").hide();
+            $(".containersecondphase").slideDown(200);
+            $(".containersecondphase").show();
+        }else if(action_type == 'pre'){
+            $(".containersecondphase").slideUp(200);
+            $(".containersecondphase").hide();
+            $(".containerfirstphase").slideDown(200)
+            $(".containerfirstphase").show();
+        }else{
+            
+        }
+        
+}
+
 </script>
 @endsection
 
