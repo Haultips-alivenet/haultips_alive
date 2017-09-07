@@ -17,6 +17,7 @@ Route::resource('user/faq', 'Front\UserHomeController@faq');
 Route::resource('user/notification', 'Front\UserHomeController@notification');
 Route::resource('user/changepassword', 'Front\UserHomeController@changepassword');
 Route::resource('user/transactionhistory', 'Front\UserHomeController@transactionhistory');
+Route::get('getquesAns', 'Front\UserHomeController@getquesAns');
 #User
 Route::resource('user/find/deliveries', 'Front\FindDeliveriesController');
 Route::resource('user/login', 'Front\LoginController');
@@ -29,6 +30,9 @@ Route::resource('user/partner-registration', 'Front\LoginController@partner_regi
 Route::get('getlength ', 'Front\UserHomeController@gettrucklength');
 Route::get('getcapacity ', 'Front\UserHomeController@gettruckcapacity');
 Route::get('subCategory/{id}', 'Front\UserHomeController@subCategory');
+Route::get('subCategory/twowheeler/{id}', 'Front\UserHomeController@twowheeler');
+Route::get('subCategory/fourwheeler/{id}', 'Front\UserHomeController@twowheeler');
+
 Route::resource('office', 'Front\ShipmentController@office');
 
 
