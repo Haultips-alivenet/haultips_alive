@@ -15,11 +15,19 @@
                 <br>
 
                 <div class="clearfix"></div>
-               
-               <div class="col-md-8">
+               {!! Form::open(array('url'=>'office','class'=>'form-horizontal','id'=>'office-shipment', 'method'=>'POST', 'files'=>true,)) !!}
+               <div class="col-md-8">ajax-loader
+                   <div class="inputbox-mandat-loading-1"><img src="{{ asset('public/admin/images/ajax-loader')}}" alt=""></div>    
+                   
+                   <div class="col-md-6">                             
+                            <div class="form-group">
+                                <label for="">Delivery Title</label>
+                                <input type="text" name="title" value=""  id="title" class="office-data">
+                             </div>
+                        </div>
                 <div class="select_opt">
                     <div class="row">
-                        <div class="col-md-6">
+                        <div class="col-md-6">                             
                             <div class="form-group">
                                 <label for="">Collection floor</label>
                                 {!! Form::select('collectionFloor', ['First Floor', 'Second Floor', 'Third Floor', 'Fourth Floor', 'Fifth Floor', 'Sixth Floor', 'Seventh Floor', 'Eight Floor'], null, ['class'=>'selectpicker']) !!}
@@ -40,13 +48,13 @@
                                     <div class="col-sm-4"><label for="">Lift/Elevatior</label></div>
                                     <div class="col-sm-8">
                                         <div class="radio radio-inline">
-                                            <input name="radio1" id="radio1" value="option1" checked="" type="radio">
+                                            <input name="radio1" id="radio1" value="1" checked="" type="radio">
                                             <label for="radio1">
                                                 Yes
                                             </label>                                               
                                         </div> 
                                         <div class="radio radio-inline">
-                                            <input name="radio1" id="radio2" value="option2" checked="" type="radio">
+                                            <input name="radio1" id="radio2" value="0" checked="" type="radio">
                                            <label for="radio2">
                                                No
                                            </label>
@@ -78,10 +86,10 @@
                                     <li>
                                         <div class="ch_bx">
                                                 <label for="name">{{$generalData->name}}</label>
-                                                <input type="text" name="french-hens" value="0"  id="qty1">
+                                                <input type="text" name="general[]" value="0"  id="general{{$generalData->id}}">
                                                 <div class="_btn_act">
-                                                <a href="JavaScript:void(0);" class="a_sign" onclick="increaseValue()"  id="add1">+</a>
-                                                <a href="JavaScript:void(0);" class="a_sign" onclick="decreaseValue()" id="minus1">-</a>
+                                                <a href="JavaScript:void(0);" class="a_sign" onclick="increaseValue('general<?php echo  $generalData->id ?>')" id="add{{$generalData->id}}">+</a>
+                                                <a href="JavaScript:void(0);" class="a_sign" onclick="decreaseValue('general<?php echo  $generalData->id ?>')" id="minus{{$generalData->id}}">-</a>
                                                 </div>
                                         </div>  
                                     </li>
@@ -103,10 +111,10 @@
                                     <li>
                                         <div class="ch_bx">
                                                 <label for="name">{{$equipmentData->name}}</label>
-                                                <input type="text" name="french-hens" value="0"  id="qty1">
+                                                <input type="text" name="equipment[]" value="0"  id="equipment{{$equipmentData->id}}">
                                                 <div class="_btn_act">
-                                                <a href="JavaScript:void(0);" class="a_sign" onclick="increaseValue()"  id="add1">+</a>
-                                                <a href="JavaScript:void(0);" class="a_sign" onclick="decreaseValue()" id="minus1">-</a>
+                                                <a href="JavaScript:void(0);" class="a_sign" onclick="increaseValue('equipment<?php echo  $equipmentData->id ?>')"  id="add{{$equipmentData->id}}">+</a>
+                                                <a href="JavaScript:void(0);" class="a_sign" onclick="decreaseValue('equipment<?php echo  $equipmentData->id ?>')" id="minus{{$equipmentData->id}}">-</a>
                                                 </div>
                                         </div>  
                                     </li>
@@ -128,10 +136,10 @@
                                     <li>
                                         <div class="ch_bx">
                                                 <label for="name">{{$miscellaneousData->name}}</label>
-                                                <input type="text" name="french-hens" value="0"  id="qty1">
+                                                <input type="text" name="box[]" value="0"  id="misc{{$miscellaneousData->id}}">
                                                 <div class="_btn_act">
-                                                <a href="JavaScript:void(0);" class="a_sign" onclick="increaseValue()"  id="add1">+</a>
-                                                <a href="JavaScript:void(0);" class="a_sign" onclick="decreaseValue()" id="minus1">-</a>
+                                                <a href="JavaScript:void(0);" class="a_sign" onclick="increaseValue('misc<?php echo  $miscellaneousData->id ?>')"  id="add{{$miscellaneousData->id}}">+</a>
+                                                <a href="JavaScript:void(0);" class="a_sign" onclick="decreaseValue('misc<?php echo  $miscellaneousData->id ?>')" id="minus{{$miscellaneousData->id}}">-</a>
                                                 </div>
                                         </div>  
                                     </li>
@@ -145,8 +153,9 @@
                     
         <div class="row">
             <div class="col-md-12">
+                
                 <ul class="img_up_list">
-                   
+                    
                 </ul>
                 <div class="clearfix"></div>
 
@@ -165,13 +174,14 @@
                     <h4>Additional information (Optional) </h4>
                     <p>Additional information:</p>
                     <div class="form-group">
-                        <textarea name="" id="" cols="55" rows="5"  class="form-control"></textarea>
+                        <textarea name="additonalInfo" id="" cols="55" rows="5"  class="form-control"></textarea>
                         <small>You have 1200 characters left</small>
                     </div>
                 </div>
 
                 <div class="_add_btn_btm">
-                    <button class="btn btn-border">Back</button><button class="btn btn-color">Continue</button>
+                    <button class="btn btn-border">Back</button>                    
+                    <button type="button" class="btn btn-color" onclick="validate_office('next')">Continue</button>
                 </div>
             </div>
     
@@ -182,6 +192,7 @@
                 </div>   
             </div>
         </div>
+               {!! Form::close() !!}
     </div>
     </div>
     </div>
@@ -202,6 +213,7 @@ $(function() {
 
                 reader.onload = function(event) {
                     $($.parseHTML('<img>')).attr('src', event.target.result).appendTo(placeToInsertImagePreview);
+                    $('img').wrap('<li />');
                 }
 
                 reader.readAsDataURL(input.files[i]);
@@ -210,15 +222,118 @@ $(function() {
 
     };
 
-    $('#uploadFile').on('change', function() {
-      var img_list = imagesPreview(this, 'div.gallery');
-      $('<div>', {
-    id: 'foo',
-    href: 'http://google.com',
-    title: 'Become a Googler'
-}).appendTo('.gallery');
-    });
+    $('#uploadFile').on('change', function() {    
+         imagesPreview(this, 'ul.img_up_list');  
+        
+        });
 });
+
+function validate_office(action_type){ 
+    var actionUrl  = $("#office-shipment").attr('action');
+      $(".inputbox-mandat-loading-1").show();
+      var file_data = $("#uploadFile").prop("files")[0];
+      var ajaxData = new FormData();
+    
+       if(file_data!='' && file_data!=null && file_data!='undefined'  && file_data!=undefined){
+          ajaxData.append("file", file_data);
+       }
+       
+       ajaxData.append("mode", 'office-details');
+       ajaxData.append("action_type", action_type);
+        
+        $('.office-data').each(function(){
+            ajaxData.append($(this).attr('name'), encodeURIComponent($(this).val()));
+        });
+
+    $.ajax({
+        type : 'post',
+        async : true,
+        cache: false,
+        contentType: false,
+        processData: false,
+        url : actionUrl,//set the dynamic url for ajax
+        data: ajaxData,
+        error : function(result) {
+
+        },
+        success: function(result){ 
+           
+            $(".inputbox-mandat-loading-1").hide();
+            $(".inputbox-mandat-loading-2").hide();
+    
+            var serverResult = JSON.parse(result);   
+            var errorsyntax = 'error-quicksetup-registration-'; 
+            var inputsyntax = 'quicksetup-registration-'; 
+            $('#websiteHeadingMessage').show();
+            $('#error-quicksetup-registration-alias').text('');
+            $('#error-quicksetup-registration-alias').hide();
+            if(serverResult['status'] == 0){
+             
+             var focusSet = 0;
+             
+              $('.quicksetup-registration-value-1').each(function(){
+                    var elementObj = $(this);
+                    var elementObjId = elementObj.attr('id');
+                    var actualNameTemp = elementObjId.split('-');
+                    var actualName = actualNameTemp.pop();
+
+                     if(serverResult['field'] == 'dataerror' && 
+                        serverResult['data'][actualName]!=undefined &&
+                        serverResult['data'][actualName]!=null && 
+                        serverResult['data'][actualName]!=''){
+
+                        $('#'+errorsyntax+actualName).text(serverResult['data'][actualName]);
+                        $('#'+errorsyntax+actualName).show();
+                        if(focusSet ==0){
+                         $('#'+inputsyntax+actualName).focus();    
+                         focusSet = 1;
+                        }
+                        
+                    }else{
+                        $('#'+errorsyntax+actualName).text('');
+                        $('#'+errorsyntax+actualName).hide();
+                    }
+              });
+              if(serverResult['field'] == 'dataerror' && 
+                 serverResult['data']['wedsite_banner']!=undefined &&
+                 serverResult['data']['wedsite_banner']!=null && 
+                 serverResult['data']['wedsite_banner']!=''){
+             
+                    $('#'+errorsyntax+'wedsite_banner').text(serverResult['data']['wedsite_banner']);
+                    $('#'+errorsyntax+'wedsite_banner').show();
+                    if(focusSet ==0){
+                        $('#'+inputsyntax+'wedsite_banner').focus();    
+                        focusSet = 1;
+                    }
+                        
+                 }else{
+                        $('#'+errorsyntax+'wedsite_banner').text('');
+                        $('#'+errorsyntax+'wedsite_banner').hide();
+                 }
+                 
+               if(serverResult['field'] == 'dataerror' && 
+                  serverResult['websiteurlhtml']!=undefined &&
+                  serverResult['websiteurlhtml']!=null && 
+                  serverResult['websiteurlhtml']!=''){
+                  
+                  $('#error-quicksetup-registration-alias').text('This website name is already in use.');
+                  $('#error-quicksetup-registration-alias').show();  
+                  $('.suggested-wedsite-url').show();  
+                  $('#websiteHeadingMessage').hide();
+                  if($('#quicksetup-registration-groom_first_name').val() != '' && $('#quicksetup-registration-bride_first_name').val() != ''){
+                    $('#quicksetup-registration-alias').val($('#quicksetup-registration-groom_first_name').val().toLowerCase()+'-weds-'+$('#quicksetup-registration-bride_first_name').val().toLowerCase());   
+                    $('#quicksetup-registration-alias-reflection').text($('#quicksetup-registration-alias').val().toLowerCase());
+                    setCookie('quicksetup-registration-alias',$('#quicksetup-registration-alias').val(),1);
+                  }
+                  $('.suggested-wedsite-url').html(serverResult['websiteurlhtml']);
+                }
+               quicksetupprenext(serverResult['action_type']);
+         }
+       } 
+    });
+
+}
+
 </script>
 </script>
 @endsection

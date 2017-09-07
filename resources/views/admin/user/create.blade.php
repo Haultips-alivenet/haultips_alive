@@ -87,7 +87,7 @@
                 { alert(msg);
                     //If username exists, set response to true
                     //response = (msg === 'true') ? true : false;
-                    isSuccess = msg === "true" ? true : false
+                    isSuccess = msg === "false" ?  false : true;
                     
                 }
              });

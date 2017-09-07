@@ -25,7 +25,7 @@
                                 <div class="col-md-3 border-right">
                                     <div class="_p_m_bx">
                                        <?php $urlName = $str=preg_replace('/\s+/', '', $subCategory->category_name); ?>
-                                        <a href="{{URL :: asset('subCategory/'.strtolower($urlName).'/'.$subCategory->id)}}" class="wow  bounce">
+                                        <a href="{{URL :: asset(strtolower($urlName))}}" class="wow  bounce">
                                           <span>  <img src="{{ asset('public/user/img/'.$subCategory->category_image)}}" alt=""></span>
                                             <p>{{$subCategory->category_name}}</p>
                                         </a>

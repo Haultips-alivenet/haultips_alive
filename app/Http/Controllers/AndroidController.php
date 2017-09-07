@@ -116,8 +116,8 @@ class AndroidController extends AppController
 
                     $otpMsg = 'Your Otp is '.$otp;
 
-                   // $smsObj = new Smsapi();
-                  //  $smsObj->sendsms_api('+91'.$mobileNumber,$otpMsg);            
+                    $smsObj = new Smsapi();
+                   $smsObj->sendsms_api('+91'.$mobileNumber,$otpMsg);            
 
                     $msg['responseCode'] = "200";
                     $msg['responseMessage'] = "Otp is fetched successfully";
@@ -1900,12 +1900,13 @@ class AndroidController extends AppController
                 $msg['responseCode'] = "0";
                 $msg['responseMessage'] = "userId required.";
             }else{           
-                    $quesdetails = TblQuesMaster::select('tq.question', 'u.first_name','u.last_name','ud.image','sd.table_name','sd.id as shippingId','tq.id as quesId')                            
+                    $quesdetails = TblQuesMaster::select('tq.question', 'u.first_name','u.last_name','ud.image','sd.table_name','sd.id as shippingId','tq.id as quesId','tbl_ques_masters.carrier_id')                            
                                     ->leftJoin('tbl_questions as tq','tq.ques_master_id','=','tbl_ques_masters.id')
                                     ->leftJoin('users as u','u.id','=','tbl_ques_masters.carrier_id')
                                     ->leftJoin('user_details as ud','ud.user_id','=','tbl_ques_masters.carrier_id')
                                     ->leftJoin('shipping_details as sd','sd.id','=','tbl_ques_masters.shipping_id')                                   
                                     ->orderBy('tq.id', 'desc')
+                                    ->groupBy('tbl_ques_masters.shipping_id')
                                     ->groupBy('tbl_ques_masters.carrier_id')
                                     ->where('tq.status',1)
                                     ->where('tbl_ques_masters.user_id',$userId)->get();                
@@ -1917,6 +1918,7 @@ class AndroidController extends AppController
                             
                             $data[$i]['quesId'] = $detail['quesId'];
                             $data[$i]['shippingId'] = $detail['shippingId'];
+                            $data[$i]['partnerId'] = $detail['carrier_id'];
                             $data[$i]['title'] = $shippingData->delivery_title;
                             $data[$i]['partnerName'] = $detail['first_name'].' '.$detail['last_name'];
                             $data[$i]['partnerImage'] = $detail['image'];
@@ -2256,6 +2258,8 @@ class AndroidController extends AppController
                             ])                            
                          ->setDevicesToken($offerNotification->device_token)
                          ->send();
+                    
+                    print_r($response); die;
 
                     $msg['responseCode'] = "200";
                     $msg['responseMessage'] = "Quotation post successfully";
@@ -2840,7 +2844,8 @@ class AndroidController extends AppController
             $data = array();
             $i = 0;
             $shippingId = $_POST['shippingId'];
-            $required = array('shippingId');
+            $partnerId = $_POST['partnerId'];
+            $required = array('shippingId','partnerId');
 
             $error = false;
             foreach($required as $field) {
@@ -2855,16 +2860,18 @@ class AndroidController extends AppController
                 $msg['responseCode'] = "0";
                 $msg['responseMessage'] = "$fieldName required.";
             }else{
-                $quesDetail = TblQuesMaster::select('tq.question','tq.created_at as quesTime','u.first_name as cfname','u.last_name as clname','ta.answer','ta.created_at as ansTime','uc.first_name as ufname','uc.last_name as ulname')
+                $quesDetail = TblQuesMaster::select('tq.id as quesId','tq.question','tq.created_at as quesTime','u.first_name as cfname','u.last_name as clname','ta.answer','ta.created_at as ansTime','uc.first_name as ufname','uc.last_name as ulname')
                                     ->leftJoin('tbl_questions as tq','tq.ques_master_id','=','tbl_ques_masters.id')
                                     ->leftJoin('users as u','u.id','=','tbl_ques_masters.carrier_id')
                                     ->leftJoin('tbl_answers as ta','ta.ques_id','=','tq.id')
                                     ->leftJoin('users as uc','uc.id','=','tbl_ques_masters.user_id')
+                                    ->where('tbl_ques_masters.carrier_id', $partnerId)
                                     ->where('tbl_ques_masters.shipping_id', $shippingId)->get();
                 
                 $quesData = $quesDetail->toArray();
                 if(count($quesData) > 0){
                     foreach($quesDetail as $detail){
+                        $data[$i]['quesId'] = $detail['quesId'];
                         $data[$i]['partnerName'] = $detail['cfname']. ' '.$detail['clname'];
                         $data[$i]['quesTime'] = $detail['quesTime'];
                         $data[$i]['question'] = $detail['question'];
@@ -2874,14 +2881,13 @@ class AndroidController extends AppController
                         $i++;
                     }
                     
-                    $msg['responseCode'] = "0";
+                    $msg['responseCode'] = "200";
                     $msg['responseMessage'] = "Details get successfully";
                     $msg['data'] = $data;
                 }
                 else{
-                  $msg['responseCode'] = "0";
-                  $msg['responseMessage'] = "Some Error occur! Please try again";
-                  $msg['data'] = $data;
+                  $msg['responseCode'] = "100";
+                  $msg['responseMessage'] = "Data not found";
                 }
             }
         }catch(\Exception $e) {

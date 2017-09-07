@@ -225,8 +225,8 @@ India - 201007</address>
     ================================================== -->
     <!-- Placed at the end of the document so the pages load faster -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
-    <script>window.jQuery || document.write('<script src="public/user/js/jquery.min.js"><\/script>')</script>
-    <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false"></script>
+   <!-- {!! Html::script('public/user/js/jquery.min.js') !!} -->
+    <!-- <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false"></script> -->
     
      {!! Html::script('public/user/js/bootstrap.min.js') !!}
      {!! Html::script('public/admin/js/jquery.validate.min.js') !!}
@@ -235,6 +235,7 @@ India - 201007</address>
      {!! Html::script('public/user/js/bootstrap-slider.js') !!}
      {!! Html::script('public/user/js/bootstrap-select.min.js') !!}
      {!! Html::script('public/admin/js/additional-methods.min.js') !!}
+     {!! Html::script('public/admin/js/jquery.nicescroll.js') !!}
     @yield('script')
     <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
     <script>

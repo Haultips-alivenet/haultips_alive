@@ -78,46 +78,29 @@ function closeOver(f, value){
     };
 }
 
-$(function () {
-    var numButtons = 2;    
-    for (var i = 1; i <= numButtons; i++) {
-        $("#add" + i).click(closeOver(add, i));
-        $("#minus" + i).click(closeOver(minus, i));
+//$(function () {
+//    var numButtons = 2;    
+//    for (var i = 1; i <= numButtons; i++) {
+//        $("#add" + i).click(closeOver(add, i));
+//        $("#minus" + i).click(closeOver(minus, i));
+//    }
+//});
+
+function increaseValue(id)
+{
+    var val=$("#"+id).val();
+    $("#"+id).val(parseInt(val)+1);  
+}
+
+function decreaseValue(id)
+{
+    var val=$("#"+id).val();
+    if(val=="" || val==null || val==0)
+    {
+      $("#"+id).val('0');
     }
-});
-$(document).ready(function(){
-    $(".scrollbar").niceScroll();
-
-});
-
-/* left side menu*/
-
-  function htmlbodyHeightUpdate(){
-        var height3 = $( window ).height()
-        var height1 = $('.nav').height()+50
-        height2 = $('.main').height()
-        if(height2 > height3){
-            $('html').height(Math.max(height1,height3,height2)+10);
-            $('body').height(Math.max(height1,height3,height2)+10);
-        }
-        else
-        {
-            $('html').height(Math.max(height1,height3,height2));
-            $('body').height(Math.max(height1,height3,height2));
-        }
-        
+    else
+    {
+       $("#"+id).val(parseInt(val)-1);
     }
-    $(document).ready(function () {
-        htmlbodyHeightUpdate()
-        $( window ).resize(function() {
-            htmlbodyHeightUpdate()
-        });
-        $( window ).scroll(function() {
-            height2 = $('.main').height()
-            htmlbodyHeightUpdate()
-        });
-    });
-
-    function toggle(val){
-        $('.ulist'+val).slideToggle();
-    }
+}
