@@ -284,6 +284,7 @@
 @endsection
 @section('script')
 <script type="text/javascript">
+    
 $(function() {
     // Multiple images preview in browser
     var imagesPreview = function(input, placeToInsertImagePreview) {

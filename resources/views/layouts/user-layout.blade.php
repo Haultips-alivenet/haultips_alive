@@ -31,11 +31,13 @@
         <!-- jQuery -->
         <!-- lined-icons -->
         {!! Html::style('public/admin/css/icon-font.min.css') !!}
+        {!! Html::style('public/user/css/bootstrap-datetimepicker.css') !!}
         <!-- //lined-icons -->
         <!-- chart -->
         {!! HTML::script('public/admin/js/Chart.js')!!}      
         <!-- //chart -->
-        {!! HTML::script('public/admin/js/wow.min.js')!!}   
+        {!! HTML::script('public/admin/js/wow.min.js')!!}  
+        
           <script>
             new WOW().init();
            </script>
@@ -236,6 +238,9 @@ India - 201007</address>
      {!! Html::script('public/user/js/bootstrap-select.min.js') !!}
      {!! Html::script('public/admin/js/additional-methods.min.js') !!}
      {!! Html::script('public/admin/js/jquery.nicescroll.js') !!}
+     {!! Html::script('public/user/js/moment.js') !!}
+     {!! Html::script('public/user/js/bootstrap-datetimepicker.js') !!}
+     
     @yield('script')
     <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
     <script>
@@ -247,7 +252,30 @@ India - 201007</address>
    new WOW().init();
      $("#ex2").slider({});
      
-     
+   $(function () {
+    $('.datetime').datetimepicker({
+         format:'LT'
+    });
+
+    $('.datetime2').datetimepicker({
+         format:'LT'
+    })
+        $('.datetimepicker6').datetimepicker({
+             format: 'Y-MM-DD'
+        });
+        $('.datetimepicker7').datetimepicker({
+            useCurrent: false ,//Important! See issue #1075
+             format: 'Y-MM-DD'
+        });
+        $(".datetimepicker6").on("dp.change", function (e) {
+            $('.datetimepicker7').data("DateTimePicker").minDate(e.date);
+        });
+        $(".datetimepicker7").on("dp.change", function (e) {
+            $('.datetimepicker6').data("DateTimePicker").maxDate(e.date);
+        });
+    });
+
+  
 </script>
   </body>
 </html>

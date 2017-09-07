@@ -109,9 +109,6 @@ class UserHomeController extends FrontController
         
         return view('user/subCategory/index', ['category'=>$category, 'subCategories'=>$subCategories]);
     }
-    public function twowheeler(Request $request){
-        
-        return view('user/subCategory/vehicle');
-    }
+   
 }
 

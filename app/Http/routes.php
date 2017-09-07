@@ -30,11 +30,11 @@ Route::resource('user/partner-registration', 'Front\LoginController@partner_regi
 Route::get('getlength ', 'Front\UserHomeController@gettrucklength');
 Route::get('getcapacity ', 'Front\UserHomeController@gettruckcapacity');
 Route::get('subCategory/{id}', 'Front\UserHomeController@subCategory');
-Route::resource('office', 'Front\ShipmentController@office');
 
 
 Route::resource('office', 'Front\ShipmentController@office');
-
+Route::get('twowheeler', 'Front\ShipmentController@twowheeler');
+Route::get('fourwheeler', 'Front\ShipmentController@fourwheeler');
 
 #Admin
 Route::get('/admin/login', function () {

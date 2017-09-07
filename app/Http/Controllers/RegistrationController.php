@@ -75,7 +75,7 @@ class RegistrationController extends Controller
                'firstName' => 'required|min:3|max:255|Regex:/^[a-z-.]+( [a-z-.]+)*$/i',
                'lastName' => 'required|min:3|max:255|Regex:/^[a-z-.]+( [a-z-.]+)*$/i',
                'email' => 'required|email|unique:users|max:100',
-               'mobile' => 'required|mobile_number|unique:users|min:10|max:10|Regex: /^[0-9]{1,45}$/',
+               'mobile' => 'required|min:10|max:10|Regex: /^[0-9]{1,45}$/',
                'password' => 'required|min:6|max:12',
                'cpassword' => 'required|min:6|same:password'
             ]);
@@ -203,7 +203,9 @@ class RegistrationController extends Controller
         $mobile = $request->checkMobile;
         $query = User::where('mobile_number', $mobile)->select('id')->first();
         if($query){
-             return "true";
+             echo "true";
+        } else {
+            echo "false";
         }
        
     }

@@ -38,7 +38,7 @@
                              <div class="form-group">
                                 <label for="name" class="col-sm-2 control-label">Mobile</label>
                                 <div class="col-sm-8">
-                                    {!! Form :: text('mobile',$user->mobile_number,['class'=>'form-control1', 'id'=>'mobile'])  !!}
+                                    {!! Form :: text('mobile',$user->mobile_number,['class'=>'form-control1', 'id'=>'mobile','readonly'])  !!}
                                 </div>                                
                             </div>
                             <div class="form-group">

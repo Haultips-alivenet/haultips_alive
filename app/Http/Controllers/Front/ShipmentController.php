@@ -61,6 +61,14 @@ class ShipmentController extends FrontController
             return View('user.shipment.office',['general'=>$general, 'equipment'=>$equipment, 'miscellaneous'=>$miscellaneous]);
         }
     }
+     public function twowheeler(Request $request){
+        
+        return view('user/shipment/vehicle');
+    }
     
+     public function fourwheeler(Request $request){
+        
+        return view('user/shipment/vehicle');
+    }
 }
     
