@@ -22,9 +22,23 @@
          {!! Html::style('public/user/css/bootstrap.min.css') !!}        
         <!-- Custom CSS -->
         {!! Html::style('public/user/css/animate.css') !!}
-         {!! Html::style('public/user/css/style.css') !!}
-         {!! Html::style('public/user/css/bootstrap-select.min.css') !!}
-          {!! HTML::script('public/admin/js/jquery-1.10.2.min.js')!!}   
+        {!! Html::style('public/user/css/style.css') !!}
+        {!! Html::style('public/user/css/bootstrap-select.min.css') !!}
+        {!! HTML::script('public/admin/js/jquery-1.10.2.min.js')!!} 
+       
+        <!-- Graph CSS -->
+        {!! Html::style('public/admin/css/font-awesome.css') !!}
+        <!-- jQuery -->
+        <!-- lined-icons -->
+        {!! Html::style('public/admin/css/icon-font.min.css') !!}
+        <!-- //lined-icons -->
+        <!-- chart -->
+        {!! HTML::script('public/admin/js/Chart.js')!!}      
+        <!-- //chart -->
+        {!! HTML::script('public/admin/js/wow.min.js')!!}   
+          <script>
+            new WOW().init();
+           </script>
   </head>
 <body>
    

@@ -52,6 +52,7 @@ Route::get('admin/dashboard', 'DashboardController@index');
 
 # Admin Panel Routes
 Route::post('admin/store', 'RegistrationController@store');
+Route::get('admin/mobileCheck', 'RegistrationController@mobileCheck');
 Route::get('admin/userList', 'RegistrationController@index');
 
 Route::get('admin/users/{id}/delete', 'RegistrationController@destroy');
