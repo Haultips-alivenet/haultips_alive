@@ -66,7 +66,7 @@ class ShipmentController extends FrontController
         return view('user/shipment/vehicle');
     }
     
-     public function fourwheeler(Request $request){
+    public function fourwheeler(Request $request){
         
         return view('user/shipment/vehicle');
     }

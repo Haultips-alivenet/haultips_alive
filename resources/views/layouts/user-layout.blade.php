@@ -261,18 +261,25 @@ India - 201007</address>
          format:'LT'
     })
         $('.datetimepicker6').datetimepicker({
-             format: 'Y-MM-DD'
+            useCurrent: false,
+             format: 'Y-MM-DD',
+             minDate: moment().subtract(1,'d')
+            
         });
+      
         $('.datetimepicker7').datetimepicker({
-            useCurrent: false ,//Important! See issue #1075
-             format: 'Y-MM-DD'
+             useCurrent: false,//Important! See issue #1075
+             format: 'Y-MM-DD',
+             //minDate: new Date
         });
         $(".datetimepicker6").on("dp.change", function (e) {
+             
             $('.datetimepicker7').data("DateTimePicker").minDate(e.date);
         });
         $(".datetimepicker7").on("dp.change", function (e) {
             $('.datetimepicker6').data("DateTimePicker").maxDate(e.date);
         });
+        
     });
 
   
