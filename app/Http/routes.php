@@ -33,11 +33,13 @@ Route::get('subCategory/{id}', 'Front\UserHomeController@subCategory');
 
 
 Route::get('office/{id}', 'Front\ShipmentController@office');
+Route::post('office', 'Front\ShipmentController@office');
 Route::get('fourwheeler/{id}', 'Front\ShipmentController@twowheeler');
 Route::get('twowheeler/{id}', 'Front\ShipmentController@twowheeler');
 Route::post('twowheeler', 'Front\ShipmentController@twowheeler');
 Route::post('fourwheeler', 'Front\ShipmentController@twowheeler');
 Route::get('user/getoffer', 'Front\ShipmentController@getoffer');
+
 
 #Admin
 Route::get('/admin/login', function () {

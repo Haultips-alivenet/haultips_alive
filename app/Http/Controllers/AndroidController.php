@@ -2258,8 +2258,6 @@ class AndroidController extends AppController
                             ])                            
                          ->setDevicesToken($offerNotification->device_token)
                          ->send();
-                    
-                    print_r($response); die;
 
                     $msg['responseCode'] = "200";
                     $msg['responseMessage'] = "Quotation post successfully";

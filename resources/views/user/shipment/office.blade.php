@@ -15,7 +15,7 @@
                 <br>
 
                 <div class="clearfix"></div>
-               {!! Form::open(array('url'=>'office','class'=>'form-horizontal','id'=>'office-shipment', 'method'=>'POST', 'files'=>true,)) !!}
+               {!! Form::open(array('url'=>'office','class'=>'form-horizontal','id'=>'office_form', 'method'=>'POST', 'files'=>true,)) !!}
                <div class="col-md-8">
                    <div class="col-md-6">                             
                             <div class="form-group">
@@ -47,13 +47,13 @@
                                     <div class="col-sm-4"><label for="">Lift/Elevatior</label></div>
                                     <div class="col-sm-8">
                                         <div class="radio radio-inline">
-                                            <input name="radio1" id="radio1" value="1" checked="" type="radio">
+                                            <input name="lift" id="radio1" value="1" checked="" type="radio">
                                             <label for="radio1">
                                                 Yes
                                             </label>                                               
                                         </div> 
                                         <div class="radio radio-inline">
-                                            <input name="radio1" id="radio2" value="0" checked="" type="radio">
+                                            <input name="lift" id="radio2" value="0" checked="" type="radio">
                                            <label for="radio2">
                                                No
                                            </label>
@@ -162,7 +162,7 @@
                 <div class="form-group _fl_upd">
                     <label for="">Upload pictures:</label>
                     <div id="imagePreview"></div>
-                    <span> <input id="uploadFile" type="file" multiple  name="image" class="_fl_f" />
+                    <span> <input id="uploadFile" type="file" multiple="multiple"  name="image[]" class="_fl_f" />
                     Add Photo
                     </span>
                 </div>
@@ -193,7 +193,7 @@
                 </div>   
             </div>
         </div>
-               {!! Form::close() !!}
+              
     </div>
     </div>
     </div>
@@ -219,7 +219,7 @@
                                <div class="col-md-12">
                                    
                                 <div class='input-group date datetimepicker6' >
-                               <input type="text" class="form-control datetimepicker6 ">
+                               <input type="text" name="pickupdate" id="pickupdate" class="form-control datetimepicker6 ">
                                    <span class="input-group-addon" style="background: transparent; border-radius: 0;" ><img src="{{ asset('public/user/img/date-time-icon.png')}}" alt=""></span>
                                </div>
 
@@ -233,7 +233,7 @@
                         <div class="row">
                                <div class="col-md-12">
                                <div class='input-group date datetimepicker7' >
-                               <input type="text" class="form-control datetimepicker7">
+                               <input type="text" name="deliverydate" class="form-control datetimepicker7">
                                    <span class="input-group-addon" style="background: transparent; border-radius: 0;"><img src="{{ asset('public/user/img/date-time-icon.png')}}" alt=""></span>
                                </div>
                                
@@ -248,44 +248,83 @@
               <div class="col-md-12">
               <label for="">Pickup Address</label>
 
-              <textarea name="" id="" cols="30" rows="10" class="form-control _fm_c_t"></textarea>
+              <textarea name="pickupaddress" id="" cols="30" rows="10" class="form-control _fm_c_t"></textarea>
 
 
               </div>
               </div>
-<div class="form-group row">
-              <div class="col-md-12">
+                <div class="form-group row">
+                <div class="col-md-12">
               <label for="">Delivery Address</label>
 
-              <textarea name="" id="" cols="30" rows="10" class="form-control _fm_c_t"></textarea>
+              <textarea name="deliveryaddress" id="" cols="30" rows="10" class="form-control _fm_c_t"></textarea>
 
               </div>
-              </div>
-
-
-<div class="form-group">
-<input type="text" class="btn btn-color" value="Submit">
-</div>
-
+                    {!! Form::hidden('imageCount', '', array('id' => 'imageCount')) !!}
+              </div>                
+            <div class="form-group">
+            
+             {!! Form :: submit("Submit",["class"=>"btn btn-color",'id'=>'']) !!}
+            </div>
                </div> 
                     
-                        
-                   
                 </div> 
-
-          
-
-
                 <div class="clearfix"></div>
                 
     </div>
 </section>
+ {!! Form::close() !!}
 
 @endsection
 @section('script')
 <script type="text/javascript">
     
+    $('#office_form').validate({
+
+            rules: {
+                pickupdate:{
+                    required : true,
+                },
+                deliverydate:{
+                    required : true,
+                    
+                },
+                pickupaddress:{
+                    required : true,
+                    
+                },
+                deliveryaddress:{
+                    required : true,
+                    
+                }
+                
+                
+            },
+
+            messages: {
+                
+                pickupdate :{
+                    required : "Select Pickup Date"
+                   
+                },
+                deliverydate :{
+                    required : "Select Delivery Date"
+                   
+                },
+                pickupaddress :{
+                    required : "Enter Pickup Address"
+                   
+                },
+                deliveryaddress :{
+                    required : "Enter Delivery Address"
+                   
+                }
+            }
+            
+        });
+    
 $(function() {
+    var imageCount = 1;
     // Multiple images preview in browser
     var imagesPreview = function(input, placeToInsertImagePreview) {
 
@@ -306,13 +345,48 @@ $(function() {
 
     };
 
-    $('#uploadFile').on('change', function() {    
+    $('#uploadFile').on('change', function() {           
          imagesPreview(this, 'ul.img_up_list');  
-        
+          var imageValue = imageCount++; 
+        $('#imageCount').val(imageValue);
         });
 });
 
-function validate_office(action_type){  alert(action_type);
+$('#office-shipment').validate({ 
+
+            rules: {
+                pickDate :{
+                    required : true
+                },
+                pickAddress :{
+                    required : true,
+                    minlength:2
+                },
+                deliveryaddress :{
+                    required : true,
+                    minlength:2
+                }
+             },
+            messages: {
+                
+                pickDate :{
+                    required : "Select the Pickup Date"
+                },
+                pickAddress :{
+                    required : "Enter your Pick Address",
+                    minlength : 'Pick Address should be 2 digits'
+                },
+                deliveryaddress :{
+                    required : "Enter your Delivery Address",
+                    minlength : 'Delivery Address should be 2 digits'
+                }
+            }
+            
+           
+
+        });
+
+function validate_office(action_type){  
     
      var title = $('#title').val();
      var image = $('#uploadFile').val();
@@ -327,7 +401,7 @@ function validate_office(action_type){  alert(action_type);
             }
         
         if(image!=''){
-                var fileInput = $('#fileUpload')[0]; 
+                var fileInput = $('#uploadFile')[0]; 
                 var ext = fileInput.files[0].type;     
                 if($.inArray(ext, ['image/jpg','image/jpeg','image/png']) == -1){
                     $('html, body').animate({ scrollTop: 450 }, 1000);
@@ -338,7 +412,7 @@ function validate_office(action_type){  alert(action_type);
                 } 
         }
 
-        if(c>0){alert('action_type');
+        if(c>0){
                 return false;
                 
         }else{

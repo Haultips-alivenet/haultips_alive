@@ -49,18 +49,101 @@ class ShipmentController extends FrontController
        
     }
     
-    public function office(Request $request){
+     public function office(Request $request){
         $general = AdminGeneralShipment::where('status','1')->select('id','name')->get();
         $equipment = AdminEquipment::where('status','1')->select('id','name')->get();
         $miscellaneous = AdminMiscellaneous::where('status','1')->select('id','name')->get();
        
-        if($request->mode == 'office-details'){ 
-           $result = json_encode('$request->mode');
-            return $result;
+        if($_POST){ 
+//            $category_id = $_POST['catId'];
+//            $subCatId = $_POST['subCatId'];
+            $title = $_POST['title'];
+            $collectionFloor = $_POST['collectionFloor'];
+            $deliveryFloor = $_POST['deliveryFloor'];
+            $lift = $_POST['lift'];
+            $generalArr = $_POST['general'];
+            $equipmentArr = $_POST['equipment'];
+            $boxArr = $_POST['box'];
+            $pickupDate = $_POST['pickupdate'];
+            $deliveryDate = $_POST['deliverydate'];
+            $pickupAddress = $_POST['pickupaddress'];
+            $deliveryAddress = $_POST['deliveryaddress'];   
+            $imageCount = $_POST['imageCount']; 
+            $generalData ="";
+            $equipmentData ="";
+            $miscData ="";            
+            
+            if($generalArr){
+                $i=0;
+                foreach($generalArr as $gData){
+                    if($gData!=0){
+                        $generalData = ($generalData == "")? $general[$i]['id'].'-'.$gData : ','.$general[$i]['id'].'-'.$gData;
+                        $i++;
+                    }
+                }
+            }
+            
+            if($equipmentArr){
+                $i=0;
+                foreach($equipmentArr as $eData){
+                    if($eData!=0){
+                        $equipmentData.= ($equipmentData == "")? $equipment[$i]['id'].'-'.$eData : ','.$equipment[$i]['id'].'-'.$eData;
+                        $i++;
+                    }
+                }
+            }
+            
+            if($boxArr){
+                $i=0;
+                foreach($boxArr as $bData){
+                    if($bData!=0){
+                        $miscData = ($miscData == "")? $miscellaneous[$i]['id'].'-'.$bData : ','.$miscellaneous[$i]['id'].'-'.$bData;
+                        $i++;
+                    }
+                }
+            }
+           // echo'<pre>'; print_r(Input::file('image')); die;
+            $officeImages = '1';
+//            if(Input::hasFile('image')){ 
+//                foreach(Input::file('image') as $file){
+//                  
+//                   echo $file->getClientOriginalName(); die;
+//                } 
+//            } 
+            
+            if ( Input::hasFile('image') ):
+
+            $files = Input::file('image');
+             $file_count = count($files); echo $file_count; die;
+
+        endif;
+
+                 
+                
+             
+   
+                
+            for($i=1;$i<=$imageCount;$i++){
+                $pic=Input::file('image'.$i);
+
+                $extension = $pic->getClientOriginalExtension(); // getting image extension
+                $name = time() . rand(111, 999) . '.' . $extension; // renameing image                
+                $pic->move(public_path().'/uploads/userimages/',$name);
+
+                if($officeImages != ''){
+                    $officeImages.= ','.$name;
+                }else{
+                    $officeImages = $name;
+                }
+            }
+            
+            
         }else{  
             return View('user.shipment.office',['general'=>$general, 'equipment'=>$equipment, 'miscellaneous'=>$miscellaneous]);
         }
     }
+    
+    
      public function twowheeler(Request $request){
          
          if($_POST){
@@ -155,10 +238,10 @@ class ShipmentController extends FrontController
     public function getoffer(Request $request){
         
         $shiping_id=$request->session()->get('shiping_id');
-        $tempArr = Session::get('currentUser');
+        $tempArr = Session::get('currentUser'); //echo'<pre>'; print_r($tempArr); die;
         if($shiping_id!="") {
         $shipping = ShippingDetail::find($shiping_id); 
-        $shipping->user_id = $tempArr["id"];
+        $shipping->user_id = $tempArr['id'];
         $shipping->status = 1;
         $shippingSucess = $shipping->save(); 
         } else {
