@@ -6,7 +6,7 @@
 @section('body')
 
 
- {!! Form::open(array('url'=>'user/vehicle/pickup','class'=>'form-horizontal','id'=>'vehicle_form','files' => true)) !!}
+ {!! Form::open(array('url'=>'twowheeler','class'=>'form-horizontal','id'=>'vehicle_form','files' => true)) !!}
 <section class="categories containerfirstphase">
     <div class="container">
         
@@ -54,6 +54,7 @@
                                 </div>
                                 <div class="col-md-7">
                             <input type="text" name="vehicle_model" class="form-control">
+                            <input type="hidden" name="subcategory_id" value="{{$subcategory_id}}">
                             </div>
                        </div>
                        <div class="form-group row">
@@ -76,7 +77,7 @@
 <h4>Additional information (Optional) </h4>
                         <p>Additional information:</p>
                         <div class="form-group">
-                            <textarea name="" id="" cols="55" rows="5"  class="form-control"></textarea>
+                            <textarea name="additional_detail" id="additional_detail" cols="55" rows="5"  class="form-control"></textarea>
                             <small>You have 1200 characters left</small>
                         </div>
                     </div>
@@ -243,13 +244,13 @@
         }    
     }
  
-function validate_office(action_type){  alert(action_type);
+function validate_office(action_type){  
     
      var title = $('#delivery_title').val();
      var image = $('#vehicle_image').val();
      var vehicle_name = $('#vehicle_name').val();
      var c=0;
-     alert(image);
+     
         if(title==''){
             $('html, body').animate({ scrollTop: 100 }, 1000);
             $('#errname').show();

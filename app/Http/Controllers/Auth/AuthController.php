@@ -7,6 +7,7 @@ use Validator;
 use App\Http\Controllers\Controller;
 use Illuminate\Foundation\Auth\ThrottlesLogins;
 use Illuminate\Foundation\Auth\AuthenticatesAndRegistersUsers;
+use Session;
 
 class AuthController extends Controller
 {
@@ -29,14 +30,18 @@ class AuthController extends Controller
     
     public function authenticated($request , $user){
         
-      
-        if($user->user_type_id=='1'){            
-            return redirect('admin/dashboard') ;
-        }elseif($user->user_type_id=='2'){
-            return redirect(url('user/home'));
-        }elseif($user->user_type_id=='3'){
-            //return redirect()->route('user/dashboard') ;
-             return redirect(url('user/home'));
+        $shiping_id=$request->session()->get('shiping_id');
+        if($shiping_id=="") {
+            if($user->user_type_id=='1'){            
+                return redirect('admin/dashboard') ;
+            }elseif($user->user_type_id=='2'){
+                return redirect(url('user/home'));
+            }elseif($user->user_type_id=='3'){
+                //return redirect()->route('user/dashboard') ;
+                 return redirect(url('user/home'));
+            }
+        } else {
+           return redirect(url('user/getoffer'));  
         }
     }
     

@@ -17,6 +17,7 @@ use App\AdminBox;
 use App\TblQuesMaster;
 use DB;
 
+
 class UserHomeController extends FrontController
 {
     /**
@@ -104,6 +105,7 @@ class UserHomeController extends FrontController
     
     public function subCategory(Request $request){
         $catId = $request->id; 
+        $request->session()->put('category_id', $catId);
         $category = VehicleCategory::where('status',1)->where('id',$catId)->select('category_name')->first();
         $subCategories = VehicleCategory::where('status',1)->where('parent_id',$catId)->select('id','category_name','category_image')->get();
         
