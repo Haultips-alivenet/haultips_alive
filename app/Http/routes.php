@@ -39,7 +39,7 @@ Route::get('twowheeler/{id}', 'Front\ShipmentController@twowheeler');
 Route::post('twowheeler', 'Front\ShipmentController@twowheeler');
 Route::post('fourwheeler', 'Front\ShipmentController@twowheeler');
 Route::get('user/getoffer', 'Front\ShipmentController@getoffer');
-
+Route::get('user/getofferprocess', 'Front\ShipmentController@getofferprocess');
 
 #Admin
 Route::get('/admin/login', function () {

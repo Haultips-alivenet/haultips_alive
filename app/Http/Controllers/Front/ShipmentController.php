@@ -49,7 +49,7 @@ class ShipmentController extends FrontController
        
     }
     
-     public function office(Request $request){
+    public function office(Request $request){
         $general = AdminGeneralShipment::where('status','1')->select('id','name')->get();
         $equipment = AdminEquipment::where('status','1')->select('id','name')->get();
         $miscellaneous = AdminMiscellaneous::where('status','1')->select('id','name')->get();
@@ -144,7 +144,7 @@ class ShipmentController extends FrontController
     }
     
     
-    public function twowheeler(Request $request){
+     public function twowheeler(Request $request){
          
          if($_POST){
             
@@ -240,7 +240,12 @@ class ShipmentController extends FrontController
         
         //echo $request->id;die;
         
-        $shiping_id=$request->session()->get('shiping_id');
+       
+        return view('user/shipment/getoffer');
+    }
+      public function getofferprocess(Request $request){
+          
+         $shiping_id=$request->session()->get('shiping_id');
         $tempArr = Session::get('currentUser');
         if($shiping_id) {
         $shipping = ShippingDetail::find($shiping_id); 
@@ -254,9 +259,8 @@ class ShipmentController extends FrontController
         } else {
              Session::flash('success', 'Error occur ! Please try again.');
         }
-        return view('user/shipment/getoffer');
-    }
-    
+         return redirect(url('user/getoffer'));
+      }
    
 }
     

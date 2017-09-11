@@ -186,7 +186,7 @@
                     required : true,
                 },
                 deliverydate:{
-                    required : true,
+                    //required : true,
                     
                 },
                 pickupaddress:{
@@ -208,7 +208,7 @@
                    
                 },
                 deliverydate :{
-                    required : "Select Delivery Date"
+                    //required : "Select Delivery Date"
                    
                 },
                 pickupaddress :{

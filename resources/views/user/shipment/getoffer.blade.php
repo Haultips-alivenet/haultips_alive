@@ -36,7 +36,7 @@
 
 
                         <div class="form-group text-center">
-                            <a href="{{URL :: asset("getoffer")}}" class="wow  bounce"> <button class="btn btn-color" id="">Get Offer</button></a>
+                            <a href="{{URL :: asset("user/getofferprocess")}}" class="wow  bounce"> <button class="btn btn-color" id="">Get Offer</button></a>
                         </div>
 
 
