@@ -144,7 +144,7 @@ class ShipmentController extends FrontController
     }
     
     
-     public function twowheeler(Request $request){
+    public function twowheeler(Request $request){
          
          if($_POST){
             
@@ -223,8 +223,9 @@ class ShipmentController extends FrontController
                 $success = "0";
                 DB::rollback();
             }      
+            $request->session()->put('shiping_id', $shippingId); 
             if($tempArr["id"]=="" && $custid=="0") {
-               $request->session()->put('shiping_id', $shippingId); 
+               $request->session()->put('check_getofferpage', "GetOfferPage"); 
                return redirect(url('user/login'));
             } else {
                  return redirect(url('user/getoffer'));
@@ -237,17 +238,22 @@ class ShipmentController extends FrontController
     
     public function getoffer(Request $request){
         
+        //echo $request->id;die;
+        
         $shiping_id=$request->session()->get('shiping_id');
-        $tempArr = Session::get('currentUser'); //echo'<pre>'; print_r($tempArr); die;
-        if($shiping_id!="") {
+        $tempArr = Session::get('currentUser');
+        if($shiping_id) {
         $shipping = ShippingDetail::find($shiping_id); 
-        $shipping->user_id = $tempArr['id'];
+        $shipping->user_id = $tempArr["id"];
         $shipping->status = 1;
         $shippingSucess = $shipping->save(); 
-        } else {
-        DB::table('shipping_details')->where('id', $tempArr["id"])->update(['status' => 1]);
-        }
+        
         $request->session()->forget('shiping_id');
+        $request->session()->forget('check_getofferpage');
+        Session::flash('success', 'Data Post successfully');
+        } else {
+             Session::flash('success', 'Error occur ! Please try again.');
+        }
         return view('user/shipment/getoffer');
     }
     

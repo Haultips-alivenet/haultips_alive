@@ -30,8 +30,8 @@ class AuthController extends Controller
     
     public function authenticated($request , $user){
         
-        $shiping_id=$request->session()->get('shiping_id');
-        if($shiping_id=="") {
+        $getoffer=$request->session()->get('check_getofferpage');
+        if($getoffer=="") {
             if($user->user_type_id=='1'){            
                 return redirect('admin/dashboard') ;
             }elseif($user->user_type_id=='2'){

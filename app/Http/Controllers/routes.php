@@ -75,6 +75,117 @@
 |
 
 */
+Route::get('/', 'Front\UserHomeController@index');
+Route::resource('user/dashboard', 'Front\UserHomeController@index');
+Route::resource('user/home', 'Front\UserHomeController@userdashboard');
+Route::resource('user/faq', 'Front\UserHomeController@faq');
+Route::resource('user/notification', 'Front\UserHomeController@notification');
+Route::resource('user/changepassword', 'Front\UserHomeController@changepassword');
+Route::resource('user/transactionhistory', 'Front\UserHomeController@transactionhistory');
+Route::get('getquesAns', 'Front\UserHomeController@getquesAns');
+#User
+Route::resource('user/find/deliveries', 'Front\FindDeliveriesController');
+Route::resource('user/login', 'Front\LoginController');
+Route::resource('user/signup', 'Front\LoginController@signup');
+Route::resource('user/customer', 'Front\LoginController@customer');
+Route::resource('user/partner', 'Front\LoginController@partner');
+#Customer Registration
+Route::resource('user/customer-registration', 'Front\LoginController@customer_registration');
+Route::resource('user/partner-registration', 'Front\LoginController@partner_registration');
+Route::get('getlength ', 'Front\UserHomeController@gettrucklength');
+Route::get('getcapacity ', 'Front\UserHomeController@gettruckcapacity');
+Route::get('subCategory/{id}', 'Front\UserHomeController@subCategory');
+
+
+Route::get('office/{id}', 'Front\ShipmentController@office');
+Route::get('fourwheeler/{id}', 'Front\ShipmentController@twowheeler');
+Route::get('twowheeler/{id}', 'Front\ShipmentController@twowheeler');
+Route::post('twowheeler', 'Front\ShipmentController@twowheeler');
+Route::post('fourwheeler', 'Front\ShipmentController@twowheeler');
+Route::get('user/getoffer', 'Front\ShipmentController@getoffer');
+Route::get('getoffer', 'Front\ShipmentController@getoffer');
+
+#Admin
+Route::get('/admin/login', function () {
+    if(Auth::check()){return Redirect::to('admin/dashboard');}
+    return view('admin/login');
+});
+
+
+// Authentication routes...
+Route::get('/auth/login', 'Auth\AuthController@getLogin');
+Route::post('auth/login', 'Auth\AuthController@postLogin');
+Route::get('auth/logout', 'Auth\AuthController@getLogout');
+
+Route::get('admin/dashboard', 'DashboardController@index');
+
+# Admin Panel Routes
+Route::post('admin/store', 'RegistrationController@store');
+Route::get('admin/mobileCheck', 'RegistrationController@mobileCheck');
+Route::get('admin/userList', 'RegistrationController@index');
+
+Route::get('admin/users/{id}/delete', 'RegistrationController@destroy');
+Route::resource('admin/users', 'RegistrationController');
+
+# Admin Category
+Route::resource('admin/category', 'CategoryController');
+Route::post('admin/Category-Save', 'CategoryController@store');
+Route::get('admin/category/{id}/update', 'CategoryController@create');
+Route::get('admin/category/{id}/delete', 'CategoryController@destroy');
+
+# Admin Sub Category
+Route::resource('admin/subcategory', 'SubCategoryController');
+Route::post('admin/subCategory-Save', 'SubCategoryController@store');
+Route::get('admin/subcategory/{id}/update', 'SubCategoryController@create');
+Route::get('admin/subcategory/{id}/delete', 'SubCategoryController@destroy');
+
+# Admin partner
+Route::resource('admin/partner', 'PartnerRegistrationController');
+Route::post('admin/partner/store', 'PartnerRegistrationController@store');
+Route::get('admin/partnerList', 'PartnerRegistrationController@index');
+Route::get('gettransporterData', 'PartnerRegistrationController@gettransporterData');
+Route::get('admin/partner/{id}/delete', 'PartnerRegistrationController@destroy');
+Route::get('admin/partner/{id}/approve', 'PartnerRegistrationController@approve');
+Route::post('admin/partnerDocumentsUpload', 'PartnerRegistrationController@DocumentsUpload');
+
+# Truck Length
+Route::resource('admin/trucklength', 'TruckLengthController');
+Route::post('admin/trucklength-Save', 'TruckLengthController@store');
+Route::get('admin/trucklength/{id}/update', 'TruckLengthController@create');
+Route::get('admin/trucklength/{id}/delete', 'TruckLengthController@destroy');
+Route::get('checktrucklength ', 'TruckLengthController@checktrucklength');
+
+# Truck Capacity
+Route::resource('admin/truckcapacity', 'TruckCapacityController');
+Route::get('gettrucklength ', 'TruckCapacityController@gettrucklength');
+Route::post('admin/truckcapacity-Save', 'TruckCapacityController@store');
+Route::get('admin/truckcapacity/{id}/update', 'TruckCapacityController@create');
+Route::get('admin/truckcapacity/{id}/delete', 'TruckCapacityController@destroy');
+Route::get('gettruckcapacity ', 'TruckCapacityController@gettruckcapacity');
+
+# Cost Estimation
+Route::resource('admin/cost', 'CostController');
+Route::post('admin/cost-Save', 'CostController@store');
+Route::get('admin/cost/{id}/update', 'CostController@create');
+Route::get('admin/cost/{id}/delete', 'CostController@destroy');
+
+# adminshipment admin
+Route::resource('admin/adminshipment/shipList', 'AdminShipmentController@shipList');
+Route::resource('admin/adminshipment', 'AdminShipmentController');
+Route::post('admin/adminshipment-Save', 'AdminShipmentController@store');
+Route::post('admin/adminshipment-update', 'AdminShipmentController@update');
+Route::get('admin/adminshipment/{id}/update', 'AdminShipmentController@edit');
+Route::get('admin/adminshipment/{id}/delete', 'AdminShipmentController@destroy');
+
+#Transaction-History
+Route::resource('admin/transaction/history', 'TransactionHistoryController');
+
+
+#shipment/report
+Route::get('shipment/detailsReport/{id}', 'ShipmentReportController@details_report');
+Route::get('shipment/BidsReport/{id}', 'ShipmentReportController@bids_report');
+Route::resource('shipment/{id}/report', 'ShipmentReportController');
+Route::resource('shipment/reportList/{id}', 'ShipmentReportController@index');
 
 
 

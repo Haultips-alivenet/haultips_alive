@@ -12,7 +12,15 @@
         <div class="row">
             <div class="col-lg-offset-2 col-md-offset-2  col-lg-8 col-md-8">
                 <div class="snup_bx _login wow zoomIn">
-                    <h2>GetOffer</h2>
+                    <h2>Get Offer</h2>
+                     @if(Session::has('success'))
+                            <div class="alert alert-success">
+                                <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+                                {{Session::get('success')}}
+                            </div>
+                        @endif
+                        
+                    {{--    Error Display ends--}}
                    <div class="clearfix"></div>
                     <div class="_cus_bx _get_offer">
                         
@@ -28,7 +36,7 @@
 
 
                         <div class="form-group text-center">
-                            <button class="btn btn-color" id="">Get Offer</button>
+                            <a href="{{URL :: asset("getoffer")}}" class="wow  bounce"> <button class="btn btn-color" id="">Get Offer</button></a>
                         </div>
 
 
