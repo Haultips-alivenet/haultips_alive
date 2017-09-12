@@ -5,7 +5,7 @@
 
 @section('body')
 
-
+ {!! Form::open(array('url'=>'office','class'=>'form-horizontal','id'=>'office_form','files' => true)) !!}
 <section class="_inner_pages containerfirstphase">
     <div class="container">
         <div class="row">
@@ -15,8 +15,9 @@
                 <br>
 
                 <div class="clearfix"></div>
-            <!--   {!! Form::open(array('url'=>'office','class'=>'form-horizontal','id'=>'office_form', 'method'=>'POST', 'files'=>true,)) !!}-->
-               <form role="form" method="POST" action="{{ url('office') }}" enctype="multipart/form-data">
+               
+              
+              
                <div class="col-md-8">
                    <div class="col-md-6">                             
                             <div class="form-group">
@@ -155,7 +156,7 @@
         <div class="row">
             <div class="col-md-12">
                 
-                <ul class="img_up_list">
+                <ul class="img_up_list" id="img_up_list">
                     
                 </ul>
                 <div id='errAttchment' style='display:none'>Image should be jpg or png</div>
@@ -164,15 +165,14 @@
                 <div class="form-group _fl_upd">
                     <label for="">Upload pictures:</label>
                     <div id="imagePreview"></div>
-                    <span> <input id="uploadFile" type="file"  name="image" class="_fl_f" />
+                    <span> <input id="uploadFile" type="file"  name="image[]" multiple="" class="_fl_f" />
                     Add Photo
                     </span>
-                  
+                    {!! Form::hidden('imageCount', '', array('id' => 'imageCount')) !!}
+                     <input type="hidden" name="subcategory_id" value="{{$subcategory_id}}">
                 </div>
             </div>  <div class="gallery"></div>
-            <div id="finalimage">
-                <input type="text" name="inputTextToSave" id="inputTextToSave">
-            </div>
+           
 
             <div class="col-md-6">
                 <div class="_add_cmt_bx">
@@ -265,8 +265,7 @@
               <textarea name="deliveryaddress" id="" cols="30" rows="10" class="form-control _fm_c_t"></textarea>
 
               </div>
-                    {!! Form::hidden('imageCount', '', array('id' => 'imageCount')) !!}
-              </div>                
+              </div>
             <div class="form-group">
             
              {!! Form :: submit("Submit",["class"=>"btn btn-color",'id'=>'']) !!}
@@ -278,20 +277,20 @@
                 
     </div>
 </section>
- <!--{!! Form::close() !!}-->
-</form>
+{!! Form::close() !!}
+
 @endsection
 @section('script')
 <script type="text/javascript">
     
-    $('#office_form').validate({
+     $('#office_form').validate({
 
             rules: {
                 pickupdate:{
                     required : true,
                 },
                 deliverydate:{
-                    required : true,
+                    //required : true,
                     
                 },
                 pickupaddress:{
@@ -313,7 +312,7 @@
                    
                 },
                 deliverydate :{
-                    required : "Select Delivery Date"
+                    //required : "Select Delivery Date"
                    
                 },
                 pickupaddress :{
@@ -335,7 +334,7 @@ $(function() {
 
         if (input.files) {
             var filesAmount = input.files.length;
-            var j=1;
+            
             for (i = 0; i < filesAmount; i++) {
                 var reader = new FileReader();
 
@@ -344,68 +343,23 @@ $(function() {
                     $('img').wrap('<li />');
                    
                 }
-              // alert(event.target.result);
-              //  $a='<input id="uploadFilellll" type="file"  name="image[]" class="" value="'+event.target.result+'" />';
-               // $('#finalimage').html($a);
+           
                 reader.readAsDataURL(input.files[i]);
-                j++;
+                
             }
         }
 
     };
 
     $('#uploadFile').on('change', function() {
-    
-        var fileToLoad = document.getElementById("uploadFile").files[0];
-
-  var fileReader = new FileReader();
-  fileReader.onload = function(fileLoadedEvent){
-      var textFromFileLoaded = fileLoadedEvent.target.result;
-      document.getElementById("inputTextToSave").value = textFromFileLoaded;
-  };
-
-    
-    
-    
+        $('#img_up_list').html('');
          imagesPreview(this, 'ul.img_up_list'); 
           var imageValue = imageCount++; 
         $('#imageCount').val(imageValue);
         });
 });
 
-$('#office-shipment').validate({ 
 
-            rules: {
-                pickDate :{
-                    required : true
-                },
-                pickAddress :{
-                    required : true,
-                    minlength:2
-                },
-                deliveryaddress :{
-                    required : true,
-                    minlength:2
-                }
-             },
-            messages: {
-                
-                pickDate :{
-                    required : "Select the Pickup Date"
-                },
-                pickAddress :{
-                    required : "Enter your Pick Address",
-                    minlength : 'Pick Address should be 2 digits'
-                },
-                deliveryaddress :{
-                    required : "Enter your Delivery Address",
-                    minlength : 'Delivery Address should be 2 digits'
-                }
-            }
-            
-           
-
-        });
 
 function validate_office(action_type){  
     

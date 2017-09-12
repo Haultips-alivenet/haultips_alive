@@ -50,14 +50,15 @@ class ShipmentController extends FrontController
     }
     
     public function office(Request $request){
-       // print_r($_FILES);die;
+       
         $general = AdminGeneralShipment::where('status','1')->select('id','name')->get();
         $equipment = AdminEquipment::where('status','1')->select('id','name')->get();
         $miscellaneous = AdminMiscellaneous::where('status','1')->select('id','name')->get();
        
         if($_POST){ 
-//            $category_id = $_POST['catId'];
-//            $subCatId = $_POST['subCatId'];
+            $category_id = $request->session()->get('category_id');
+            $subCatId = base64_decode(urldecode($request->subcategory_id));
+            
             $title = $_POST['title'];
             $collectionFloor = $_POST['collectionFloor'];
             $deliveryFloor = $_POST['deliveryFloor'];
@@ -65,25 +66,35 @@ class ShipmentController extends FrontController
             $generalArr = $_POST['general'];
             $equipmentArr = $_POST['equipment'];
             $boxArr = $_POST['box'];
-            $pickupDate = $_POST['pickupdate'];
-            $deliveryDate = $_POST['deliverydate'];
-            $pickupAddress = $_POST['pickupaddress'];
-            $deliveryAddress = $_POST['deliveryaddress'];   
             $imageCount = $_POST['imageCount']; 
             $generalData ="";
             $equipmentData ="";
-            $miscData ="";            
-            
+            $miscData ="";  
+            $pickupLocation=$request->pickupaddress;
+            $pickupLat="0";
+            $pickupLong="0";
+            $pickupDate=$request->pickupdate;
+            $dropLocation=$request->deliveryaddress;
+            $dropLat="0";
+            $dropLong="0";
+            $deliveryDate=$request->deliverydate;
+            $additional_detail=$request->additonalInfo;
+            $tempArr = Session::get('currentUser');
+            if($tempArr["id"]!="") {
+                $custid = $tempArr["id"];
+            } else {
+                $custid = "0";
+            }
             if($generalArr){
                 $i=0;
                 foreach($generalArr as $gData){
                     if($gData!=0){
-                        $generalData = ($generalData == "")? $general[$i]['id'].'-'.$gData : ','.$general[$i]['id'].'-'.$gData;
+                        $generalData.= ($generalData == "")? $general[$i]['id'].'-'.$gData : ','.$general[$i]['id'].'-'.$gData;
                         $i++;
                     }
                 }
             }
-            
+           
             if($equipmentArr){
                 $i=0;
                 foreach($equipmentArr as $eData){
@@ -98,34 +109,17 @@ class ShipmentController extends FrontController
                 $i=0;
                 foreach($boxArr as $bData){
                     if($bData!=0){
-                        $miscData = ($miscData == "")? $miscellaneous[$i]['id'].'-'.$bData : ','.$miscellaneous[$i]['id'].'-'.$bData;
+                        $miscData.= ($miscData == "")? $miscellaneous[$i]['id'].'-'.$bData : ','.$miscellaneous[$i]['id'].'-'.$bData;
                         $i++;
                     }
                 }
             }
-           // echo'<pre>'; print_r(Input::file('image')); die;
-            $officeImages = '1';
-//            if(Input::hasFile('image')){ 
-//                foreach(Input::file('image') as $file){
-//                  
-//                   echo $file->getClientOriginalName(); die;
-//                } 
-//            } 
-            
-            if ( Input::hasFile('image') ):
-
+          
+            $officeImages = '';
+            if ( Input::hasFile('image') ){
             $files = Input::file('image');
-             $file_count = count($files); echo $file_count; die;
-
-        endif;
-
-                 
-                
-             
-   
-                
-            for($i=1;$i<=$imageCount;$i++){
-                $pic=Input::file('image'.$i);
+            foreach($files as $pic){
+                //$pic=Input::file('image'.$i);
 
                 $extension = $pic->getClientOriginalExtension(); // getting image extension
                 $name = time() . rand(111, 999) . '.' . $extension; // renameing image                
@@ -137,10 +131,66 @@ class ShipmentController extends FrontController
                     $officeImages = $name;
                 }
             }
+            }
+            //try{
+                // DB::beginTransaction();
+                 
+                $shipping= new ShippingDetail;
+                $shipping->user_id = $custid;
+                $shipping->category_id = $category_id;
+                $shipping->subcategory_id = $subCatId;
+                $shipping->table_name = 'shipment_listing_offices';
+                $shipping->status = 0;
+                $shipping->save(); 
+                $shippingId= $shipping->id;
+                
+                $shipmentList= new ShipmentListingOffice;
+                $shipmentList->shipping_id = $shippingId;
+                $shipmentList->collection_floor = $collectionFloor;
+                $shipmentList->delivery_floor = $deliveryFloor;
+                $shipmentList->lift_elevator = $lift;
+                $shipmentList->delivery_title = $title;
+                $shipmentList->general_shipment_inventory = $generalData;
+                $shipmentList->equipment_shipment_inventory = $equipmentData;
+                $shipmentList->boxes = $miscData;
+                $shipmentList->item_image = $officeImages;
+                $shipmentList->additional_detail = $additional_detail;
+                $shipmentList->save();
+               
+                $pickupDetail = new ShippingPickupDetail;
+                $pickupDetail->shipping_id = $shippingId;
+                $pickupDetail->pickup_address = trim($pickupLocation);
+                $pickupDetail->latitude = $pickupLat;
+                $pickupDetail->longitutde = $pickupLong;
+                $pickupDetail->pickup_date = trim($pickupDate);
+                $pickupDetail->save();
+ 
+                $deliveryDetail = new ShippingDeliveryDetail;
+                $deliveryDetail->shipping_id = $shippingId;
+                $deliveryDetail->delivery_address = trim($dropLocation);
+                $deliveryDetail->latitude = $dropLat;
+                $deliveryDetail->longitutde = $dropLong;
+                $deliveryDetail->delivery_date = trim($deliveryDate);
+                $deliveryDetail->save();
+               
+           //}
+           // catch(\Exception $e){
+
+                //$success = "0";
+               // DB::rollback();
+            //}      
+            $request->session()->put('shiping_id', $shippingId); 
+            if($tempArr["id"]=="" && $custid=="0") {
+               $request->session()->put('check_getofferpage', "GetOfferPage"); 
+               return redirect(url('user/login'));
+            } else {
+               
+                 return redirect(url('user/getoffer'));
+            }
             
             
         }else{  
-            return View('user.shipment.office',['general'=>$general, 'equipment'=>$equipment, 'miscellaneous'=>$miscellaneous]);
+            return View('user.shipment.office',['general'=>$general, 'equipment'=>$equipment, 'miscellaneous'=>$miscellaneous,'subcategory_id'=>$request->id]);
         }
     }
     
@@ -229,7 +279,7 @@ class ShipmentController extends FrontController
                $request->session()->put('check_getofferpage', "GetOfferPage"); 
                return redirect(url('user/login'));
             } else {
-                echo "gfg";die;
+               
                  return redirect(url('user/getoffer'));
             }
          }else{
@@ -356,6 +406,214 @@ class ShipmentController extends FrontController
               return view('subCategory/4');
          }
     }
-   
+    
+    public function householdgoods(Request $request){
+        //print_r($_POST);die;
+        if($_POST){
+            
+                    
+            $category_id = $request->session()->get('category_id');
+            $title = $request->delivery_title;
+            $materialId = $request->material_id;
+            $weight = $request->weight;
+            $pickupLocation=$request->pickupaddress;
+            $pickupLat="0";
+            $pickupLong="0";
+            $pickupDate=$request->pickupdate;
+            $dropLocation=$request->deliveryaddress;
+            $dropLat="0";
+            $dropLong="0";
+            $deliveryDate=$request->deliverydate;
+            $additional_detail=$request->additional_detail;
+           
+            $tempArr = Session::get('currentUser');
+            if($tempArr["id"]!="") {
+                $custid = $tempArr["id"];
+            } else {
+                $custid = "0";
+            }
+            $otherImages = '';
+            if ( Input::hasFile('image') ){
+            $files = Input::file('image');
+            foreach($files as $pic){
+                //$pic=Input::file('image'.$i);
+
+                $extension = $pic->getClientOriginalExtension(); // getting image extension
+                $name = time() . rand(111, 999) . '.' . $extension; // renameing image                
+                $pic->move(public_path().'/uploads/userimages/',$name);
+
+                if($otherImages != ''){
+                    $otherImages.= ','.$name;
+                }else{
+                    $otherImages = $name;
+                }
+            }
+            }
+            $add_details="";
+            for($i=0;$i<count($additional_detail);$i++){
+                
+                $add_details.=$additional_detail[$i].',';
+            }
+            $add_details= rtrim($add_details,",");
+            try{
+             DB::beginTransaction();
+             
+                
+
+                $shipping= new ShippingDetail;
+                $shipping->user_id = $custid;
+                $shipping->category_id = $category_id;
+                $subCatId = base64_decode(urldecode($request->subcategory_id));
+                $shipping->subcategory_id = $subCatId;
+                $shipping->table_name = 'shipment_listing_householdgoods';
+                $shipping->status = 0;
+                $shipping->save(); 
+                $shippingId= $shipping->id;
+
+                $shipmentList= new ShipmentListingHouseholdgood;
+                $shipmentList->shipping_id = $shippingId;
+                $shipmentList->delivery_title = $title;
+                $shipmentList->additional_detail = $add_details;
+                $shipmentList->item_image = $otherImages;
+                $shipmentList->save();
+                
+                $pickupDetail = new ShippingPickupDetail;
+                $pickupDetail->shipping_id = $shippingId;
+                $pickupDetail->pickup_address = trim($pickupLocation);
+                $pickupDetail->latitude = $pickupLat;
+                $pickupDetail->longitutde = $pickupLong;
+                $pickupDetail->pickup_date = trim($pickupDate);
+                $pickupDetail->save();
+
+                $deliveryDetail = new ShippingDeliveryDetail;
+                $deliveryDetail->shipping_id = $shippingId;
+                $deliveryDetail->delivery_address = trim($dropLocation);
+                $deliveryDetail->latitude = $dropLat;
+                $deliveryDetail->longitutde = $dropLong;
+                $deliveryDetail->delivery_date = trim($deliveryDate);
+                $deliveryDetail->save();
+                
+                
+                DB::commit();
+                $success = "1";
+            }
+            catch(\Exception $e){
+
+                $success = "0";
+                DB::rollback();
+            }      
+            $request->session()->put('shiping_id', $shippingId); 
+            if($tempArr["id"]=="" && $custid=="0") {
+               $request->session()->put('check_getofferpage', "GetOfferPage"); 
+               return redirect(url('user/login'));
+            } else {
+                 return redirect(url('user/getoffer'));
+            }
+        }else{
+        return view('user/shipment/householdgoods',['subcategory_id'=>$request->id]);
+       }
+    }
+    public function others(Request $request){
+        //print_r($_POST);die;
+        if($_POST){
+            
+                    
+            $category_id = $request->session()->get('category_id');
+            $title = $request->delivery_title;
+            $materialId = $request->material_id;
+            $weight = $request->weight;
+            $pickupLocation=$request->pickupaddress;
+            $pickupLat="0";
+            $pickupLong="0";
+            $pickupDate=$request->pickupdate;
+            $dropLocation=$request->deliveryaddress;
+            $dropLat="0";
+            $dropLong="0";
+            $deliveryDate=$request->deliverydate;
+            $additional_detail=$request->additional_detail;
+           
+            $tempArr = Session::get('currentUser');
+            if($tempArr["id"]!="") {
+                $custid = $tempArr["id"];
+            } else {
+                $custid = "0";
+            }
+            $otherImages = '';
+            if ( Input::hasFile('image') ){
+            $files = Input::file('image');
+            foreach($files as $pic){
+                //$pic=Input::file('image'.$i);
+
+                $extension = $pic->getClientOriginalExtension(); // getting image extension
+                $name = time() . rand(111, 999) . '.' . $extension; // renameing image                
+                $pic->move(public_path().'/uploads/userimages/',$name);
+
+                if($otherImages != ''){
+                    $otherImages.= ','.$name;
+                }else{
+                    $otherImages = $name;
+                }
+            }
+            }
+            
+          
+            try{
+             DB::beginTransaction();
+             
+                
+
+                $shipping= new ShippingDetail;
+                $shipping->user_id = $custid;
+                $shipping->category_id = $category_id;
+                $subCatId = base64_decode(urldecode($request->subcategory_id));
+                $shipping->subcategory_id = $subCatId;
+                $shipping->table_name = 'shipment_listing_others';
+                $shipping->status = 0;
+                $shipping->save(); 
+                $shippingId= $shipping->id;
+
+                $shipmentList= new ShipmentListingOther;
+                $shipmentList->shipping_id = $shippingId;
+                $shipmentList->delivery_title = $title;
+                $shipmentList->additional_detail = $additional_detail;
+                $shipmentList->item_image = $otherImages;
+                $shipmentList->save();
+                
+                $pickupDetail = new ShippingPickupDetail;
+                $pickupDetail->shipping_id = $shippingId;
+                $pickupDetail->pickup_address = trim($pickupLocation);
+                $pickupDetail->latitude = $pickupLat;
+                $pickupDetail->longitutde = $pickupLong;
+                $pickupDetail->pickup_date = trim($pickupDate);
+                $pickupDetail->save();
+
+                $deliveryDetail = new ShippingDeliveryDetail;
+                $deliveryDetail->shipping_id = $shippingId;
+                $deliveryDetail->delivery_address = trim($dropLocation);
+                $deliveryDetail->latitude = $dropLat;
+                $deliveryDetail->longitutde = $dropLong;
+                $deliveryDetail->delivery_date = trim($deliveryDate);
+                $deliveryDetail->save();
+                
+                
+                DB::commit();
+                $success = "1";
+            }
+            catch(\Exception $e){
+
+                $success = "0";
+                DB::rollback();
+            }      
+            $request->session()->put('shiping_id', $shippingId); 
+            if($tempArr["id"]=="" && $custid=="0") {
+               $request->session()->put('check_getofferpage', "GetOfferPage"); 
+               return redirect(url('user/login'));
+            } else {
+                 return redirect(url('user/getoffer'));
+            }
+        }else{
+        return view('user/shipment/others',['subcategory_id'=>$request->id]);
+       }
+    }
 }
     

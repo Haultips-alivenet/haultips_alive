@@ -27,7 +27,8 @@
                     </div>
                 <div class="form-group _fgrp">
                     <label for="" style="font-weight: normal; display: block;">Weight</label>
-                   <input type="text" onkeyup="delivery_titlehide();" name="weight" id="weight" class="form-control">
+                   <input type="text" onkeyup="weightide();" name="weight" id="weight" class="form-control">
+                   <div id='errweight' style='display:none;color:red;'>Please Enter Weight</div>
                     </div>
 
 
@@ -68,6 +69,7 @@
                        
                     </ul>
                     <input type="hidden" name="material_id" id="material_id">
+                    <div id='errmaterial' style='display:none;color:red;'>Please Select Material</div>
                 </div>
             </div>
             <div class="clearfix"></div>
@@ -242,7 +244,8 @@
 function validate_part(action_type){  
     
      var title = $('#delivery_title').val();
-     //var image = $('#vehicle_image').val();
+     var weight = $('#weight').val();
+     var material_id = $('#material_id').val();
      //var vehicle_name = $('#vehicle_name').val();
      var c=0;
      
@@ -253,7 +256,20 @@ function validate_part(action_type){
             }else{
                 $('#errname').hide();
             }
-        
+        if(weight==''){
+            $('html, body').animate({ scrollTop: 100 }, 1000);
+            $('#errweight').show();
+                c = c+1;
+            }else{
+                $('#errweight').hide();
+            }
+        if(material_id==''){
+            $('html, body').animate({ scrollTop: 100 }, 1000);
+            $('#errmaterial').show();
+                c = c+1;
+            }else{
+                $('#errmaterial').hide();
+            }    
         
         if(c>0){//alert('action_type');
                 return false;
@@ -284,8 +300,8 @@ function quicksetupprenext(action_type){
 function delivery_titlehide(){
     $('#errname').hide();
 }
-function vehicle_namehide(){
-    $('#errvehicle').hide(); 
+function weightide(){
+    $('#errweight').hide(); 
 }
 </script>
 <script>
@@ -296,6 +312,7 @@ function vehicle_namehide(){
    new WOW().init();
 
    $(".choose_m a").click(function(){
+       $('#errmaterial').hide();
      var a=$(this).attr("matid");
      $('#material_id').val(a);
   $(this).parent().addClass("selected").siblings().removeClass("selected"); 
