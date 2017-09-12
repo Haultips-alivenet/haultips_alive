@@ -40,7 +40,7 @@ Route::post('twowheeler', 'Front\ShipmentController@twowheeler');
 Route::post('fourwheeler', 'Front\ShipmentController@twowheeler');
 Route::get('user/getoffer', 'Front\ShipmentController@getoffer');
 Route::get('user/getofferprocess', 'Front\ShipmentController@getofferprocess');
-
+Route::post('partload', 'Front\ShipmentController@partload');
 #Admin
 Route::get('/admin/login', function () {
     if(Auth::check()){return Redirect::to('admin/dashboard');}

@@ -15,11 +15,13 @@
                 <br>
 
                 <div class="clearfix"></div>
-               {!! Form::open(array('url'=>'office','class'=>'form-horizontal','id'=>'office_form', 'method'=>'POST', 'files'=>true,)) !!}
+            <!--   {!! Form::open(array('url'=>'office','class'=>'form-horizontal','id'=>'office_form', 'method'=>'POST', 'files'=>true,)) !!}-->
+               <form role="form" method="POST" action="{{ url('office') }}" enctype="multipart/form-data">
                <div class="col-md-8">
                    <div class="col-md-6">                             
                             <div class="form-group">
                                 <label for="">Delivery Title</label>
+                                <input type="hidden" name="_token" value="{{ csrf_token() }}">
                                 <input type="text" name="title" value=""  id="title" class="office-data">
                              </div>
                        <div id='errname' style='display:none'>Please Enter delivery title</div>
@@ -162,12 +164,15 @@
                 <div class="form-group _fl_upd">
                     <label for="">Upload pictures:</label>
                     <div id="imagePreview"></div>
-                    <span> <input id="uploadFile" type="file" multiple="multiple"  name="image[]" class="_fl_f" />
+                    <span> <input id="uploadFile" type="file"  name="image" class="_fl_f" />
                     Add Photo
                     </span>
+                  
                 </div>
             </div>  <div class="gallery"></div>
-
+            <div id="finalimage">
+                <input type="text" name="inputTextToSave" id="inputTextToSave">
+            </div>
 
             <div class="col-md-6">
                 <div class="_add_cmt_bx">
@@ -273,8 +278,8 @@
                 
     </div>
 </section>
- {!! Form::close() !!}
-
+ <!--{!! Form::close() !!}-->
+</form>
 @endsection
 @section('script')
 <script type="text/javascript">
@@ -330,23 +335,39 @@ $(function() {
 
         if (input.files) {
             var filesAmount = input.files.length;
-
+            var j=1;
             for (i = 0; i < filesAmount; i++) {
                 var reader = new FileReader();
 
                 reader.onload = function(event) {
                     $($.parseHTML('<img>')).attr('src', event.target.result).appendTo(placeToInsertImagePreview);
                     $('img').wrap('<li />');
+                   
                 }
-
+              // alert(event.target.result);
+              //  $a='<input id="uploadFilellll" type="file"  name="image[]" class="" value="'+event.target.result+'" />';
+               // $('#finalimage').html($a);
                 reader.readAsDataURL(input.files[i]);
+                j++;
             }
         }
 
     };
 
-    $('#uploadFile').on('change', function() {           
-         imagesPreview(this, 'ul.img_up_list');  
+    $('#uploadFile').on('change', function() {
+    
+        var fileToLoad = document.getElementById("uploadFile").files[0];
+
+  var fileReader = new FileReader();
+  fileReader.onload = function(fileLoadedEvent){
+      var textFromFileLoaded = fileLoadedEvent.target.result;
+      document.getElementById("inputTextToSave").value = textFromFileLoaded;
+  };
+
+    
+    
+    
+         imagesPreview(this, 'ul.img_up_list'); 
           var imageValue = imageCount++; 
         $('#imageCount').val(imageValue);
         });

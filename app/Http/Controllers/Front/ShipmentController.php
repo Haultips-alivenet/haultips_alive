@@ -50,6 +50,7 @@ class ShipmentController extends FrontController
     }
     
     public function office(Request $request){
+       // print_r($_FILES);die;
         $general = AdminGeneralShipment::where('status','1')->select('id','name')->get();
         $equipment = AdminEquipment::where('status','1')->select('id','name')->get();
         $miscellaneous = AdminMiscellaneous::where('status','1')->select('id','name')->get();
@@ -228,6 +229,7 @@ class ShipmentController extends FrontController
                $request->session()->put('check_getofferpage', "GetOfferPage"); 
                return redirect(url('user/login'));
             } else {
+                echo "gfg";die;
                  return redirect(url('user/getoffer'));
             }
          }else{
@@ -237,15 +239,19 @@ class ShipmentController extends FrontController
     }
     
     public function getoffer(Request $request){
-        
-        //echo $request->id;die;
-        
-       
+        $shiping_id=$request->session()->get('shiping_id');
+       //echo $shiping_id;die;
+        if($shiping_id!="") {
+           // echo "fdfdf";die;
         return view('user/shipment/getoffer');
+        } else {
+           //  echo "456";die;
+            return redirect(url('/')); 
+        }
     }
       public function getofferprocess(Request $request){
           
-         $shiping_id=$request->session()->get('shiping_id');
+        $shiping_id=$request->session()->get('shiping_id');
         $tempArr = Session::get('currentUser');
         if($shiping_id) {
         $shipping = ShippingDetail::find($shiping_id); 
@@ -259,8 +265,97 @@ class ShipmentController extends FrontController
         } else {
              Session::flash('success', 'Error occur ! Please try again.');
         }
-         return redirect(url('user/getoffer'));
+        return view('user/shipment/thankyou');
       }
+      
+      
+      public function partload(Request $request){
+         
+         
+         if($_POST){
+            
+                    
+            $category_id = $request->session()->get('category_id');
+            $title = $request->delivery_title;
+            $materialId = $request->material_id;
+            $weight = $request->weight;
+            $pickupLocation=$request->pickupaddress;
+            $pickupLat="0";
+            $pickupLong="0";
+            $pickupDate=$request->pickupdate;
+            $dropLocation=$request->deliveryaddress;
+            $dropLat="0";
+            $dropLong="0";
+            $deliveryDate=$request->deliverydate;
+            $additional_detail=$request->additional_detail;
+            
+            $tempArr = Session::get('currentUser');
+            if($tempArr["id"]!="") {
+                $custid = $tempArr["id"];
+            } else {
+                $custid = "0";
+            }
+            try{
+             DB::beginTransaction();
+             
+                
+
+                $shipping= new ShippingDetail;
+                $shipping->user_id = $custid;
+                $shipping->category_id = $category_id;
+                $shipping->subcategory_id = 0;
+                $shipping->table_name = 'shipment_listing_materials';
+                $shipping->status = 0;
+                $shipping->save(); 
+                $shippingId= $shipping->id;
+
+                $shipmentList= new ShipmentListingMaterial;
+                $shipmentList->shipping_id = $shippingId;
+                $shipmentList->material_id = $materialId;
+                $shipmentList->delivery_title = $title;
+                $shipmentList->weight = $weight;
+                $shipmentList->item_image = 'NA';
+                $shipmentList->remarks = $additional_detail;
+                //print_r($shipmentList);die;
+                $shipmentList->save();
+                
+                $pickupDetail = new ShippingPickupDetail;
+                $pickupDetail->shipping_id = $shippingId;
+                $pickupDetail->pickup_address = trim($pickupLocation);
+                $pickupDetail->latitude = $pickupLat;
+                $pickupDetail->longitutde = $pickupLong;
+                $pickupDetail->pickup_date = trim($pickupDate);
+                $pickupDetail->save();
+
+                $deliveryDetail = new ShippingDeliveryDetail;
+                $deliveryDetail->shipping_id = $shippingId;
+                $deliveryDetail->delivery_address = trim($dropLocation);
+                $deliveryDetail->latitude = $dropLat;
+                $deliveryDetail->longitutde = $dropLong;
+                $deliveryDetail->delivery_date = trim($deliveryDate);
+                $deliveryDetail->save();
+                
+                
+                DB::commit();
+                $success = "1";
+            }
+            catch(\Exception $e){
+
+                $success = "0";
+                DB::rollback();
+            }      
+            $request->session()->put('shiping_id', $shippingId); 
+            if($tempArr["id"]=="" && $custid=="0") {
+               $request->session()->put('check_getofferpage', "GetOfferPage"); 
+               return redirect(url('user/login'));
+            } else {
+                 return redirect(url('user/getoffer'));
+            }
+         }else{
+             
+              return view('subCategory/4');
+         }
+    }
    
 }
     
