@@ -615,5 +615,149 @@ class ShipmentController extends FrontController
         return view('user/shipment/others',['subcategory_id'=>$request->id]);
        }
     }
+    public function home(Request $request){
+       // print_r($_POST);die;
+        $data["dinningRoom"] = AdminDinningRoom::where('status','1')->select('id','name')->get();
+        $data["livingRoom"] = AdminLivingRoom::where('status','1')->select('id','name')->get();
+        $data["bedRooms"] = AdminBedroom::where('status','active')->select('id','name')->get();
+        $data["kitchen"] = AdminKitchen::where('status','1')->select('id','name')->get();
+        $data["homeOffice"] = AdminHomeOffice::where('status','1')->select('id','name')->get();
+        $data["garage"] = AdminGarage::where('status','1')->select('id','name')->get();
+        $data["outdoors"] = AdminOutdoor::where('status','1')->select('id','name')->get();
+        $data["boxes"] = AdminBox::where('status','1')->select('id','name')->get();
+        $data["miscellaneous"] = AdminMiscellaneous::where('status','1')->select('id','name')->get();
+        $data["subcategory_id"] = $request->id;
+        if($_POST){
+            
+                    
+            $category_id = $request->session()->get('category_id');
+            $title = $request->title;
+            $residenceType = $request->residenceType;
+            $no_of_room = $request->no_of_room;
+            $pickupLocation=$request->pickupaddress;
+            $pickupLat="0";
+            $pickupLong="0";
+            $pickupDate=$request->pickupdate;
+            $dropLocation=$request->deliveryaddress;
+            $dropLat="0";
+            $dropLong="0";
+            $deliveryDate=$request->deliverydate;
+            $additional_detail=$request->additonalInfo;
+           
+            $tempArr = Session::get('currentUser');
+            if($tempArr["id"]!="") {
+                $custid = $tempArr["id"];
+            } else {
+                $custid = "0";
+            }
+            $otherImages = '';
+            if ( Input::hasFile('image') ){
+            $files = Input::file('image');
+            foreach($files as $pic){
+                //$pic=Input::file('image'.$i);
+
+                $extension = $pic->getClientOriginalExtension(); // getting image extension
+                $name = time() . rand(111, 999) . '.' . $extension; // renameing image                
+                $pic->move(public_path().'/uploads/userimages/',$name);
+
+                if($otherImages != ''){
+                    $otherImages.= ','.$name;
+                }else{
+                    $otherImages = $name;
+                }
+            }
+            }
+            
+            //dinning
+            $dinningData="";
+            $livingdata="";
+            $kitchen="";
+            $home="";
+            $garage="";
+            $outdoor="";
+            $misc="";
+            $diningArr = $request->dinning;
+             if($diningArr){
+                $i=0;
+                foreach($diningArr as $gData){
+                    if($gData!=0){
+                        $dinningData.= ($dinningData == "")? $data["dinningRoom"][$i]['id'].'-'.$gData : ','.$data["dinningRoom"][$i]['id'].'-'.$gData;
+                        $i++;
+                    }
+                }
+            }
+           
+          
+           // try{
+            // DB::beginTransaction();
+             
+                
+
+                $shipping= new ShippingDetail;
+                $shipping->user_id = $custid;
+                $shipping->category_id = $category_id;
+                $subCatId = base64_decode(urldecode($request->subcategory_id));
+                $shipping->subcategory_id = $subCatId;
+                $shipping->table_name = 'shipment_listing_homes';
+                $shipping->status = 0;
+                $shipping->save(); 
+                $shippingId= $shipping->id;
+
+                $shipmentList= new ShipmentListingHome;
+                $shipmentList->shipping_id = $shippingId;
+                $shipmentList->residence_type = $residenceType;
+                $shipmentList->no_of_room = $no_of_room;
+                $shipmentList->collection_story = '';
+                $shipmentList->delivery_story = '';
+                $shipmentList->delivery_title = $title;
+                $shipmentList->dining_room = $dinningData;
+                $shipmentList->living_room = $livingdata;
+                //$shipmentList->bedroom = $bedroom;
+                $shipmentList->kitchen = $kitchen;
+                $shipmentList->home_office = $home;
+                $shipmentList->garage = $garage;
+                $shipmentList->outdoor = $outdoor;
+                $shipmentList->miscellaneous = $misc;
+                //$shipmentList->boxes = $box;
+                $shipmentList->item_image = $otherImages;
+                $shipmentList->item_detail = $additional_detail;
+                $shipmentList->save(); 
+                
+                $pickupDetail = new ShippingPickupDetail;
+                $pickupDetail->shipping_id = $shippingId;
+                $pickupDetail->pickup_address = trim($pickupLocation);
+                $pickupDetail->latitude = $pickupLat;
+                $pickupDetail->longitutde = $pickupLong;
+                $pickupDetail->pickup_date = trim($pickupDate);
+                $pickupDetail->save();
+
+                $deliveryDetail = new ShippingDeliveryDetail;
+                $deliveryDetail->shipping_id = $shippingId;
+                $deliveryDetail->delivery_address = trim($dropLocation);
+                $deliveryDetail->latitude = $dropLat;
+                $deliveryDetail->longitutde = $dropLong;
+                $deliveryDetail->delivery_date = trim($deliveryDate);
+                $deliveryDetail->save();
+                
+                
+              //  DB::commit();
+                $success = "1";
+            //}
+           // catch(\Exception $e){
+
+                $success = "0";
+             //   DB::rollback();
+          //  }      
+            $request->session()->put('shiping_id', $shippingId); 
+            if($tempArr["id"]=="" && $custid=="0") {
+               $request->session()->put('check_getofferpage', "GetOfferPage"); 
+               return redirect(url('user/login'));
+            } else {
+                 return redirect(url('user/getoffer'));
+            }
+        }else{
+        return view('user/shipment/home',$data);
+        } 
+    }
 }
     

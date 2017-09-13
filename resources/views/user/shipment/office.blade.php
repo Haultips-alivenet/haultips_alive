@@ -16,17 +16,30 @@
 
                 <div class="clearfix"></div>
                
-              
-              
                <div class="col-md-8">
-                   <div class="col-md-6">                             
+                    
+                    <div class="select_opt">
+                        <div class="row">
+                           <div class="col-md-6">                             
                             <div class="form-group">
                                 <label for="">Delivery Title</label>
                                 <input type="hidden" name="_token" value="{{ csrf_token() }}">
-                                <input type="text" name="title" value=""  id="title" class="office-data">
+                                <input type="text" name="title" value=""  id="title" class="form-control">
                              </div>
-                       <div id='errname' style='display:none'>Please Enter delivery title</div>
+                       <div id='errname' style='display:none;color: red;'>Please Enter Delivery Title</div>
                         </div>
+                           
+                            <div class="clearfix"></div>
+                            <br>
+
+                        </div>
+
+                    </div>
+
+                </div>
+              
+               <div class="col-md-8">
+                   
                 <div class="select_opt">
                     <div class="row">
                         <div class="col-md-6">                             

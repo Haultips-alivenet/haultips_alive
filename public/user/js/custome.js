@@ -91,6 +91,7 @@ $(document).ready(function(){
 });
 function increaseValue(id)
 {
+   
     var val=$("#"+id).val();
     $("#"+id).val(parseInt(val)+1);  
 }
