@@ -70,7 +70,7 @@
                     
                 </ul>
 
-            <ul class="nav navbar-nav navbar-right">
+                <ul class="nav navbar-nav navbar-right">
                     <?php $tempArr = Session::get('currentUser'); ?>
                     <li class="pro_im">
                         <a href="#"><span><img src="{{asset('public/user/img/sign-up-icon.png')}}" alt=""></span>{{$tempArr["first_name"]." ".$tempArr["last_name"]}}</a>
@@ -115,6 +115,7 @@
                     <li><a href="{{url('user/transactionhistory')}}"><span><i class="fa fa-credit-card" aria-hidden="true"></i></span>Transaction History</a></li>
                     <li class="toggle"><a href="javascript:void();" onclick="toggle(2);"><span><i class="fa fa-cog" aria-hidden="true"></i></span>Setting <span class="pull-right"><i class="fa fa-angle-down" aria-hidden="true"></i></span></a>
                         <ul class="ulist2">
+                            <li><a href="{{ url('user/profile') }}">Profile</a></li>
                             <li><a href="javascript:void(0);">Edit Profile</a></li>
                             <li><a href="{{url('user/changepassword')}}">Change Password</a></li>
                         </ul>

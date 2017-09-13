@@ -15,7 +15,6 @@ Route::resource('user/dashboard', 'Front\UserHomeController@index');
 Route::resource('user/home', 'Front\UserHomeController@userdashboard');
 Route::resource('user/faq', 'Front\UserHomeController@faq');
 Route::resource('user/notification', 'Front\UserHomeController@notification');
-Route::resource('user/changepassword', 'Front\UserHomeController@changepassword');
 Route::resource('user/transactionhistory', 'Front\UserHomeController@transactionhistory');
 Route::get('getquesAns', 'Front\UserHomeController@getquesAns');
 Route::get('user/profile', 'Front\UserHomeController@profile');
@@ -44,10 +43,6 @@ Route::post('fourwheeler', 'Front\ShipmentController@twowheeler');
 Route::get('user/getoffer', 'Front\ShipmentController@getoffer');
 Route::get('user/getofferprocess', 'Front\ShipmentController@getofferprocess');
 Route::post('partload', 'Front\ShipmentController@partload');
-Route::get('householdgoods/{id}', 'Front\ShipmentController@householdgoods');
-Route::post('householdgoods', 'Front\ShipmentController@householdgoods');
-Route::get('others/{id}', 'Front\ShipmentController@others');
-Route::post('others', 'Front\ShipmentController@others');
 #Admin
 Route::get('/admin/login', function () {
     if(Auth::check()){return Redirect::to('admin/dashboard');}

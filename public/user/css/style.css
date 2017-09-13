@@ -34,6 +34,11 @@ a:hover{ text-decoration:none;}
     z-index: 1000;
     display: none;
 }
+
+.error{
+    color:red !important;
+}
+
 .sidebar-nav {
     list-style: outside none none;
     margin: 0;
