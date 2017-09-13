@@ -99,14 +99,14 @@
                    <li class="toggle"><a href="javascript:void();" onclick="toggle(1);">
                            <span><i class="fa fa-check-square" aria-hidden="true"></i></span>My Deliveries <span class="pull-right"><i class="fa fa-angle-down" aria-hidden="true"></i></span></a>
                             <ul class="ulist1">
-                                <li><a href="javascript:void(0);">All Statuses</a></li>
-                                <li><a href="javascript:void(0);">Active</a></li>
-                                <li><a href="javascript:void(0);">Booked</a></li>
-                                <li><a href="javascript:void(0);">Pending </a></li>
-                                <li><a href="javascript:void(0);">Picked Up</a></li>
-                                <li><a href="javascript:void(0);">Delivered</a></li>
-                                <li><a href="javascript:void(0);">Closed</a></li>
-                                <li><a href="javascript:void(0);">Deleted</a></li>
+                                <li><a href="{{ url('user/my-deliveries/all-status') }}">All Status</a></li>
+                                <li><a href="{{ url('user/my-deliveries/active') }}">Active</a></li>
+                                <li><a href="javascript:void(0);{{ url('user/my-deliveries/booked') }}">Booked</a></li>
+                                <li><a href="{{ url('user/my-deliveries/pending') }}">Pending </a></li>
+                                <li><a href="{{ url('user/my-deliveries/picked-up') }}">Picked Up</a></li>
+                                <li><a href="{{ url('user/my-deliveries/delivered') }}">Delivered</a></li>
+                                <li><a href="{{ url('user/my-deliveries/closed') }}">Closed</a></li>
+                                <li><a href="{{ url('user/my-deliveries/deleted') }}">Deleted</a></li>
                             </ul>
 
                     </li>

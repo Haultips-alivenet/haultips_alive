@@ -15,6 +15,8 @@ use App\TruckLengths;
 use App\AdminBedroom;
 use App\AdminBox;
 use App\TblQuesMaster;
+use App\ShippingDetail;
+use App\ShippingQuote;
 use DB;
 
 
@@ -149,6 +151,64 @@ class UserHomeController extends FrontController
         return view('user/subCategory/index', ['category'=>$category, 'subCategories'=>$subCategories]);
         }
     }
-   
+
+    public function myDeliveries($status){
+      $sts_arr = array("active" => "1", "deleted" => "2");
+      $sts_label_arr = array("all-status" => "All Status", "active" => "Active", "deleted" => "Deleted");
+      $data['st_label'] = $sts_label_arr[$status];
+      $userId = Auth::User()->id;
+      $shiipings = ShippingDetail::where('user_id', $userId);
+      if (array_key_exists($status, $sts_arr)) $shiipings->where('status', $sts_arr[$status]);
+      $shiipings = $shiipings->get();
+      if(count($shiipings) > 0){
+         foreach($shiipings as $key=>$shipping){
+            $shippingId = $shipping->id; 
+            $shippingData = DB::table($shipping->table_name)->select('delivery_title','item_image')->where('shipping_id',$shippingId)->first();
+            if(count($shippingData)){
+              $image = explode(',', $shippingData->item_image);
+              $status = array("Inactive","Active","Process","Complete");
+              $shiipings[$key]->title = $shippingData->delivery_title;
+              $shiipings[$key]->image = $image[0];
+              $shiipings[$key]->status = $status[$shipping->status];
+              $shiipings[$key]->postDate = date('d-F-Y', strtotime($shipping->created_at));
+            }
+         }
+      }
+      $data['shippings'] = $shiipings;
+      return view('user.my-deliveries', $data);
+    }
+    
+    public function deliveryDetail($id){
+      $shipmentDetail = ShippingDetail::select('shipping_details.id', 'shipping_details.payments_status', 'shipping_details.status', 'shipping_details.table_name', 'shipping_price as price','shipping_details.created_at as published', 'spd.pickup_address', 'spd.pickup_date','sdd.delivery_address', 'sdd.delivery_date', 'pm.method as paymnentType', 'vcat.category_name', 'vscat.category_name as subcat_name')
+                  ->leftJoin('shipping_pickup_details as spd','spd.shipping_id','=','shipping_details.id')
+                  ->leftJoin('shipping_delivery_details as sdd','sdd.shipping_id','=','shipping_details.id')
+                  ->leftJoin('payment_methods as pm','pm.id','=','shipping_details.payment_method_id')
+                  ->leftJoin('vehicle_categories as vcat','vcat.id','=','shipping_details.category_id')
+                  ->leftJoin('vehicle_categories as vscat','vscat.id','=','shipping_details.subcategory_id')
+                  ->where('shipping_details.id', $id)->first();
+      
+      $shippingData = DB::table($shipmentDetail->table_name)->select('delivery_title','item_image')->where('shipping_id',$id)->first();
+      $data['sts'] = $shipmentDetail->status;
+      if(count($shippingData)){
+        $image = explode(',', $shippingData->item_image);
+        $status = array("Inactive","Active","Process","Complete");
+        $shipmentDetail->title = $shippingData->delivery_title;
+        $shipmentDetail->image = $image[0];
+        $shipmentDetail->status = $status[$shipmentDetail->status];
+        $shipmentDetail->postDate = date('d-F-Y', strtotime($shipmentDetail->published));
+      }
+
+      $data['quotation_count'] = ShippingQuote::where('shipping_id', $id)->count();
+      $data['shippingDetail'] = $shipmentDetail; 
+      return view('user.delivery-detail', $data);                    
+    }
+
+    public function deliveryDelete($id){
+      $shipping_detail = ShippingDetail::where('id', $id)
+                                  ->where('user_id', Auth::User()->id);
+      if($shipping_detail->count()) $shipping_detail->update(['status' => 2]);
+      return redirect('user/my-deliveries/deleted');
+    }
+
 }
 

@@ -21,6 +21,9 @@ Route::get('getquesAns', 'Front\UserHomeController@getquesAns');
 Route::get('user/profile', 'Front\UserHomeController@profile');
 Route::get('user/changepassword', 'Front\UserHomeController@changepassword');
 Route::post('user/changepassword', 'Front\UserHomeController@changepassword');
+Route::get('user/my-deliveries/{status}', 'Front\UserHomeController@myDeliveries');
+Route::get('user/delivery-detail/{shipping_id}', 'Front\UserHomeController@deliveryDetail');
+Route::get('user/my-delivery-delete/{shipping_id}', 'Front\UserHomeController@deliveryDelete');
 #User
 Route::resource('user/find/deliveries', 'Front\FindDeliveriesController');
 Route::resource('user/login', 'Front\LoginController');
