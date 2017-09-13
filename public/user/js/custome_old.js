@@ -1,0 +1,106 @@
+function initialize() {
+    var myLatlng = new google.maps.LatLng(53.3333,-3.08333),
+    mapOptions = {
+        zoom: 11,
+        center: myLatlng,
+        mapTypeId: google.maps.MapTypeId.ROADMAP
+        }
+var map = new google.maps.Map(document.getElementById('map'), mapOptions),
+contentString = 'Some address here..',
+infowindow = new google.maps.InfoWindow({
+    content: contentString,
+    maxWidth: 500
+});
+
+var marker = new google.maps.Marker({
+    position: myLatlng,
+    map: map
+});
+
+google.maps.event.addListener(marker, 'click', function() {
+    infowindow.open(map,marker);
+});
+
+google.maps.event.addDomListener(window, "resize", function() {
+    var center = map.getCenter();
+    google.maps.event.trigger(map, "resize");
+    map.setCenter(center);
+    });
+}
+
+google.maps.event.addDomListener(window, 'load', initialize);
+
+
+$(document).on('click', '.panel-heading span.clickable', function(e){
+    var $this = $(this);
+	if(!$this.hasClass('panel-collapsed')) {
+		$this.parents('.panel').find('.panel-body').slideUp();
+		$this.addClass('panel-collapsed');
+		$this.find('i').removeClass('glyphicon-minus').addClass('glyphicon-plus');
+	} else {
+		$this.parents('.panel').find('.panel-body').slideDown();
+		$this.removeClass('panel-collapsed');
+		$this.find('i').removeClass('glyphicon-plus').addClass('glyphicon-minus');
+	}
+});
+
+
+
+
+function list_toggle(val)
+ {$('.test-dwn'+val).slideToggle(); }
+
+/* Truck booking*/
+
+
+/*number increase and decrease */
+
+
+
+
+function add(value){
+    var currentVal = parseInt($("#qty" + value).val());    
+    if (!isNaN(currentVal)) {
+        $("#qty" + value).val(currentVal + 1);
+    }
+};
+
+function minus(value){
+    var currentVal = parseInt($("#qty" + value).val());    
+    if (!isNaN(currentVal)) {
+        $("#qty" + value).val(currentVal - 1);
+    }
+};
+
+function closeOver(f, value){
+    return function(){
+        f(value);
+    };
+}
+
+//$(function () {
+//    var numButtons = 2;    
+//    for (var i = 1; i <= numButtons; i++) {
+//        $("#add" + i).click(closeOver(add, i));
+//        $("#minus" + i).click(closeOver(minus, i));
+//    }
+//});
+
+function increaseValue(id)
+{
+    var val=$("#"+id).val();
+    $("#"+id).val(parseInt(val)+1);  
+}
+
+function decreaseValue(id)
+{
+    var val=$("#"+id).val();
+    if(val=="" || val==null || val==0)
+    {
+      $("#"+id).val('0');
+    }
+    else
+    {
+       $("#"+id).val(parseInt(val)-1);
+    }
+}

@@ -1567,9 +1567,12 @@ section.main_pages {
     margin: 0;
     padding: 0;
 }
+
 ._pnl ul li {
+    float: left;
     line-height: 150%;
     list-style: outside none none;
+    width: 21.2rem;
 }
 ._fgrp .btn-default {
     border-radius: 0;
@@ -2332,6 +2335,7 @@ border: 1px solid rgb(170, 170, 170);
 }
 ._dash_lft li {
     display: block;
+    position: relative;
 }
 ._dash_lft li a {
     border-bottom: 1px solid rgba(221, 221, 221, 0.5);
@@ -2357,8 +2361,12 @@ border: 1px solid rgb(170, 170, 170);
     transition: all 0.3s linear 0s;
 
 }
-._dash_lft a:hover {
+._dash_lft li:hover {
     background: rgb(14, 97, 89) none repeat scroll 0 0;
+    color: rgb(255, 255, 255);
+}
+._dash_lft li a:hover {
+    
     color: rgb(255, 255, 255);
 }
 .pro_im span {
@@ -2679,7 +2687,8 @@ table._del_img tr td {
     display: block;
 }
 ._dash_lft._dash_m > h3 {
-    margin: 11px 0 20px 10px;
+    padding: 5px 20px;
+    width: 100%;
 }
 
 .choose_item ul {
@@ -2727,6 +2736,109 @@ table._del_img tr td {
 }
 .choose_m input {
     position: absolute;
+}
+._dash_m_inner {
+    border-bottom: 1px solid rgb(221, 221, 221);
+    display: inline-block;
+    float: left;
+    margin-bottom: 0;
+    padding-bottom: 20px;
+    position: relative;
+    width: 100%;
+    margin-left: 23px;
+}
+._dash_full {
+    float: left;
+    width: 100%;
+}
+._dash_full_lft {
+    float: left;
+    padding: 6px 0;
+    width: 45%;
+}
+._dash_full_lrt {
+    float: left;
+    width: 45%;
+      padding: 6px 0;
+}
+._dash_m_inner > h3 {
+    font-size: 18px;
+    color:#0E6159;
+}
+._dash_rft .tb-lft.table tr td {
+    text-align: center;
+}
+.upd_file > input[type="file"] {
+     float: left;
+    height: 45px;
+    opacity: 0;
+    position: absolute;
+    width: 100%;
+    left: 0;
+    top: 0;
+}
+.upd_file {
+    border-bottom: 1px solid rgba(221, 221, 221, 0.5);
+    color: rgb(14, 97, 89);
+    cursor: pointer;
+    padding: 15px 0;
+    position: relative;
+}
+.upd_file > span {
+    margin-left: 10px;
+}
+._per_docu_fl > h3 {
+    font-size: 20px;
+}
+ul.ulist2 > li:hover a {
+    color: rgb(255, 255, 255);
+}
+.up_fl_in {
+    display: inline-block;
+    position: relative;
+    width: 100%;
+}
+.up_fl_in > input[type="file"] {
+     opacity: 0;
+    position: absolute;
+    top: 0;
+    width: 100%;
+    height: 41px;
+}
+.up_fl_in {
+     background: rgb(14, 97, 89) none repeat scroll 0 0;
+    border-radius: 60px;
+    color: rgb(255, 255, 255);
+    display: inline-block;
+    padding: 10px 0;
+    position: relative;
+    text-align: center;
+    width: 24%;
+}
+._per_docu_fl label {
+    float: left;
+    width: 100%;
+}
+._up_img_load {
+    border: 1px solid rgb(221, 221, 221);
+    display: inline-block;
+    float: left;
+    margin-bottom: 20px;
+    min-height: 140px;
+    width: 100%;
+}
+._per_docu_fl label {
+    float: left;
+    padding-top: 10px;
+    width: 100%;
+}
+._imp_load_fl {
+    float: left;
+    padding: 5px;
+    width: 17.7rem;
+}
+._imp_load_fl > img {
+    width: 100%;
 }
 
 
