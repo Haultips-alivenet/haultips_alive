@@ -245,7 +245,7 @@ class UserHomeController extends FrontController
         return redirect('user/home');
 
       $status = array("Pending","Accepted","Rejected");
-      $offerData->quoteId = $offerData->quoteId;
+      $offerData->quoteId = $quoteId;
       $offerData->shippingId = $offerData->shippingId;
       $offerData->price = $offerData->quote_price;
       $offerData->validTill = date('d-F-Y', strtotime($offerData->pickup_date));
@@ -254,6 +254,25 @@ class UserHomeController extends FrontController
 
       $data['offerData'] = $offerData;
       return view('user.quotation-detail', $data);
+    }
+
+    public function quotationStatusChange(Request $request, $quot_id){
+      $shipping_quote = ShippingQuote::where('id', $quot_id);
+      
+      // check shipping id belongs to logged in user
+      $sq = $shipping_quote->first();
+      if(!ShippingDetail::isShippingIdBelongsToLoggedInUser($sq->shipping_id, Auth::User()->id))
+        return redirect('user/home');
+
+      if($shipping_quote->count()){
+        $status = array("pending", "accepted", "rejected");
+        $sts_title = $status[$request->get('quot_sts')];
+        if($shipping_quote->update(['quote_status' => $request->get('quot_sts')])){
+          $request->session()->flash('alert_type', 'success');
+          $request->session()->flash('alert_msg', "Quotation is $sts_title successfully!");
+        }
+      } 
+      return redirect("user/quotation-offer/$quot_id");
     }
 
 }

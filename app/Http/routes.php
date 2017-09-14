@@ -27,6 +27,7 @@ Route::get('user/my-delivery-delete/{shipping_id}', 'Front\UserHomeController@de
 ####
 Route::get('user/all-quotation/{shipping_id}', 'Front\UserHomeController@allQuotation');
 Route::get('user/quotation-offer/{quote_id}', 'Front\UserHomeController@quotationDetail');
+Route::post('user/quotation-offer/{quote_id}', 'Front\UserHomeController@quotationStatusChange');
 #User
 Route::resource('user/find/deliveries', 'Front\FindDeliveriesController');
 Route::resource('user/login', 'Front\LoginController');
