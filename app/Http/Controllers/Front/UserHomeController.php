@@ -154,10 +154,11 @@ class UserHomeController extends FrontController
 
     public function myDeliveries($status){
       $sts_arr = array("active" => "1", "deleted" => "2");
-      $sts_label_arr = array("all-status" => "All Status", "active" => "Active", "deleted" => "Deleted");
+      $sts_label_arr = array("all-status" => "All Status", "active" => "Active", "deleted" => "Deleted", "delivered" => "Delivered");
       $data['st_label'] = $sts_label_arr[$status];
       $userId = Auth::User()->id;
       $shiipings = ShippingDetail::where('user_id', $userId);
+      if($status == 'delivered') $shiipings->where('payments_status', 1);
       if (array_key_exists($status, $sts_arr)) $shiipings->where('status', $sts_arr[$status]);
       $shiipings = $shiipings->get();
       if(count($shiipings) > 0){
@@ -166,10 +167,10 @@ class UserHomeController extends FrontController
             $shippingData = DB::table($shipping->table_name)->select('delivery_title','item_image')->where('shipping_id',$shippingId)->first();
             if(count($shippingData)){
               $image = explode(',', $shippingData->item_image);
-              $status = array("Inactive","Active","Process","Complete");
+              $statuss = array("Inactive","Active","Process","Complete");
               $shiipings[$key]->title = $shippingData->delivery_title;
               $shiipings[$key]->image = $image[0];
-              $shiipings[$key]->status = $status[$shipping->status];
+              $shiipings[$key]->status = $statuss[$shipping->status];
               $shiipings[$key]->postDate = date('d-F-Y', strtotime($shipping->created_at));
             }
          }
@@ -208,6 +209,51 @@ class UserHomeController extends FrontController
                                   ->where('user_id', Auth::User()->id);
       if($shipping_detail->count()) $shipping_detail->update(['status' => 2]);
       return redirect('user/my-deliveries/deleted');
+    }
+
+    public function allQuotation($id){
+      $data = array();
+      // check shipping id belongs to logged in user
+      if(!ShippingDetail::isShippingIdBelongsToLoggedInUser($id, Auth::User()->id))
+        return redirect('user/home');
+
+      // Quote Details
+      $quoteDetails = ShippingQuote::select('shipping_quotes.id as quoteId','u.first_name','u.last_name', 'quote_price')
+              ->leftJoin('users as u','u.id','=','shipping_quotes.carrier_id')
+              ->where('shipping_quotes.shipping_id', $id)->get();
+  
+      if(count($quoteDetails) > 0){
+        foreach($quoteDetails as $key=>$quotes){
+            $quoteDetails[$key]->quoteId = $quotes->quoteId;
+            $quoteDetails[$key]->carrier = $quotes->first_name.' '.$quotes->last_name;
+            $quoteDetails[$key]->price = $quotes->quote_price;
+        }
+      }
+      $data['quoteDetails'] = $quoteDetails;
+      return view('user.all-quotation', $data);
+    }
+
+    public function quotationDetail($quoteId){
+      $data = array();
+      $offerData = ShippingQuote::select('shipping_quotes.quote_status','sd.created_at','sd.id as shippingId','spd.pickup_date','shipping_quotes.quote_price')
+                  ->leftJoin('shipping_details as sd','sd.id','=','shipping_quotes.shipping_id')
+                  ->leftJoin('shipping_pickup_details as spd','spd.shipping_id','=','shipping_quotes.shipping_id')
+                  ->where('shipping_quotes.id', $quoteId)->first();
+      
+      // check shipping id belongs to logged in user
+      if(!ShippingDetail::isShippingIdBelongsToLoggedInUser($offerData->shippingId, Auth::User()->id))
+        return redirect('user/home');
+
+      $status = array("Pending","Accepted","Rejected");
+      $offerData->quoteId = $offerData->quoteId;
+      $offerData->shippingId = $offerData->shippingId;
+      $offerData->price = $offerData->quote_price;
+      $offerData->validTill = date('d-F-Y', strtotime($offerData->pickup_date));
+      $offerData->developed = date('d-F-Y', strtotime($offerData->created_at));
+      $offerData->status = $status[$offerData->quote_status];
+
+      $data['offerData'] = $offerData;
+      return view('user.quotation-detail', $data);
     }
 
 }

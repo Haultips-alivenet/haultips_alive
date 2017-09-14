@@ -11,12 +11,12 @@
         <div class="form-group row">
             <div class="col-md-4">
                <div class="_m_gr">
-                    <img src="img/gallery03.png" alt="">
+                    <img src="{{ url('public/uploads/userimages/' . $shippingDetail->image) }}" alt="">
                </div>
             </div>
 
             <div class="col-md-7">
-                {{ $shippingDetail->title }}
+                <h3>{{ ucwords($shippingDetail->title) }}</h3>
             </div>
 
             <div class="clearfix"></div>
@@ -64,7 +64,7 @@
                <label for="">Published</label>
             </div>
             <div class="col-md-8">
-                {{ $shippingDetail->published }}
+                {{ date('d-F-Y', strtotime($shippingDetail->published)) }}
             </div>
         </div>
 
@@ -73,7 +73,7 @@
              <label for="">  Pickup Date</label>
             </div>
             <div class="col-md-8">
-                {{ $shippingDetail->pickup_date }}
+                {{ date('d-F-Y', strtotime($shippingDetail->pickup_date)) }}
             </div>
         </div>
 
@@ -82,7 +82,7 @@
               <label for=""> Delivery Date</label>
             </div>
             <div class="col-md-8">
-                {{ $shippingDetail->delivery_date }}
+                {{ date('d-F-Y', strtotime($shippingDetail->delivery_date)) }}
             </div>
         </div>
         
@@ -111,7 +111,11 @@
         @if($quotation_count <= 0 && $sts <> 2)
             <button class="btn btn-color">Relist Shipment</button>
         @endif
-            <button class="btn btn-color">All Quotation</button>
+        
+        @if($quotation_count > 0)
+            <button class="btn btn-color"  onclick="window.location.href='{{ url("user/all-quotation/" . $shippingDetail->id) }}';">All Quotations</button>
+        @endif
+
         @if($quotation_count <= 0 && $sts <> 2)
             <button class="btn btn-color" onclick="window.location.href='{{ url("user/my-delivery-delete/" . $shippingDetail->id) }}';">Delete</button>
         @endif

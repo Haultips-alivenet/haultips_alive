@@ -101,11 +101,7 @@
                             <ul class="ulist1">
                                 <li><a href="{{ url('user/my-deliveries/all-status') }}">All Status</a></li>
                                 <li><a href="{{ url('user/my-deliveries/active') }}">Active</a></li>
-                                <li><a href="javascript:void(0);{{ url('user/my-deliveries/booked') }}">Booked</a></li>
-                                <li><a href="{{ url('user/my-deliveries/pending') }}">Pending </a></li>
-                                <li><a href="{{ url('user/my-deliveries/picked-up') }}">Picked Up</a></li>
                                 <li><a href="{{ url('user/my-deliveries/delivered') }}">Delivered</a></li>
-                                <li><a href="{{ url('user/my-deliveries/closed') }}">Closed</a></li>
                                 <li><a href="{{ url('user/my-deliveries/deleted') }}">Deleted</a></li>
                             </ul>
 

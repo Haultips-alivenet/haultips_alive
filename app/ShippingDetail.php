@@ -54,4 +54,9 @@ class ShippingDetail extends Model
             return "";
         }
       }
+
+      // check if shipping id is belongs to logged in user
+      public static function isShippingIdBelongsToLoggedInUser($shipping_id, $user_id){
+        return DB::table('shipping_details')->where('id', $shipping_id)->where('user_id', $user_id)->count();
+      }
 }

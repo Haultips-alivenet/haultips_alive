@@ -34,11 +34,6 @@ a:hover{ text-decoration:none;}
     z-index: 1000;
     display: none;
 }
-
-.error{
-    color:red !important;
-}
-
 .sidebar-nav {
     list-style: outside none none;
     margin: 0;
@@ -2511,6 +2506,7 @@ border: 1px solid rgb(170, 170, 170);
 ._dash_rft table > thead > tr > th {
     border-right: 1px solid rgb(221, 221, 221);
 }
+._dash_rft .form-group.row table > thead > tr > th { border-right: 0; }
 ._d_mg {
     float: none;
     margin: 10px auto;
@@ -2840,7 +2836,111 @@ ul.ulist2 > li:hover a {
 ._imp_load_fl > img {
     width: 100%;
 }
+._qu_list {
+    display: inline-block;
+    float: left;
+    width: 100%;
+}
+._qu_list > ul {
+    list-style: outside none none;
+    margin: 0;
+    padding: 0;
+}
+._qu_list > ul li{
+    display: inline-block;
 
+}
+._qu_list > ul li {
+    border-bottom: 1px solid rgb(221, 221, 221);
+    display: inline-block;
+    float: left;
+    width: 100%;
+    padding: 5px 10px;
+}
+._qu_li_lft > p {
+    margin: 0;
+}
+._qu_li_lft {
+    float: left;
+    width: 70%;
+}
+._qu_li_lrt {
+    float: left;
+    width: 30%;
+    position: relative;
+}
+._qu_li_lrt > span {
+    background: rgb(14, 97, 89) none repeat scroll 0 0;
+    color: rgb(255, 255, 255);
+    font-size: 20px;
+    height: auto;
+    position: absolute;
+    right: 0;
+    width: auto;
+}
+._qu_li_lrt span a {
+    color: rgb(255, 255, 255);
+    display: block;
+    padding: 10px 15px;
+}
+
+._qu_li_lrt > p .fa {
+    color: inherit;
+    font-size: inherit;
+}
+._qu_li_lrt > p {
+    font-size: 20px;
+    height: auto;
+    line-height: 250%;
+    margin: 0;
+    padding-right: 10px;
+    text-align: center;
+}
+._qu_list > ul li:nth-child(2n) {
+    background: rgba(239, 239, 239, 0.5) none repeat scroll 0 0;
+}
+
+._qu_list-de > ul {
+     margin: 0;
+    padding: 10px 3px;
+    width: 100%;
+    float: left;
+}
+._qu_list-de ul li{
+    border-bottom: 1px solid rgb(221, 221, 221);
+    float: left;
+    list-style: outside none none;
+    padding: 11px 1px;
+    width: auto;
+}
+._qu_list-de ul li._w60{
+    width: 60%;
+}
+._qu_list-de ul li._w40{
+    width: 40%;
+    text-align: left;
+}
+._price_cir strong {
+    color: rgb(14, 97, 89);
+    font-family: work sans;
+    font-size: 28px;
+    font-weight: 400;
+}
+
+._qu_list-de .fa.fa-inr {
+    color: rgb(14, 97, 89);
+}
+._price_cir {
+    border: 1px solid rgb(221, 221, 221);
+    border-radius: 50%;
+    box-shadow: 0 0 12px rgb(221, 221, 221);
+    display: inline-block;
+    height: 180px;
+    line-height: 6.5;
+    margin: 0 auto;
+    vertical-align: middle;
+    width: 180px;
+}
 
 @media (max-width: 1280px) {
 
