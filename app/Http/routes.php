@@ -18,6 +18,8 @@ Route::resource('user/notification', 'Front\UserHomeController@notification');
 Route::resource('user/changepassword', 'Front\UserHomeController@changepassword');
 Route::resource('user/transactionhistory', 'Front\UserHomeController@transactionhistory');
 Route::get('getquesAns', 'Front\UserHomeController@getquesAns');
+
+// User login panel 
 Route::get('user/profile', 'Front\UserController@profile');
 Route::get('user/changepassword', 'Front\UserController@changepassword');
 Route::post('user/changepassword', 'Front\UserController@changepassword');
@@ -30,9 +32,11 @@ Route::post('user/quotation-offer/{quote_id}', 'Front\UserController@quotationSt
 Route::get('user/relist-shipment/{shipping_id}', 'Front\UserController@relistShipment');
 Route::post('user/relist-shipment/{shipping_id}', 'Front\UserController@relistShipment');
 Route::get('user/bank-infomation', 'Front\UserController@bankInformation');
-Route::post('user/bank-infomation', 'Front\UserController@bankInformation');
+Route::get('user/bank-infomation/delete/{bank_info_id}', 'Front\UserController@bankInformationDelete');
 Route::get('user/bank-infomation/add', 'Front\UserController@bankInformationAdd');
 Route::post('user/bank-infomation/add', 'Front\UserController@bankInformationAdd');
+// User login panel end
+
 #User
 Route::resource('user/find/deliveries', 'Front\FindDeliveriesController');
 Route::resource('user/login', 'Front\LoginController');

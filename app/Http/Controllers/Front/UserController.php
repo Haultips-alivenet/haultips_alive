@@ -227,27 +227,55 @@ class UserController extends FrontController
       return view('user.relist-shipment', $data);
     }
 
+    // Get Bank Info
     public function bankInformation(){
+      $data['bank_infos'] = PayInfo::where('user_id', Auth::User()->id)
+                                      ->orderBy('id', 'desc')->get();
+      return view('user.bank-information', $data);
+    }
+
+    // Delete bank info with 
+    public function bankInformationDelete(Request $request, $bank_info_id){
+      $bank_info = PayInfo::where('user_id', Auth::User()->id)
+                            ->where('id', $bank_info_id);
+      if($bank_info->delete()){
+        $request->session()->flash('alert_type', 'success');
+        $request->session()->flash('alert_msg', 'Bank information is deleted successfully!');
+      }
+      else{
+        $request->session()->flash('alert_type', 'danger');
+        $request->session()->flash('alert_msg', 'Error: failed!');
+      }
+      return redirect('user/bank-infomation');
+    }
+
+    public function bankInformationAdd(Request $request){
       if($request->isMethod('post')){
-        // Delete bank info with 
-        $pick_updt = PayInfo::where('shipping_id', $shipping_id)->update([
-                        'pickup_address' => $request->get('pickup_address'),
-                        'pickup_date' => $request->get('pickup_date')
-                      ]);
-        if($pick_updt && $ship_updt){
-          DB::commit();
+        $this->validate($request, [
+            'name' => 'required|max:100',
+            'number' => 'required|numeric',
+            'code' => 'required|max:50',
+          ],
+          [
+            'number.required' => 'The account number is required.',
+            'number.numeric' => 'The account number must be numeric.'
+          ]
+        );
+        
+        $bank_info = new PayInfo;
+        $bank_info->user_id = Auth::User()->id;
+        $bank_info->name = $request->get('name');
+        $bank_info->number = $request->get('number');
+        $bank_info->code = $request->get('code');
+        
+        if($bank_info->save()){
           $request->session()->flash('alert_type', 'success');
-          $request->session()->flash('alert_msg', 'Re-list shipment detail changed successfully!');
+          $request->session()->flash('alert_msg', 'Bank information is added successfully!');
         }
-        return redirect('user/relist-shipment/' . $shipping_id);
+        return redirect('user/bank-infomation');
       }
 
-      // Get shipment details
-      $data['shipPickDetail'] = ShippingPickupDetail::where('shipping_id', $shipping_id)->first();
-      $data['shipDelivDetail'] = ShippingDeliveryDetail::where('shipping_id', $shipping_id)->first();
-      if(count($data['shipPickDetail']) <= 0 || count($data['shipDelivDetail']) <= 0)
-        return redirect('user/delivery-detail/' . $shipping_id);
-      return view('user.relist-shipment', $data);
+      return view('user.bank-information-add');
     }
 
 }
