@@ -109,7 +109,7 @@
         <hr>
         <div class="form-group _re_all_de">
         @if($quotation_count <= 0 && $sts <> 2)
-            <button class="btn btn-color">Relist Shipment</button>
+            <button class="btn btn-color" onclick="window.location.href='{{ url("user/relist-shipment/" . $shippingDetail->id) }}';">Relist Shipment</button>
         @endif
         
         @if($quotation_count > 0)

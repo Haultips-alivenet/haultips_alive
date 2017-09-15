@@ -86,39 +86,7 @@ class UserHomeController extends FrontController
         return view('user.notification');
     }
     
-    public function profile(){
-      $data['user'] = Auth::User();
-      $data['user_detail'] = UserDetail::where('user_id', Auth::User()->id)->first();
-
-      return view('user.profile', $data);
-    }
-
-    public function changepassword(Request $request){
-      if($request->isMethod('post')){
-        $this->validate($request, [
-            'old_password' => 'required',
-            'new_password' => 'required|confirmed|min:6',
-            'new_password_confirmation' => 'required',
-        ]);
-
-        $user = User::find(Auth::User()->id);
-        $old_password = bcrypt($request->get('old_password'));
-
-        if (Auth::attempt(array('email' => Auth::User()->email, 'password' => $request->get('old_password')))){
-          $user->password = bcrypt($request->get('new_password'));
-          if($user->save()){
-            $request->session()->flash('alert_type', 'success');
-            $request->session()->flash('alert_msg', 'Your password is changed successfully!');
-          }
-        }else{
-          $request->session()->flash('alert_type', 'danger');
-          $request->session()->flash('alert_msg', 'Old password is wrong!');
-        }
-
-        return redirect('user/changepassword');
-      }
-      return view('user.changepassword');
-    }
+    
      public function transactionhistory()
     {
         return view('user.transactionhistory');

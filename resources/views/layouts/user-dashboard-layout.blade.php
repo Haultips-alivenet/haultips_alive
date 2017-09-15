@@ -20,7 +20,8 @@
 
    
      <!-- Bootstrap core CSS -->
-        {!! Html::style('public/user/css/bootstrap.min.css') !!}        
+        {!! Html::style('public/user/css/bootstrap.min.css') !!}
+        {!! Html::style('public/user/css/bootstrap-datetimepicker.css') !!}         
         <!-- Custom CSS -->
         {!! Html::style('public/user/css/animate.css') !!}
         {!! Html::style('public/user/css/style.css') !!}
@@ -97,22 +98,20 @@
                 <ul>
                    <li><a href="{{url('user/home')}}"><span><i class="fa fa-tachometer"></i></span>Dashboard</a></li>
                    <li class="toggle"><a href="javascript:void();" onclick="toggle(1);">
-                           <span><i class="fa fa-check-square" aria-hidden="true"></i></span>My Deliveries <span class="pull-right"><i class="fa fa-angle-down" aria-hidden="true"></i></span></a>
-                            <ul class="ulist1">
-                                <li><a href="{{ url('user/my-deliveries/all-status') }}">All Status</a></li>
-                                <li><a href="{{ url('user/my-deliveries/active') }}">Active</a></li>
-                                <li><a href="{{ url('user/my-deliveries/delivered') }}">Delivered</a></li>
-                                <li><a href="{{ url('user/my-deliveries/deleted') }}">Deleted</a></li>
-                            </ul>
+                       <span><i class="fa fa-check-square" aria-hidden="true"></i></span>My Deliveries <span class="pull-right"><i class="fa fa-angle-down" aria-hidden="true"></i></span></a>
+                        <ul class="ulist1">
+                            <li><a href="{{ url('user/my-deliveries/all-status') }}">All Status</a></li>
+                            <li><a href="{{ url('user/my-deliveries/active') }}">Active</a></li>
+                            <li><a href="{{ url('user/my-deliveries/delivered') }}">Delivered</a></li>
+                            <li><a href="{{ url('user/my-deliveries/deleted') }}">Deleted</a></li>
+                        </ul>
 
                     </li>
-                    <li><a href="javascript:void();"><span><i class="fa fa-inbox" aria-hidden="true"></i></span>Inbox</a></li>
-                    <li><a href="javascript:void();"><span><i class="fa fa-university" aria-hidden="true"></i></span>Bank Information</a></li>
+                    <li><a href="{{ url('user/bank-infomation') }}"><span><i class="fa fa-university" aria-hidden="true"></i></span>Bank Information</a></li>
                     <li><a href="{{url('user/transactionhistory')}}"><span><i class="fa fa-credit-card" aria-hidden="true"></i></span>Transaction History</a></li>
                     <li class="toggle"><a href="javascript:void();" onclick="toggle(2);"><span><i class="fa fa-cog" aria-hidden="true"></i></span>Setting <span class="pull-right"><i class="fa fa-angle-down" aria-hidden="true"></i></span></a>
                         <ul class="ulist2">
                             <li><a href="{{ url('user/profile') }}">Profile</a></li>
-                            <li><a href="javascript:void(0);">Edit Profile</a></li>
                             <li><a href="{{url('user/changepassword')}}">Change Password</a></li>
                         </ul>
 
@@ -245,14 +244,16 @@ India - 201007</address>
      {!! Html::script('public/user/js/bootstrap-slider.js') !!}
      {!! Html::script('public/admin/js/additional-methods.min.js') !!}
      {!! Html::script('public/admin/js/jquery.nicescroll.js') !!}
-     {!! Html::script('public/admin/js/bootstrap-select.min.js') !!}
+     {!! Html::script('public/user/js/moment.js') !!}
+     {!! Html::script('public/user/js/bootstrap-datetimepicker.js') !!}
+     <!-- {!! Html::script('public/admin/js/bootstrap-select.min.js') !!} -->
     @yield('script')
     <script>
-   $('.carousel').carousel();
-   $('#menu-toggle').click(function(){
-   $('#sidebar-wrapper').toggle();
-   });
-   new WOW().init();
-</script>
+       $('.carousel').carousel();
+       $('#menu-toggle').click(function(){
+           $('#sidebar-wrapper').toggle();
+        });
+        new WOW().init();
+    </script>
   </body>
 </html>
