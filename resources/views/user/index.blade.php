@@ -77,59 +77,42 @@
              <div class="col-lg-4 col-md-4">
                  
                 <div class="_bx_rft">
-                    <h2>Latest Post <div class="_lp_icon"><img src="public/user/img/pin.png" alt=""></div></h2>
+                    <h2>Latest Post <div class="_lp_icon"><img src="{{asset('public/user/img/pin.png')}}" alt=""></div></h2>
                     <div class="clearfix"></div>
+                    <div class="scrollbar">
+                        <?php foreach($latest_post as $value) { 
+                           
+                           
+                            $image=App\ShippingDetail::getImageName($value->table_name,$value->id);
+                           
+                           if($image) {
+                            $img=explode(",",$image);
+                            $img=$img[0];
+                           } else {
+                               $img="cale_icon.png";
+                           }
+                           
+                            
+                            ?>
                     <div class="_post_list">
-                        <div class="_p_l_img"><img src="public/user/img/post_icon.png" alt=""></div>
+                        <div class="_p_l_img"><img style="height:50px;weight:50px;" src="{{asset('public/uploads/userimages/'.$img)}}" alt=""></div>
                         <div class="_p_l_txt">
-                        <div class="_p_l_date">20/07-2017 <img src="public/user/img/cale_icon.png" alt=""></div>
-                            <h5>General motors car</h5>
+                        <div class="_p_l_date">{{date('d-m-Y',strtotime($value->created_at))}} <img src="{{asset('public/user/img/cale_icon.png')}}" alt=""></div>
+                            <h5>{!! App\ShippingDetail::getDeliveryName($value->table_name,$value->id) !!}</h5>
                             
                             <div class="_p_l_txt_up">
                              <p>Pickup address</p>
-                                Lorem ipsum dolor sit amet, consectetur elit.
+                                {{$value->pickup_address}}
                             </div>
-                            <div class="_p_l_txt_d">
-                                <p>Devices Mobile/Tab</p>
-                                Lorem ipsum dolor sit amet, consectetur adipisicing elit. 
-                            </div>
-
-                        </div>
-                    </div>
-                     <div class="_post_list">
-                        <div class="_p_l_img "><img src="public/user/img/post_icon1.png" alt=""></div>
-                        <div class="_p_l_txt">
-                        <div class="_p_l_date">20/07-2017 <img src="public/user/img/cale_icon.png" alt=""></div>
-                            <h5>General motors car</h5>
                             
-                            <div class="_p_l_txt_up">
-                             <p>Pickup address</p>
-                                Lorem ipsum dolor sit amet, consectetur  elit.
-                            </div>
-                            <div class="_p_l_txt_d">
-                                <p>Delivery address</p>
-                                Lorem ipsum dolor sit amet, consectetur . 
-                            </div>
 
                         </div>
                     </div>
-                     <div class="_post_list">
-                        <div class="_p_l_img"><img src="public/user/img/post_icon2.png" alt=""></div>
-                        <div class="_p_l_txt">
-                        <div class="_p_l_date">20/07-2017 <img src="public/user/img/cale_icon.png" alt=""></div>
-                            <h5>Devices Mobile/Tab</h5>
-                            
-                            <div class="_p_l_txt_up">
-                             <p>Pickup address</p>
-                                Lorem ipsum dolor sit amet, consectetur adipisicing elit.
-                            </div>
-                            <div class="_p_l_txt_d">
-                                <p>Delivery address</p>
-                                Lorem ipsum dolor sit amet, consectetur . 
-                            </div>
+                        <?php } ?>
+                     
+                     
+                </div>
 
-                        </div>
-                    </div>
                     <div class="_bx_footer">More</div>
                 </div>
 

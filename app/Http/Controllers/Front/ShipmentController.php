@@ -90,8 +90,9 @@ class ShipmentController extends FrontController
                 foreach($generalArr as $gData){
                     if($gData!=0){
                         $generalData.= ($generalData == "")? $general[$i]['id'].'-'.$gData : ','.$general[$i]['id'].'-'.$gData;
-                        $i++;
+                       
                     }
+                     $i++;
                 }
             }
            
@@ -100,8 +101,9 @@ class ShipmentController extends FrontController
                 foreach($equipmentArr as $eData){
                     if($eData!=0){
                         $equipmentData.= ($equipmentData == "")? $equipment[$i]['id'].'-'.$eData : ','.$equipment[$i]['id'].'-'.$eData;
-                        $i++;
+                      
                     }
+                      $i++;
                 }
             }
             
@@ -110,8 +112,9 @@ class ShipmentController extends FrontController
                 foreach($boxArr as $bData){
                     if($bData!=0){
                         $miscData.= ($miscData == "")? $miscellaneous[$i]['id'].'-'.$bData : ','.$miscellaneous[$i]['id'].'-'.$bData;
-                        $i++;
+                       
                     }
+                     $i++;
                 }
             }
           
@@ -616,7 +619,7 @@ class ShipmentController extends FrontController
        }
     }
     public function home(Request $request){
-       // print_r($_POST);die;
+        //print_r($_POST);die;
         $data["dinningRoom"] = AdminDinningRoom::where('status','1')->select('id','name')->get();
         $data["livingRoom"] = AdminLivingRoom::where('status','1')->select('id','name')->get();
         $data["bedRooms"] = AdminBedroom::where('status','active')->select('id','name')->get();
@@ -671,25 +674,118 @@ class ShipmentController extends FrontController
             //dinning
             $dinningData="";
             $livingdata="";
+            $bedroomgdata="";
             $kitchen="";
             $home="";
             $garage="";
             $outdoor="";
+            $box="";
             $misc="";
             $diningArr = $request->dinning;
+            $livingArr = $request->living;
+            $bedroomsArr = $request->bedrooms;
+            $kitchenArr = $request->kitchen;
+            $homeOfficeArr = $request->homeOffice;
+            $garageArr = $request->garage;
+            $outdoorsArr = $request->outdoors;
+            $boxesArr = $request->boxes;
+            $miscellaneousArr = $request->miscellaneous;
              if($diningArr){
                 $i=0;
                 foreach($diningArr as $gData){
                     if($gData!=0){
                         $dinningData.= ($dinningData == "")? $data["dinningRoom"][$i]['id'].'-'.$gData : ','.$data["dinningRoom"][$i]['id'].'-'.$gData;
-                        $i++;
+                       
                     }
+                $i++;
                 }
             }
            
+            if($livingArr){
+                $i=0;
+                foreach($livingArr as $gData){
+                    if($gData!=0){
+                        $livingdata.= ($livingdata == "")? $data["livingRoom"][$i]['id'].'-'.$gData : ','.$data["livingRoom"][$i]['id'].'-'.$gData;
+                       
+                    }
+                $i++;
+                }
+            }
+           
+          if($bedroomsArr){
+                $i=0;
+                foreach($bedroomsArr as $gData){
+                    if($gData!=0){
+                        $bedroomgdata.= ($bedroomgdata == "")? $data["bedRooms"][$i]['id'].'-'.$gData : ','.$data["bedRooms"][$i]['id'].'-'.$gData;
+                       
+                    }
+                $i++;
+                }
+            }
+            if($kitchenArr){
+                $i=0;
+                foreach($kitchenArr as $gData){
+                    if($gData!=0){
+                        $kitchen.= ($kitchen == "")? $data["kitchen"][$i]['id'].'-'.$gData : ','.$data["kitchen"][$i]['id'].'-'.$gData;
+                       
+                    }
+                $i++;
+                }
+            }
+            if($homeOfficeArr){
+                $i=0;
+                foreach($homeOfficeArr as $gData){
+                    if($gData!=0){
+                        $home.= ($home == "")? $data["homeOffice"][$i]['id'].'-'.$gData : ','.$data["homeOffice"][$i]['id'].'-'.$gData;
+                       
+                    }
+                $i++;
+                }
+            }
+            if($garageArr){
+                $i=0;
+                foreach($garageArr as $gData){
+                    if($gData!=0){
+                        $garage.= ($garage == "")? $data["garage"][$i]['id'].'-'.$gData : ','.$data["garage"][$i]['id'].'-'.$gData;
+                       
+                    }
+                $i++;
+                }
+            }
+            if($outdoorsArr){
+                $i=0;
+                foreach($outdoorsArr as $gData){
+                    if($gData!=0){
+                        $outdoor.= ($outdoor == "")? $data["outdoors"][$i]['id'].'-'.$gData : ','.$data["outdoors"][$i]['id'].'-'.$gData;
+                       
+                    }
+                $i++;
+                }
+            }
+             
+            if($boxesArr){
+                $i=0;
+                foreach($boxesArr as $gData){
+                    if($gData!=0){
+                        $box.= ($box == "")? $data["boxes"][$i]['id'].'-'.$gData : ','.$data["boxes"][$i]['id'].'-'.$gData;
+                       
+                    }
+                $i++;
+                }
+            }
+            if($miscellaneousArr){
+                $i=0;
+                foreach($miscellaneousArr as $gData){
+                    if($gData!=0){
+                        $misc.= ($misc == "")? $data["miscellaneous"][$i]['id'].'-'.$gData : ','.$data["miscellaneous"][$i]['id'].'-'.$gData;
+                       
+                    }
+                $i++;
+                }
+            }
           
-           // try{
-            // DB::beginTransaction();
+            try{
+             DB::beginTransaction();
              
                 
 
@@ -712,15 +808,16 @@ class ShipmentController extends FrontController
                 $shipmentList->delivery_title = $title;
                 $shipmentList->dining_room = $dinningData;
                 $shipmentList->living_room = $livingdata;
-                //$shipmentList->bedroom = $bedroom;
+                $shipmentList->bedroom = $bedroomgdata;
                 $shipmentList->kitchen = $kitchen;
                 $shipmentList->home_office = $home;
                 $shipmentList->garage = $garage;
                 $shipmentList->outdoor = $outdoor;
                 $shipmentList->miscellaneous = $misc;
-                //$shipmentList->boxes = $box;
+                $shipmentList->boxes = $box;
                 $shipmentList->item_image = $otherImages;
                 $shipmentList->item_detail = $additional_detail;
+               
                 $shipmentList->save(); 
                 
                 $pickupDetail = new ShippingPickupDetail;
@@ -740,14 +837,14 @@ class ShipmentController extends FrontController
                 $deliveryDetail->save();
                 
                 
-              //  DB::commit();
+                DB::commit();
                 $success = "1";
-            //}
-           // catch(\Exception $e){
+            }
+            catch(\Exception $e){
 
                 $success = "0";
-             //   DB::rollback();
-          //  }      
+                DB::rollback();
+            }      
             $request->session()->put('shiping_id', $shippingId); 
             if($tempArr["id"]=="" && $custid=="0") {
                $request->session()->put('check_getofferpage', "GetOfferPage"); 
@@ -758,6 +855,102 @@ class ShipmentController extends FrontController
         }else{
         return view('user/shipment/home',$data);
         } 
+    }
+    
+    public function truckbooking(Request $request){
+        // print_r($_POST);die;
+         
+         if($_POST){
+            
+                    
+            $category_id = $request->session()->get('category_id');
+            $title = $request->delivery_title;
+            $id=$request->id;
+            $truckTypeId=$request->trucktypeid;
+            $len="length".$id;
+            $cap="capacity".$id;
+            $truckLengthId=$request->$len;
+            $truckCapacityId=$request->$cap;
+            
+            
+            
+            $pickupLocation=$request->pickupaddress;
+            $pickupLat="0";
+            $pickupLong="0";
+            $pickupDate=$request->pickupdate;
+            $dropLocation=$request->deliveryaddress;
+            $dropLat="0";
+            $dropLong="0";
+            $deliveryDate=$request->deliverydate;
+            $additional_detail=$request->additional_detail;
+            
+            $tempArr = Session::get('currentUser');
+            if($tempArr["id"]!="") {
+                $custid = $tempArr["id"];
+            } else {
+                $custid = "0";
+            }
+            try{
+             DB::beginTransaction();
+             
+                
+
+                $shipping= new ShippingDetail;
+                $shipping->user_id = $custid;
+                $shipping->category_id = $category_id;
+                $shipping->subcategory_id = $truckTypeId;
+                $shipping->table_name = 'shipment_listing_truck_bookings';
+                $shipping->status = 0;
+                $shipping->save(); 
+                $shippingId= $shipping->id;
+
+                $shipmentList= new shipmentListingTruckBooking;
+                $shipmentList->shipping_id = $shippingId;
+                $shipmentList->truck_type_id = $truckTypeId;
+                $shipmentList->truck_length_id = $truckLengthId;
+                $shipmentList->truck_capacity_id = $truckCapacityId;
+                //$shipmentList->material_id = $materialId;
+                $shipmentList->delivery_title = $title;
+                $shipmentList->item_image = '';
+                $shipmentList->remarks = $additional_detail;
+                $shipmentList->save();
+                
+                $pickupDetail = new ShippingPickupDetail;
+                $pickupDetail->shipping_id = $shippingId;
+                $pickupDetail->pickup_address = trim($pickupLocation);
+                $pickupDetail->latitude = $pickupLat;
+                $pickupDetail->longitutde = $pickupLong;
+                $pickupDetail->pickup_date = trim($pickupDate);
+                $pickupDetail->save();
+
+                $deliveryDetail = new ShippingDeliveryDetail;
+                $deliveryDetail->shipping_id = $shippingId;
+                $deliveryDetail->delivery_address = trim($dropLocation);
+                $deliveryDetail->latitude = $dropLat;
+                $deliveryDetail->longitutde = $dropLong;
+                $deliveryDetail->delivery_date = trim($deliveryDate);
+                $deliveryDetail->save();
+                
+                
+                DB::commit();
+                $success = "1";
+            }
+            catch(\Exception $e){
+
+                $success = "0";
+                DB::rollback();
+            }      
+            $request->session()->put('shiping_id', $shippingId); 
+            if($tempArr["id"]=="" && $custid=="0") {
+               $request->session()->put('check_getofferpage', "GetOfferPage"); 
+               return redirect(url('user/login'));
+            } else {
+                 return redirect(url('user/getoffer'));
+            }
+         }else{
+             
+              return view('subCategory/4');
+         }
     }
 }
     

@@ -57,6 +57,7 @@ Route::get('others/{id}', 'Front\ShipmentController@others');
 Route::post('others', 'Front\ShipmentController@others');
 Route::get('home/{id}', 'Front\ShipmentController@home');
 Route::post('home', 'Front\ShipmentController@home');
+Route::post('truckbooking', 'Front\ShipmentController@truckbooking');
 #Admin
 Route::get('/admin/login', function () {
     if(Auth::check()){return Redirect::to('admin/dashboard');}

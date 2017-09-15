@@ -1,3 +1,16 @@
+$(document).on('click', '.panel-heading span.clickable', function(e){
+    var $this = $(this);
+	if(!$this.hasClass('panel-collapsed')) {
+		$this.parents('.panel').find('.panel-body').slideUp();
+		$this.addClass('panel-collapsed');
+		$this.find('i').removeClass('glyphicon-minus').addClass('glyphicon-plus');
+	} else {
+		$this.parents('.panel').find('.panel-body').slideDown();
+		$this.removeClass('panel-collapsed');
+		$this.find('i').removeClass('glyphicon-plus').addClass('glyphicon-minus');
+	}
+});
+
 function initialize() {
     var myLatlng = new google.maps.LatLng(53.3333,-3.08333),
     mapOptions = {
@@ -31,18 +44,6 @@ google.maps.event.addDomListener(window, "resize", function() {
 google.maps.event.addDomListener(window, 'load', initialize);
 
 
-$(document).on('click', '.panel-heading span.clickable', function(e){
-    var $this = $(this);
-	if(!$this.hasClass('panel-collapsed')) {
-		$this.parents('.panel').find('.panel-body').slideUp();
-		$this.addClass('panel-collapsed');
-		$this.find('i').removeClass('glyphicon-minus').addClass('glyphicon-plus');
-	} else {
-		$this.parents('.panel').find('.panel-body').slideDown();
-		$this.removeClass('panel-collapsed');
-		$this.find('i').removeClass('glyphicon-plus').addClass('glyphicon-minus');
-	}
-});
 
 
 

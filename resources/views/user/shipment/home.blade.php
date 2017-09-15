@@ -8,7 +8,11 @@
 
  {!! Form::open(array('url'=>'home','class'=>'form-horizontal','id'=>'home_form','files' => true)) !!}
 
-
+<style>
+    .panel-body{
+        display: none; 
+    }
+</style>
 <?php //print_r($dinningRoom); ?>
 <section class="_inner_pages containerfirstphase">
     <div class="container">
@@ -595,6 +599,8 @@ function fun_minus(){
     $cols--;
 }
  }
+ 
+ 
 </script>
 @endsection
 
