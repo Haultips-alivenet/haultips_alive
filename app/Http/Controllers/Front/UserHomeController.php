@@ -131,6 +131,7 @@ class UserHomeController extends FrontController
                     ->get();
       echo json_encode($data);
     }
+    
      public function gettruckcapacity(Request $request){
         
        $data["truck_capacity"]  = DB::table('truck_capacities')

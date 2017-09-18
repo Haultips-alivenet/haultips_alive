@@ -71,12 +71,14 @@ class ShipmentController extends FrontController
             $equipmentData ="";
             $miscData ="";  
             $pickupLocation=$request->pickupaddress;
-            $pickupLat="0";
-            $pickupLong="0";
+            $pickupLatlong=$this->getlatlong($request->pickupaddress);
+            $pickupLat =$pickupLatlong["lat"];
+            $pickupLong=$pickupLatlong["long"];
             $pickupDate=$request->pickupdate;
             $dropLocation=$request->deliveryaddress;
-            $dropLat="0";
-            $dropLong="0";
+            $dropupLatlong=$this->getlatlong($request->deliveryaddress);
+            $dropLat=$dropupLatlong["lat"];
+            $dropLong=$dropupLatlong["long"];
             $deliveryDate=$request->deliverydate;
             $additional_detail=$request->additonalInfo;
             $tempArr = Session::get('currentUser');
@@ -157,7 +159,7 @@ class ShipmentController extends FrontController
                 $shipmentList->equipment_shipment_inventory = $equipmentData;
                 $shipmentList->boxes = $miscData;
                 $shipmentList->item_image = $officeImages;
-                $shipmentList->additional_detail = $additional_detail;
+                $shipmentList->item_detail = $additional_detail;
                 $shipmentList->save();
                
                 $pickupDetail = new ShippingPickupDetail;
@@ -210,12 +212,14 @@ class ShipmentController extends FrontController
             $vehicle_color = $request->vehicle_color;
             $vehicleName = $request->vehicle_name;
             $pickupLocation=$request->pickupaddress;
-            $pickupLat="0";
-            $pickupLong="0";
+            $pickupLatlong=$this->getlatlong($request->pickupaddress);
+            $pickupLat =$pickupLatlong["lat"];
+            $pickupLong=$pickupLatlong["long"];
             $pickupDate=$request->pickupdate;
             $dropLocation=$request->deliveryaddress;
-            $dropLat="0";
-            $dropLong="0";
+            $dropupLatlong=$this->getlatlong($request->deliveryaddress);
+            $dropLat=$dropupLatlong["lat"];
+            $dropLong=$dropupLatlong["long"];
             $deliveryDate=$request->deliverydate;
             $additional_detail=$request->additional_detail;
             
@@ -333,12 +337,14 @@ class ShipmentController extends FrontController
             $materialId = $request->material_id;
             $weight = $request->weight;
             $pickupLocation=$request->pickupaddress;
-            $pickupLat="0";
-            $pickupLong="0";
+            $pickupLatlong=$this->getlatlong($request->pickupaddress);
+            $pickupLat =$pickupLatlong["lat"];
+            $pickupLong=$pickupLatlong["long"];
             $pickupDate=$request->pickupdate;
             $dropLocation=$request->deliveryaddress;
-            $dropLat="0";
-            $dropLong="0";
+            $dropupLatlong=$this->getlatlong($request->deliveryaddress);
+            $dropLat=$dropupLatlong["lat"];
+            $dropLong=$dropupLatlong["long"];
             $deliveryDate=$request->deliverydate;
             $additional_detail=$request->additional_detail;
             
@@ -420,12 +426,14 @@ class ShipmentController extends FrontController
             $materialId = $request->material_id;
             $weight = $request->weight;
             $pickupLocation=$request->pickupaddress;
-            $pickupLat="0";
-            $pickupLong="0";
+            $pickupLatlong=$this->getlatlong($request->pickupaddress);
+            $pickupLat =$pickupLatlong["lat"];
+            $pickupLong=$pickupLatlong["long"];
             $pickupDate=$request->pickupdate;
             $dropLocation=$request->deliveryaddress;
-            $dropLat="0";
-            $dropLong="0";
+            $dropupLatlong=$this->getlatlong($request->deliveryaddress);
+            $dropLat=$dropupLatlong["lat"];
+            $dropLong=$dropupLatlong["long"];
             $deliveryDate=$request->deliverydate;
             $additional_detail=$request->additional_detail;
            
@@ -526,12 +534,15 @@ class ShipmentController extends FrontController
             $materialId = $request->material_id;
             $weight = $request->weight;
             $pickupLocation=$request->pickupaddress;
-            $pickupLat="0";
-            $pickupLong="0";
+            $pickupLatlong=$this->getlatlong($request->pickupaddress);
+            $pickupLat =$pickupLatlong["lat"];
+            $pickupLong=$pickupLatlong["long"];
+           
             $pickupDate=$request->pickupdate;
             $dropLocation=$request->deliveryaddress;
-            $dropLat="0";
-            $dropLong="0";
+            $dropupLatlong=$this->getlatlong($request->deliveryaddress);
+            $dropLat=$dropupLatlong["lat"];
+            $dropLong=$dropupLatlong["long"];
             $deliveryDate=$request->deliverydate;
             $additional_detail=$request->additional_detail;
            
@@ -638,12 +649,15 @@ class ShipmentController extends FrontController
             $residenceType = $request->residenceType;
             $no_of_room = $request->no_of_room;
             $pickupLocation=$request->pickupaddress;
-            $pickupLat="0";
-            $pickupLong="0";
+            $pickupLatlong=$this->getlatlong($request->pickupaddress);
+            $pickupLat =$pickupLatlong["lat"];
+            $pickupLong=$pickupLatlong["long"];
+            
             $pickupDate=$request->pickupdate;
             $dropLocation=$request->deliveryaddress;
-            $dropLat="0";
-            $dropLong="0";
+            $dropupLatlong=$this->getlatlong($request->deliveryaddress);
+            $dropLat=$dropupLatlong["lat"];
+            $dropLong=$dropupLatlong["long"];
             $deliveryDate=$request->deliverydate;
             $additional_detail=$request->additonalInfo;
            
@@ -875,12 +889,14 @@ class ShipmentController extends FrontController
             
             
             $pickupLocation=$request->pickupaddress;
-            $pickupLat="0";
-            $pickupLong="0";
+            $pickupLatlong=$this->getlatlong($request->pickupaddress);
+            $pickupLat =$pickupLatlong["lat"];
+            $pickupLong=$pickupLatlong["long"];
             $pickupDate=$request->pickupdate;
             $dropLocation=$request->deliveryaddress;
-            $dropLat="0";
-            $dropLong="0";
+            $dropupLatlong=$this->getlatlong($request->deliveryaddress);
+            $dropLat=$dropupLatlong["lat"];
+            $dropLong=$dropupLatlong["long"];
             $deliveryDate=$request->deliverydate;
             $additional_detail=$request->additional_detail;
             
@@ -951,6 +967,26 @@ class ShipmentController extends FrontController
              
               return view('subCategory/4');
          }
+    }
+    public function getlatlong($address){
+        $url = "http://maps.google.com/maps/api/geocode/json?address=".urlencode($address)."&sensor=false";
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($ch, CURLOPT_PROXYPORT, 3128);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
+        $response = curl_exec($ch);
+        curl_close($ch);
+        $response_a = json_decode($response);
+        if($response_a->results){
+        $lat = $response_a->results[0]->geometry->location->lat;
+        $long = $response_a->results[0]->geometry->location->lng;
+        } else {
+            $lat=0;
+            $long=0;
+        }
+        return array("lat"=>$lat,"long"=>$long);
     }
 }
     

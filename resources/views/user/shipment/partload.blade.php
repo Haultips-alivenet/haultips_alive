@@ -148,7 +148,7 @@
               <div class="col-md-12">
               <label for="">Pickup Address</label>
 
-              <textarea name="pickupaddress" id="" cols="30" rows="10" class="form-control _fm_c_t"></textarea>
+              <textarea name="pickupaddress" id="pickupaddress" cols="30" rows="10" class="form-control _fm_c_t"></textarea>
 
 
               </div>
@@ -157,7 +157,7 @@
                 <div class="col-md-12">
               <label for="">Delivery Address</label>
 
-              <textarea name="deliveryaddress" id="" cols="30" rows="10" class="form-control _fm_c_t"></textarea>
+              <textarea name="deliveryaddress" id="deliveryaddress" cols="30" rows="10" class="form-control _fm_c_t"></textarea>
 
               </div>
               </div>

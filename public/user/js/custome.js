@@ -48,8 +48,7 @@ google.maps.event.addDomListener(window, 'load', initialize);
 
 
 
-function list_toggle(val)
- {$('.test-dwn'+val).slideToggle(); }
+
 
 /* Truck booking*/
 

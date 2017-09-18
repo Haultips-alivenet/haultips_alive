@@ -228,8 +228,9 @@ India - 201007</address>
     <!-- Placed at the end of the document so the pages load faster -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
    <!-- {!! Html::script('public/user/js/jquery.min.js') !!} -->
-    <!-- <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false"></script> -->
-    
+     
+     
+     {!! Html::script('https://maps.googleapis.com/maps/api/js?key=AIzaSyCYX0UY7wl2R_Yyc3K9h0cwYSBdqndY25o&libraries=places') !!}
      {!! Html::script('public/user/js/bootstrap.min.js') !!}
      {!! Html::script('public/admin/js/jquery.validate.min.js') !!}
      {!! Html::script('public/user/js/wow_main.js') !!}
@@ -283,6 +284,16 @@ India - 201007</address>
     });
 
   
+            function init() {
+                var input = document.getElementById('pickupaddress');
+                var autocomplete = new google.maps.places.Autocomplete(input);
+                 
+                var inputt = document.getElementById('deliveryaddress');
+                var autocomplete = new google.maps.places.Autocomplete(inputt);
+            }
+ 
+            google.maps.event.addDomListener(window, 'load', init);
+      
 </script>
   </body>
 </html>

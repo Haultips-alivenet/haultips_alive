@@ -33,9 +33,9 @@
 
                     <div class="form-group row">
                         <div class="col-md-6">
-                            <label for="">Enter loading point</label>
+                            <label for="locationTextField">Enter loading point</label>
 
-                            <input type="text" name="pickupaddress" id="pickupaddress" class="form-control">
+                            <input type="text" name="pickupaddress"  id="pickupaddress" class="form-control">
 
                         </div>
 
@@ -154,8 +154,11 @@
                 </div>
             </div>
 </section>
-
-
+ <?php 
+function getlatlong($add){
+    echo $add;
+}
+?>
  {!! Form::close() !!}
 @endsection
 @section('script')
@@ -265,6 +268,7 @@ function weightide(){
   $(this).parent().addClass("selected").siblings().removeClass("selected"); 
 });
 </script>
+
 
 @endsection
 

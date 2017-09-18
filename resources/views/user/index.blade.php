@@ -17,27 +17,27 @@
   <!-- Wrapper for slides -->
   <div class="carousel-inner">
     <div class="item active">
-      <img src="public/user/img/banner/slider-img.png" alt="...">
+      <img src="{{asset('public/user/img/banner/slider-img.png')}}" alt="...">
       <div class="carousel-caption">
         <div class="heading-banner">Treasure trove, Book & Haul all over the wonderful states of India </div>
         <p>Haultips deduce that shippers need decisive service at cutthroat rates. With Haultip’s ingenious online transit marketplace, merchants can salvage time and money without immolating the high assistance standards that they insistence.</p>
-        <button class="btn color-btn">List Your Delivery</button>
+        <a href="{{url('user/find/deliveries')}}" ><button class="btn color-btn">List Your Delivery</button></a>
       </div>
     </div>
     <div class="item">
-      <img src="public/user/img/banner/slider-img.png" alt="...">
+      <img src="{{asset('public/user/img/banner/slider-img.png')}}" alt="...">
       <div class="carousel-caption">
         <div class="heading-banner">Treasure trove, Book & Haul all over the wonderful states of India </div>
         <p>Haultips deduce that shippers need decisive service at cutthroat rates. With Haultip’s ingenious online transit marketplace, merchants can salvage time and money without immolating the high assistance standards that they insistence.</p>
-        <button class="btn color-btn">List Your Delivery</button>
+        <a href="{{url('user/find/deliveries')}}"><button class="btn color-btn">List Your Delivery</button></a>
       </div>
     </div>
     <div class="item">
-      <img src="public/user/img/banner/slider-img.png" alt="...">
+      <img src="{{asset('public/user/img/banner/slider-img.png')}}" alt="...">
       <div class="carousel-caption">
         <div class="heading-banner">Treasure trove, Book & Haul all over the wonderful states of India </div>
         <p>Haultips deduce that shippers need decisive service at cutthroat rates. With Haultip’s ingenious online transit marketplace, merchants can salvage time and money without immolating the high assistance standards that they insistence.</p>
-        <button class="btn color-btn">List Your Delivery</button>
+       <a href="{{url('user/find/deliveries')}}"> <button class="btn color-btn">List Your Delivery</button></a>
       </div>
     </div>
   </div>
@@ -61,7 +61,7 @@
                         <?php foreach($categories as $category){ ?>
                             <li>
                                 <a href="{{URL :: asset('subCategory/'.$category->id)}}">
-                                    <div class="bx_img "><img src="{{ asset('public/user/img/'.$category->category_image)}}" alt="" class="wow  bounce"></div>
+                                    <div class="bx_img "><img src="{{asset('public/user/img/'.$category->category_image)}}" alt="" class="wow  bounce"></div>
                                     <div class="discription">
                                         <h4>{{$category->category_name}}</h4>
                                         <div class="readmore">Read More <img src="{{ asset('public/user/img/readmore.png')}}" alt=""></div>
