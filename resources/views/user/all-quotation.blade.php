@@ -18,7 +18,7 @@
             </div>
             <div class="_qu_li_lrt">
                 <span><a href="{{ url("user/quotation-offer/" . $quoteDetail->quoteId) }}"><i class="fa fa-gavel" aria-hidden="true"></i></a></span>
-                <p><i class="fa fa-inr" aria-hidden="true"></i> {{ $quoteDetail->price }}</p>
+                <p><i class="fa fa-inr" aria-hidden="true"></i> {{ $quoteDetail->price }}<br><span>{{ $quoteDetail->quote_status }}</span></p>
             </div>
         </li>
       @endforeach

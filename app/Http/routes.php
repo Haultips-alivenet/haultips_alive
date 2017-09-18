@@ -18,16 +18,26 @@ Route::resource('user/notification', 'Front\UserHomeController@notification');
 Route::resource('user/changepassword', 'Front\UserHomeController@changepassword');
 Route::resource('user/transactionhistory', 'Front\UserHomeController@transactionhistory');
 Route::get('getquesAns', 'Front\UserHomeController@getquesAns');
-Route::get('user/profile', 'Front\UserHomeController@profile');
-Route::get('user/changepassword', 'Front\UserHomeController@changepassword');
-Route::post('user/changepassword', 'Front\UserHomeController@changepassword');
-Route::get('user/my-deliveries/{status}', 'Front\UserHomeController@myDeliveries');
-Route::get('user/delivery-detail/{shipping_id}', 'Front\UserHomeController@deliveryDetail');
-Route::get('user/my-delivery-delete/{shipping_id}', 'Front\UserHomeController@deliveryDelete');
-####
-Route::get('user/all-quotation/{shipping_id}', 'Front\UserHomeController@allQuotation');
-Route::get('user/quotation-offer/{quote_id}', 'Front\UserHomeController@quotationDetail');
-Route::post('user/quotation-offer/{quote_id}', 'Front\UserHomeController@quotationStatusChange');
+
+// User login panel 
+Route::get('user/profile', 'Front\UserController@profile');
+Route::post('user/profile/edit', 'Front\UserController@profileEdit');
+Route::get('user/changepassword', 'Front\UserController@changepassword');
+Route::post('user/changepassword', 'Front\UserController@changepassword');
+Route::get('user/my-deliveries/{status}', 'Front\UserController@myDeliveries');
+Route::get('user/delivery-detail/{shipping_id}', 'Front\UserController@deliveryDetail');
+Route::get('user/my-delivery-delete/{shipping_id}', 'Front\UserController@deliveryDelete');
+Route::get('user/all-quotation/{shipping_id}', 'Front\UserController@allQuotation');
+Route::get('user/quotation-offer/{quote_id}', 'Front\UserController@quotationDetail');
+Route::post('user/quotation-offer/{quote_id}', 'Front\UserController@quotationStatusChange');
+Route::get('user/relist-shipment/{shipping_id}', 'Front\UserController@relistShipment');
+Route::post('user/relist-shipment/{shipping_id}', 'Front\UserController@relistShipment');
+Route::get('user/bank-infomation', 'Front\UserController@bankInformation');
+Route::get('user/bank-infomation/delete/{bank_info_id}', 'Front\UserController@bankInformationDelete');
+Route::get('user/bank-infomation/add', 'Front\UserController@bankInformationAdd');
+Route::post('user/bank-infomation/add', 'Front\UserController@bankInformationAdd');
+// User login panel end
+
 #User
 
 Route::resource('user/login', 'Front\LoginController');
