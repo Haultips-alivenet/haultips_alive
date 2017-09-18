@@ -11,6 +11,7 @@ $(document).on('click', '.panel-heading span.clickable', function(e){
 	}
 });
 
+
 function initialize() {
     var myLatlng = new google.maps.LatLng(53.3333,-3.08333),
     mapOptions = {
@@ -140,7 +141,4 @@ function decreaseValue(id)
     function toggle(val){
         $('.ulist'+val).slideToggle();
     }
-    $('.edit_btn').click(function(){
-            $('._me_dis').toggle();
-            $('._me_input').toggle();
-    });
+    

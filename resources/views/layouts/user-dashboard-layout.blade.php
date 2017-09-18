@@ -7,6 +7,7 @@
     <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
     <meta name="description" content="">
     <meta name="author" content="">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     
 
      <title>@yield('title')</title>
@@ -117,7 +118,6 @@
 
                     </li>
                     <li><a href="{{url('user/faq')}}"><span><i class="fa fa-info-circle" aria-hidden="true"></i></span>Faq</a></li>
-                    <li><a href="{{url('user/notification')}}"><span><i class="fa fa-bell" aria-hidden="true"></i></span>Notification</a></li>
                     <li><a href="{{url('auth/logout')}}"><span><i class="fa fa-power-off" aria-hidden="true"></i></span>Logout</a></li>
                 </ul>  
             </div>   
@@ -246,7 +246,9 @@ India - 201007</address>
      {!! Html::script('public/admin/js/jquery.nicescroll.js') !!}
      {!! Html::script('public/user/js/moment.js') !!}
      {!! Html::script('public/user/js/bootstrap-datetimepicker.js') !!}
+     {!! Html::script('https://maps.googleapis.com/maps/api/js?key=AIzaSyDr-iGaiLmD2zCzCvl11pPRKgeFHxY8b7I&libraries=places&sensor=false&region=India') !!}
      <!-- {!! Html::script('public/admin/js/bootstrap-select.min.js') !!} -->
+
     @yield('script')
     <script>
        $('.carousel').carousel();

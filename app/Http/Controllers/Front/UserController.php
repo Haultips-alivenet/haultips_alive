@@ -20,6 +20,9 @@ use App\ShippingQuote;
 use App\ShippingPickupDetail;
 use App\ShippingDeliveryDetail;
 use App\PayInfo;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Input;
+use Response;
 use DB;
 
 
@@ -174,12 +177,50 @@ class UserController extends FrontController
         return redirect('user/home');
 
       if($shipping_quote->count()){
-        $status = array("pending", "accepted", "rejected");
-        $sts_title = $status[$request->get('quot_sts')];
-        if($shipping_quote->update(['quote_status' => $request->get('quot_sts')])){
+        if($request->get('quot_sts') == 1){
+          $rejectOther = ShippingQuote::where('shipping_id', $sq->shipping_id)->update(['quote_status'=>2]);
+          $sts_updt = $shipping_quote->update(['quote_status' => 1]);
+
+          #Accept offer Notification
+          $carrierData = ShippingQuote::select('u.device_token','u.first_name','u.last_name')
+                          ->leftJoin('users as u','u.id','=','shipping_quotes.carrier_id')
+                          ->where('shipping_quotes.id', $quot_id)->first();
+          $msg = 'Your Offer has been accepted by the '.$carrierData->first_name.' '.$carrierData->last_name;                           
+          
+          // Send message functionality                     
+
+
+          #Reject offer Notification
+          $rejectUsers = ShippingQuote::select('u.device_token','u.first_name','u.last_name')
+                          ->leftJoin('users as u','u.id','=','shipping_quotes.carrier_id')
+                          ->where('shipping_quotes.shipping_id', $sq->shipping_id)
+                          ->where('shipping_quotes.id','!=', $quot_id)->get();
+          
+          foreach($rejectUsers as $rejectData){
+              $msg = 'Your Offer has been rejected by the '.$rejectData->first_name.' '.$rejectData->last_name;
+              // Send message functionality
+
+          }
+        }
+
+        if($request->get('quot_sts') == 2){
+          $sts_updt = $shipping_quote->update(['quote_status' => 2]);
+
+          $carrierData = ShippingQuote::select('u.device_token','u.first_name','u.last_name')
+                          ->leftJoin('users as u','u.id','=','shipping_quotes.carrier_id')
+                          ->where('shipping_quotes.id',$quoteId)->first();
+          
+          $msg = 'Your Offer has been rejected by the '.$carrierData->first_name.' '.$carrierData->last_name;
+          // send sms
+        }
+
+        if($sts_updt){
+          $status = array("pending", "accepted", "rejected");
+          $sts_title = $status[$request->get('quot_sts')];
           $request->session()->flash('alert_type', 'success');
           $request->session()->flash('alert_msg', "Quotation is $sts_title successfully!");
         }
+
       } 
       return redirect("user/quotation-offer/$quot_id");
     }
@@ -198,13 +239,20 @@ class UserController extends FrontController
         ]);
         try{
           DB::beginTransaction();
+          $picklatlong = $this->getLatLong($request->get('pickup_address'));
           $pick_updt = ShippingPickupDetail::where('shipping_id', $shipping_id)->update([
                           'pickup_address' => $request->get('pickup_address'),
-                          'pickup_date' => $request->get('pickup_date')
+                          'pickup_date' => $request->get('pickup_date'),
+                          'latitude' => $picklatlong['lat'],
+                          'longitutde' => $picklatlong['lng'],
                         ]);
+
+          $delivlatlong = $this->getLatLong($request->get('delivery_address'));
           $ship_updt =  ShippingDeliveryDetail::where('shipping_id', $shipping_id)->update([
                           'delivery_address' => $request->get('delivery_address'),
-                          'delivery_date' => $request->get('delivery_date')
+                          'delivery_date' => $request->get('delivery_date'),
+                          'latitude' => $picklatlong['lat'],
+                          'longitutde' => $picklatlong['lng'],
                         ]);
           if($pick_updt && $ship_updt){
             DB::commit();
@@ -276,6 +324,56 @@ class UserController extends FrontController
       }
 
       return view('user.bank-information-add');
+    }
+
+    // Profile edit
+    public function profileEdit(Request $request){
+      $rules = array (
+        'first_name' => 'required|max:200',
+        'last_name' => 'required|max:200',
+        'mobile_number' => 'required|numeric',
+        'street' => 'required',
+        'city' => 'required',
+        'location' => 'required',
+        'pincode' => 'required',
+        'country' => 'required',
+      );
+      $validator = Validator::make ( Input::all (), $rules );
+      if ($validator->fails ())
+          return Response::json ($validator->messages());
+      else {
+          $user = User::find(Auth::User()->id);
+          $user->first_name = $request->get('first_name');
+          $user->last_name = $request->get('last_name');
+
+          $user_detail_updt = UserDetail::where('user_id', Auth::User()->id)
+                              ->update([
+                                    'street' => $request->get('street'),
+                                    'location' => $request->get('location'),
+                                    'city' => $request->get('city'),
+                                    'pincode' => $request->get('pincode'),
+                                    'country' => $request->get('country'),
+                                  ]);
+          
+
+          return ($user->save() && $user_detail_updt) ? 1 : 0;
+      }
+    }
+
+
+    private function getLatLong($address){
+        $url = "http://maps.google.com/maps/api/geocode/json?address=".urlencode($address)."&sensor=false&region=India";
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($ch, CURLOPT_PROXYPORT, 3128);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
+        $response = curl_exec($ch);
+        curl_close($ch);
+        $response_a = json_decode($response);
+        return array( 'lat' => $response_a->results[0]->geometry->location->lat,
+                      'lng' => $response_a->results[0]->geometry->location->lng);
     }
 
 }

@@ -61,7 +61,7 @@
 
 @section('script')
 <script type="text/javascript">
-/*$('#bank_info_form').validate({
+$('#bank_info_form').validate({
     rules: {
         name:{
             required : true,
@@ -79,14 +79,15 @@
             required : "Enter Bank Name"
         },
         number :{
-            required : "Enter Account Number"
+            required : "Enter Account Number",
+            number : "Enter Valid Account Number"
         },
         code :{
             required : "Enter IFSC Code"
         },
     }
 
-});   */
+});   
 </script>
 
 @endsection

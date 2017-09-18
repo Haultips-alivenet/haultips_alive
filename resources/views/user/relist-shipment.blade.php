@@ -28,12 +28,13 @@
     <div class="form-group row">
         <div class="col-md-6">
             <label for="">Pickup Location</label>
-            {!! Form::text('pickup_address', $shipPickDetail->pickup_address, array('class'=>'form-control', 'id'=>'pickup_address')) !!}
+            {!! Form::text('pickup_address', $shipPickDetail->pickup_address, array('class'=>'form-control autocomplete', 'id'=>'pickup_address')) !!}
+            
         </div>
         <div class="col-md-6">
             <label for="">Drop Location</label>
-            {!! Form::text('delivery_address', $shipDelivDetail->delivery_address, array('class'=>'form-control', 'id'=>'delivery_address')) !!}
-
+            {!! Form::text('delivery_address', $shipDelivDetail->delivery_address, array('class'=>'form-control autocomplete', 'id'=>'delivery_address')) !!}
+            
         </div>
     </div>
 
@@ -120,5 +121,27 @@ $('#relist_ship_form').validate({
 });
 </script>
 
+
+<script>
+      function initAutocomplete() {
+
+        var acInputs = document.getElementsByClassName("autocomplete");
+
+        for (var i = 0; i < acInputs.length; i++) {
+
+            var autocomplete = new google.maps.places.Autocomplete(acInputs[i]);
+            autocomplete.inputId = acInputs[i].id;
+            google.maps.event.addListener(autocomplete, 'place_changed', function () {
+                //document.getElementById("log").innerHTML = 'You used input with id ' + this.inputId;
+                var place = autocomplete.getPlace();
+                alert(place);
+            });
+        }
+        
+      }
+
+      initAutocomplete();
+    </script>
+    
 @endsection
 

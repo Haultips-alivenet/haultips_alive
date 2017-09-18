@@ -21,6 +21,7 @@ Route::get('getquesAns', 'Front\UserHomeController@getquesAns');
 
 // User login panel 
 Route::get('user/profile', 'Front\UserController@profile');
+Route::post('user/profile/edit', 'Front\UserController@profileEdit');
 Route::get('user/changepassword', 'Front\UserController@changepassword');
 Route::post('user/changepassword', 'Front\UserController@changepassword');
 Route::get('user/my-deliveries/{status}', 'Front\UserController@myDeliveries');
