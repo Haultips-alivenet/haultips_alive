@@ -1420,7 +1420,7 @@ class AndroidController extends AppController
             $shippingDetails = array();
             $i = 0;
             $userId = $_POST['userId'];
-            $shiipings = ShippingDetail::where('user_id',$userId)->get();
+            $shiipings = ShippingDetail::where('user_id',$userId)->where('status','!=',2)->get();
             $shipArray = $shiipings->toArray();
             if(count($shipArray) > 0){
                foreach($shiipings as $shipping){
@@ -1430,7 +1430,7 @@ class AndroidController extends AppController
                   $image = explode(',',$shippingData->item_image);
                   $status = array("Inactive","Active","Process","Complete");
 
-                 $shippingDetails[$i]['shippingId'] = $shippingId;
+                  $shippingDetails[$i]['shippingId'] = $shippingId;
                   $shippingDetails[$i]['title'] = $shippingData->delivery_title;
                   $shippingDetails[$i]['image'] = $image[0];
                   $shippingDetails[$i]['price'] = $shipping->shipping_price;
@@ -1471,10 +1471,19 @@ class AndroidController extends AppController
                             ->leftJoin('shipping_delivery_details as sdd','sdd.shipping_id','=','shipping_details.id')
                             ->leftJoin('payment_methods as pm','pm.id','=','shipping_details.payment_method_id')
                             ->where('shipping_details.id', $shipmentId)->first();
+                $shippingQuote = ShippingQuote::where('shipping_id',$shipmentId)->select('id')->first();
+                $haveQuote = ($shippingQuote) ? 'Yes' : 'No';
                 
                $msg['responseCode'] = "200";
                $msg['responseMessage'] = "Shipment Detail get successfully";
-               $msg['shippingDetails'] = $shipmentDetail; 
+               $msg['price'] = $shipmentDetail->price; 
+               $msg['published'] = date('d-M-Y', strtotime($shipmentDetail->published)); 
+               $msg['pickupAddress'] = $shipmentDetail->pickup_address; 
+               $msg['pickupDate'] = date('d-M-Y', strtotime($shipmentDetail->pickup_date)); 
+               $msg['deliveryAddress'] = $shipmentDetail->delivery_address; 
+               $msg['deliveryDate'] = date('d-M-Y', strtotime($shipmentDetail->delivery_date)); 
+               $msg['paymnentType'] = $shipmentDetail->paymnentType; 
+               $msg['haveBid'] = $haveQuote;
             }                    
         }catch(\Exception $e) {
             $msg['responseCode'] = "0";
@@ -1497,16 +1506,17 @@ class AndroidController extends AppController
                 $msg['responseCode'] = "0";
                 $msg['responseMessage'] = "shippingId required.";
             }else{            
-                    $quoteDetails = ShippingQuote::select('shipping_quotes.id as quoteId','u.first_name','u.last_name', 'quote_price')
+                    $quoteDetails = ShippingQuote::select('shipping_quotes.id as quoteId','u.first_name','u.last_name', 'quote_price', 'quote_status')
                             ->leftJoin('users as u','u.id','=','shipping_quotes.carrier_id')                            
                             ->where('shipping_quotes.shipping_id',$shippingId)->get();
                     $quoteArray = $quoteDetails->toArray();
-                
+                    $status = array("Pending","Accepted","Rejected");
                     if(count($quoteArray) > 0){
                         foreach($quoteDetails as $quotes){
                             $data[$i]['quoteId'] = $quotes['quoteId'];
                             $data[$i]['carrier'] = $quotes['first_name'].' '.$quotes['last_name'];
                             $data[$i]['price'] = $quotes['quote_price'];
+                            $data[$i]['status'] = $status[$quotes->quote_status];
                             $i++;
                         }
                         $msg['responseCode'] = "200";
@@ -1547,13 +1557,15 @@ class AndroidController extends AppController
                 
                     if(count($quoteArray) > 0){
                         foreach($quoteDetails as $quotes){
-                            $shippingData = DB::table($quotes->table_name)->select('delivery_title')->where('shipping_id',$quotes->id)->first();
-                            
-                            $data[$i]['partnerName'] = $quotes['first_name'].' '.$quotes['last_name'];
-                            $data[$i]['title'] = $shippingData->delivery_title;
-                            $data[$i]['price'] = $quotes['quote_price'];
-                            $data[$i]['time'] = date('d-F-Y h:i:s', strtotime($quotes['created_at'])); 
-                            $i++;
+                            if($quotes['first_name']){
+                                $shippingData = DB::table($quotes->table_name)->select('delivery_title')->where('shipping_id',$quotes->id)->first();
+
+                                $data[$i]['partnerName'] = $quotes['first_name'].' '.$quotes['last_name'];
+                                $data[$i]['title'] = $shippingData->delivery_title;
+                                $data[$i]['price'] = $quotes['quote_price'];
+                                $data[$i]['time'] = date('d-F-Y h:i:s', strtotime($quotes['created_at'])); 
+                                $i++;
+                            }
                         }
                         $msg['responseCode'] = "200";
                         $msg['responseMessage'] = "Notifications get successfully";               
@@ -1952,7 +1964,8 @@ class AndroidController extends AppController
             $condition = '';
             $userId = $_POST['userId'];
             $categoryId = $_POST['categoryId'];
-            $orderBy = $_POST['orderBy'];      
+            $orderBy = $_POST['orderBy'];    
+            $destinationSearch = $_POST['destinationSearch'];    
             
             if(empty($userId)) {
                 $msg['responseCode'] = "0";
@@ -1976,6 +1989,10 @@ class AndroidController extends AppController
                     if($categoryId != ''){                        
                         $categoryId = explode(",",$categoryId);
                         $shippingData = $shippingData->whereIn('shipping_details.category_id', $categoryId);
+                    }
+                    
+                    if($destinationSearch != ''){
+                        $shippingData = $shippingData->where('sdd.delivery_address', 'LIKE', '%'.$destinationSearch.'%');
                     }
                     
                     if($orderBy == 'origin asc'){
@@ -2014,6 +2031,7 @@ class AndroidController extends AppController
                             $data[$i]['postingDate'] = date('d-m-Y', strtotime($detail['created_at'])); 
                             $data[$i]['pickupDate'] = date('d-m-Y', strtotime($detail['pickup_date']));
                             $data[$i]['deliveryDate'] = date('d-m-Y', strtotime($detail['delivery_date']));
+                            $data[$i]['alreadyBid'] = ($shippingQuote) ? 'Yes' : 'No';
                             $i++;
                         }
                         $msg['responseCode'] = "200";
@@ -2042,6 +2060,7 @@ class AndroidController extends AppController
             $i = 0;
             
             $shippingId = $_POST['shippingId'];
+            $partnerId = $_POST['partnerId'];
             
             if(empty($shippingId)) {
                 $msg['responseCode'] = "0";
@@ -2049,14 +2068,14 @@ class AndroidController extends AppController
             }else{           
                     
                      
-                    $shippingData = ShippingDetail::select('shipping_details.id', 'table_name', 'u.id as userId', 'u.first_name', 'u.last_name' , 'shipping_details.created_at', 'spd.pickup_address', 'spd.pickup_date',  'sdd.delivery_date', 'spd.latitude as pickupLat', 'spd.longitutde as pickupLong', 'sdd.delivery_address', 'sdd.latitude as deliveryLat', 'sdd.longitutde as deliveryLong', 'vc.category_name as category', 'vsc.category_name as subCategory')
+                    $shippingData = ShippingDetail::select('shipping_details.id', 'table_name', 'shipping_details.payment_method_id', 'shipping_details.quote_status', 'u.id as userId', 'u.first_name', 'u.last_name' , 'shipping_details.created_at', 'spd.pickup_address', 'spd.pickup_date',  'sdd.delivery_date', 'spd.latitude as pickupLat', 'spd.longitutde as pickupLong', 'sdd.delivery_address', 'sdd.latitude as deliveryLat', 'sdd.longitutde as deliveryLong', 'vc.category_name as category', 'vsc.category_name as subCategory')
                                     ->leftJoin('users as u','u.id','=','shipping_details.user_id')                            
                                     ->leftJoin('shipping_pickup_details as spd','spd.shipping_id','=','shipping_details.id')                            
                                     ->leftJoin('shipping_delivery_details as sdd','sdd.shipping_id','=','shipping_details.id')
                                     ->leftJoin('vehicle_categories as vc','vc.id','=','shipping_details.category_id')
                                     ->leftJoin('vehicle_categories as vsc','vsc.id','=','shipping_details.subcategory_id')
                                     ->where('shipping_details.id', $shippingId)->first(); 
-                    
+                    $paymentType = array('NA','Cash on Delivery','Online');
                     $data['userId'] = $shippingData->userId;
                     $data['userName'] = $shippingData->first_name. ' '.$shippingData->last_name;
                     $data['publishDate'] = date('d-m-Y', strtotime($shippingData->created_at)); 
@@ -2069,18 +2088,25 @@ class AndroidController extends AppController
                     $data['subCategory'] = $shippingData->subCategory;
                     $data['distance'] = ShippingDetail::distance($shippingData->pickupLat, $shippingData->pickupLong, $shippingData->deliveryLat, $shippingData->deliveryLong, "K"). ' km'; 
                     
+                    $miid = ShippingQuote::where('shipping_id',$shippingId)->select((DB::raw('min(quote_price) as minimumBid')))->first();
+                    $partnerBid = ShippingQuote::where('shipping_id',$shippingId)->where('carrier_id', $partnerId)->select('quote_price')->first();
+                    $data['minimumBid'] = ($miid) ? $miid->minimumBid : '0'; 
+                    $data['yourBid'] = ($partnerBid) ? $partnerBid->quote_price : ''; 
+                    $data['paymentType'] = $paymentType[$shippingData->payment_method_id];
+                    $data['bidStatus'] = ($shippingData->quote_status == 1) ? 'Accepted' : 'Pending';
+                    
                     $shippingDetail = DB::table($shippingData->table_name)->where('shipping_id',$shippingId)->first();
                      if($shippingData->table_name == 'shipment_listing_homes'){
                          $data['residenceType'] = $shippingDetail->residence_type;
                          $data['no_ofRooms'] = $shippingDetail->no_of_room;
                          $data['deliveryTitle'] = $shippingDetail->delivery_title;
-                         $data['dining_room'] = (empty($shippingDetail->dining_room)) ? 'N/A' : ShippingDetail::getDineInData($shippingDetail->dining_room, 'admin_dinning_rooms');
-                         $data['living_room'] = (empty($shippingDetail->living_room)) ? 'N/A' : ShippingDetail::getDineInData($shippingDetail->living_room, 'admin_living_rooms');
-                         $data['kitchen'] = (empty($shippingDetail->kitchen)) ? 'N/A' : ShippingDetail::getDineInData($shippingDetail->kitchen, 'admin_kitchens');
-                         $data['home_office'] = (empty($shippingDetail->home_office)) ? 'N/A' : ShippingDetail::getDineInData($shippingDetail->home_office, 'admin_home_offices');
-                         $data['garage'] = (empty($shippingDetail->garage)) ? 'N/A' : ShippingDetail::getDineInData($shippingDetail->garage, 'admin_garages');
-                         $data['living_room'] = (empty($shippingDetail->outdoor)) ? 'N/A' : ShippingDetail::getDineInData($shippingDetail->outdoor, 'admin_outdoors');
-                         $data['miscellaneous'] = (empty($shippingDetail->miscellaneous)) ? 'N/A' : ShippingDetail::getDineInData($shippingDetail->miscellaneous, 'admin_miscellaneouses');
+                         $data['dining_room'] = (empty($shippingDetail->dining_room) || $shippingDetail->dining_room == 'null') ? 'N/A' : ShippingDetail::getDineInData($shippingDetail->dining_room, 'admin_dinning_rooms');
+                         $data['living_room'] = (empty($shippingDetail->living_room) || $shippingDetail->living_room == 'null') ? 'N/A' : ShippingDetail::getDineInData($shippingDetail->living_room, 'admin_living_rooms');
+                         $data['kitchen'] = (empty($shippingDetail->kitchen) || $shippingDetail->kitchen == 'null') ? 'N/A' : ShippingDetail::getDineInData($shippingDetail->kitchen, 'admin_kitchens');
+                         $data['home_office'] = (empty($shippingDetail->home_office) || $shippingDetail->home_office == 'null') ? 'N/A' : ShippingDetail::getDineInData($shippingDetail->home_office, 'admin_home_offices');
+                         $data['garage'] = (empty($shippingDetail->garage) || $shippingDetail->garage == 'null') ? 'N/A' : ShippingDetail::getDineInData($shippingDetail->garage, 'admin_garages');
+                         $data['living_room'] = (empty($shippingDetail->outdoor) || $shippingDetail->outdoor == 'null') ? 'N/A' : ShippingDetail::getDineInData($shippingDetail->outdoor, 'admin_outdoors');
+                         $data['miscellaneous'] = (empty($shippingDetail->miscellaneous) || $shippingDetail->miscellaneous == 'null') ? 'N/A' : ShippingDetail::getDineInData($shippingDetail->miscellaneous, 'admin_miscellaneouses');
                          $data['itemImage'] = $shippingDetail->item_image;
                          $data['additionalDetail'] = $shippingDetail->item_detail;
                      }
@@ -2089,9 +2115,9 @@ class AndroidController extends AppController
                          $data['deliveryFloor'] = $shippingDetail->delivery_floor;
                          $data['deliveryTitle'] = $shippingDetail->delivery_title;
                          $data['liftElevator'] = ($shippingDetail->lift_elevator == 0) ? 'No' : 'Yes';
-                         $data['general'] = (empty($shippingDetail->general_shipment_inventory)) ? 'N/A' : ShippingDetail::getDineInData($shippingDetail->general_shipment_inventory, 'admin_general_shipments');
-                         $data['equipment'] = (empty($shippingDetail->equipment_shipment_inventory)) ? 'N/A' : ShippingDetail::getDineInData($shippingDetail->equipment_shipment_inventory, 'admin_equipments');
-                         $data['boxes'] = (empty($shippingDetail->boxes)) ? 'N/A' : ShippingDetail::getDineInData($shippingDetail->boxes, 'admin_boxes');
+                         $data['general'] = (empty($shippingDetail->general_shipment_inventory) || $shippingDetail->general_shipment_inventory == 'null') ? 'N/A' : ShippingDetail::getDineInData($shippingDetail->general_shipment_inventory, 'admin_general_shipments');
+                         $data['equipment'] = (empty($shippingDetail->equipment_shipment_inventory) || $shippingDetail->equipment_shipment_inventory == 'null') ? 'N/A' : ShippingDetail::getDineInData($shippingDetail->equipment_shipment_inventory, 'admin_equipments');
+                         $data['boxes'] = (empty($shippingDetail->boxes) || $shippingDetail->boxes == 'null') ? 'N/A' : ShippingDetail::getDineInData($shippingDetail->boxes, 'admin_miscellaneouses');
                          $data['itemImage'] = $shippingDetail->item_image;
                          $data['additionalDetail'] = $shippingDetail->item_detail;
                      }
@@ -2107,6 +2133,7 @@ class AndroidController extends AppController
                          $data['material'] = (empty($shippingDetail->material_id)) ? 'N/A' : ShippingDetail::getCategoryName($shippingDetail->material_id, 'id', 'name','materials');
                          $data['deliveryTitle'] = $shippingDetail->delivery_title;
                          $data['itemImage'] = $shippingDetail->item_image;
+                         $data['additionalDetail'] = $shippingDetail->remarks;
                      }
                      else if($shippingData->table_name == 'shipment_listing_vehicle_shifings'){                        
                          $data['deliveryTitle'] = $shippingDetail->delivery_title;
@@ -2117,7 +2144,7 @@ class AndroidController extends AppController
                          $data['deliveryTitle'] = $shippingDetail->delivery_title;
                          $data['itemImage'] = $shippingDetail->item_image;
                          $data['weight'] = $shippingDetail->weight;
-                         $data['remarks'] = $shippingDetail->remarks;
+                         $data['additionalDetail'] = $shippingDetail->remarks;
                      }
                         $msg['responseCode'] = "200";
                         $msg['responseMessage'] = "Information get successfully"; 
@@ -2210,7 +2237,7 @@ class AndroidController extends AppController
             $quotation = $_POST['quotation'];
             $minimumBid = $_POST['minimumBid'];            
             $quotationId = $_POST['quotationId'];  
-            $required = array('shippingId','userId','quotation','minimumBid');
+            $required = array('shippingId','userId','quotation');
             
             $error = false;
             foreach($required as $field) {
@@ -2236,6 +2263,7 @@ class AndroidController extends AppController
                         $quote->quote_status = 0;
                         $quote->save();
                         $quotationId= $quote->id;
+                        
                     }else{
                         ShippingQuote::where('id',$quotationId)
                                 ->update([
@@ -2247,17 +2275,21 @@ class AndroidController extends AppController
                     $offerNotification = ShippingDetail::select('u.device_token','u.first_name','u.last_name')
                                     ->leftJoin('users as u','u.id','=','shipping_details.user_id')
                                     ->where('shipping_details.id',$shippingId)->first();
-
+                    $message=array();
+                    $currentTime = strtotime(date("Y-m-d H:i:s"));
+                    $message['data']=json_encode(array('quoteId' => $quotationId, 'title'=>'Get Offer', 'type'=>'Get Offer', 'message'=>'A new Quotation has arrived on your post from Haulitps.', 'is_background'=>'true', 'payload'=>'dataPayload', 'imageUrl'=>'', 'timestamp'=>$currentTime));
                     $push = new PushNotification('fcm');
                     $response =  $push->setMessage([
                             'notification' => [
-                                    'title'=>'Get Offer',
+                                   'title'=>'Get Offer',
                                     'body'=>'A new Quotation has arrived on your post from Haulitps.',
                                     'sound' => 'default'
-                                    ]
+                            ],
+                            'data'=>$message
                             ])                            
                          ->setDevicesToken($offerNotification->device_token)
                          ->send();
+                    echo'<pre>'; print_r($response); die;
 
                     $msg['responseCode'] = "200";
                     $msg['responseMessage'] = "Quotation post successfully";
@@ -2353,7 +2385,7 @@ class AndroidController extends AppController
                 $msg['responseCode'] = "0";
                 $msg['responseMessage'] = "$fieldName required.";
             }else{
-                $offerData = ShippingQuote::select('shipping_quotes.shipping_id','shipping_quotes.quote_status','sd.order_id','sd.category_id','sd.subcategory_id','sd.order_id','sd.table_name','sd.created_at','u.first_name','u.last_name','u.email','spd.pickup_date','spd.pickup_address','sdd.delivery_address')
+                $offerData = ShippingQuote::select('shipping_quotes.shipping_id','shipping_quotes.quote_status','sd.order_id','sd.category_id','sd.subcategory_id','sd.order_id','sd.table_name','sd.created_at','u.first_name','u.last_name','u.email','u.mobile_number','spd.pickup_date','spd.pickup_address','sdd.delivery_address')
                             ->leftJoin('shipping_details as sd','sd.id','=','shipping_quotes.shipping_id')
                             ->leftJoin('users as u','u.id','=','sd.user_id')
                             ->leftJoin('shipping_pickup_details as spd','spd.shipping_id','=','shipping_quotes.shipping_id')
@@ -2369,6 +2401,7 @@ class AndroidController extends AppController
 
                      $offerDetails['customer'] = $offerData->first_name. ' '.$offerData->last_name;
                      $offerDetails['email'] = $offerData->email;
+                     $offerDetails['mobileNumber'] = $offerData->mobile_number;
                      $offerDetails['validTill'] = date('d-m-Y', strtotime($offerData->pickup_date));
                      $offerDetails['developed'] = date('d-m-Y', strtotime($offerData->created_at));
                      $offerDetails['status'] = $status[$offerData->quote_status];
@@ -2573,7 +2606,7 @@ class AndroidController extends AppController
                 $acceptBid = ShippingQuote::where('id',$quoteId)->update(['quote_status'=>1]);
                 
                 #Accept offer Notification
-                $carrierData = ShippingQuote::select('u.device_token','u.first_name','u.last_name')
+                $carrierData = ShippingQuote::select('u.device_token','u.mobile_number','u.first_name','u.last_name')
                                 ->leftJoin('users as u','u.id','=','shipping_quotes.carrier_id')
                                 ->where('shipping_quotes.id',$quoteId)->first();
                 
@@ -2586,7 +2619,11 @@ class AndroidController extends AppController
                                 ]
                         ])                            
                      ->setDevicesToken($carrierData->device_token)
+                     //->setDevicesToken('ffHkTtZCMBI:APA91bFty3aqRWwZYg3DMfPjMSfmXDr6B4ZFse4OTlSJy8goIWfvpC8Kf2xVjI1wRKO21xOPUDz7-YloW5wAYOhVWqcwr3yQ33pP9_53oOowfYpXjNgKSW3HhTiYRYc8cJOdGvb9dKjd')
                      ->send();
+                
+                $smsObj = new Smsapi();
+                $smsObj->sendsms_api('+91'.$carrierData->mobile_number,'Your Offer has been accepted by the '.$carrierData->first_name.' '.$carrierData->last_name);        
                 
                 #Reject offer Notification
                 $rejectUsers = ShippingQuote::select('u.device_token','u.first_name','u.last_name')
@@ -2649,7 +2686,7 @@ class AndroidController extends AppController
                 
                 $rejectOffer = ShippingQuote::where('id',$quoteId)->update(['quote_status'=>2]);
                 
-                $carrierData = ShippingQuote::select('u.device_token','u.first_name','u.last_name')
+                $carrierData = ShippingQuote::select('u.device_token','u.mobile_number','u.first_name','u.last_name')
                                 ->leftJoin('users as u','u.id','=','shipping_quotes.carrier_id')
                                 ->where('shipping_quotes.id',$quoteId)->first();
                 
@@ -2663,7 +2700,9 @@ class AndroidController extends AppController
                         ])                            
                      ->setDevicesToken($carrierData->device_token)
                      ->send();
-                
+                 $smsObj = new Smsapi();
+                 $smsObj->sendsms_api('+91'.$carrierData->mobile_number,'Your Offer has been rejected by the '.$carrierData->first_name.' '.$carrierData->last_name);        
+               
                 
                 if($rejectOffer){                                        
                   $msg['responseCode'] = "200";
@@ -2919,7 +2958,7 @@ class AndroidController extends AppController
                 $msg['responseMessage'] = "$fieldName required.";
             }else{
                 
-                ShippingDetail::where('id',$shippingId)->update(['status'=>0]);
+                ShippingDetail::where('id',$shippingId)->update(['status'=>2]);
                                                      
                   $msg['responseCode'] = "200";
                   $msg['responseMessage'] = "Shipment Successfully deleted.";
@@ -3229,5 +3268,19 @@ class AndroidController extends AppController
             echo $result;
         }
     }
+    
+    public function conjob(){
+        $shipmentDetail = ShippingDetail::select('table_name','id')->where('status', 0)->get();
+        
+        if($shipmentDetail){
+            foreach($shipmentDetail as $detail){
+                $deleteData = DB::table($detail->table_name)->where('shipping_id',$detail->id)->delete();
+                $pickData = DB::table('shipping_pickup_details')->where('shipping_id',$detail->id)->delete();
+                $deliverData = DB::table('shipping_delivery_details')->where('shipping_id',$detail->id)->delete();
+            }
+            $shipmentDetail = ShippingDetail::select('table_name','id')->where('status', 0)->delete();
+        }
+    }
+    
 }
     
