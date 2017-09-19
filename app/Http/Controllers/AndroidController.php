@@ -1384,12 +1384,25 @@ class AndroidController extends AppController
                        $carrierType = array('2','3');
                    }
                    
+                   #Send notification to Partners for new delivery
                    $notificationData = User::whereIn('carrier_type_id',$carrierType)->where('user_type_id',2)->select('device_token')->get();
+                   
+                   $message=array();
+                    $currentTime = strtotime(date("Y-m-d H:i:s"));
+                    $message['data']=json_encode(array('shippingId' => $shippingId,
+                                                        'title'=>'New Delivery', 
+                                                        'type'=>'New Delivery', 
+                                                        'message'=>'A new Shipment has arrived for delivery from Haulitps.', 
+                                                        'is_background'=>'true',
+                                                        'payload'=>'dataPayload', 
+                                                        'imageUrl'=>'', 
+                                                        'timestamp'=>$currentTime));
+                   
                    foreach($notificationData as $nData){
                        $push = new PushNotification('fcm');
                         $response =  $push->setMessage([
                                 'notification' => [
-                                        'title'=>'Shipment Post',
+                                        'title'=>'New Delivery',
                                         'body'=>'A new Shipment has arrived for delivery from Haulitps.',
                                         'sound' => 'default'
                                         ]
@@ -2271,7 +2284,8 @@ class AndroidController extends AppController
                                         'lowest_quote_price'=>$minimumBid
                                     ]);
                     }
-
+                    
+                    #Send notification to User for new quotation
                     $offerNotification = ShippingDetail::select('u.device_token','u.first_name','u.last_name')
                                     ->leftJoin('users as u','u.id','=','shipping_details.user_id')
                                     ->where('shipping_details.id',$shippingId)->first();
@@ -2289,7 +2303,38 @@ class AndroidController extends AppController
                             ])                            
                          ->setDevicesToken($offerNotification->device_token)
                          ->send();
-                    echo'<pre>'; print_r($response); die;
+                    
+                    #Send notifications to partner for minimum bid information
+                    $maximumQuotes = ShippingQuote::select('shipping_quotes.id','u.device_token')
+                                                 ->leftJoin('users as u','u.id','=','shipping_quotes.carrier_id')
+                                                 ->where('shipping_quotes.shipping_id',$shippingId)
+                                                 ->where('shipping_quotes.quote_price', '>', $quotation)->get();
+                    
+                    foreach($maximumQuotes as $maximumQuote){
+                        $message=array();
+                        $message['data']=json_encode(array('quoteId' => $maximumQuote->id, 
+                                                            'shippingId' => $shippingId,
+                                                            'title'=>'Minimum Bid', 
+                                                            'type'=>'Minimum Bid', 
+                                                            'message'=>'A minimum Quotation has arrived against your quotation.', 
+                                                            'is_background'=>'true',
+                                                            'payload'=>'dataPayload', 
+                                                            'imageUrl'=>'', 
+                                                            'timestamp'=>$currentTime));
+                        
+                        $push = new PushNotification('fcm');
+                        $response =  $push->setMessage([
+                            'notification' => [
+                                   'title'=>'Minimum Bid',
+                                    'body'=>'A minimum Quotation has arrived against your quotation.',
+                                    'sound' => 'default'
+                            ],
+                            'data'=>$message
+                            ])                            
+                         ->setDevicesToken($maximumQuote->device_token)
+                         ->send();
+                    }
+                    
 
                     $msg['responseCode'] = "200";
                     $msg['responseMessage'] = "Quotation post successfully";
@@ -2609,14 +2654,25 @@ class AndroidController extends AppController
                 $carrierData = ShippingQuote::select('u.device_token','u.mobile_number','u.first_name','u.last_name')
                                 ->leftJoin('users as u','u.id','=','shipping_quotes.carrier_id')
                                 ->where('shipping_quotes.id',$quoteId)->first();
-                
+                $message=array();
+                $currentTime = strtotime(date("Y-m-d H:i:s"));
+                $message['data']=json_encode(array('quoteId' => $quoteId,
+                                                    'shippingId' => $shippingId,
+                                                    'title'=>'Offer Accepted', 
+                                                    'type'=>'Accept Offer', 
+                                                    'message'=>'Your Offer has been accepted by the '.$carrierData->first_name.' '.$carrierData->last_name, 
+                                                    'is_background'=>'true',
+                                                    'payload'=>'dataPayload', 
+                                                    'imageUrl'=>'', 
+                                                    'timestamp'=>$currentTime));
                 $push = new PushNotification('fcm');
                 $response =  $push->setMessage([
                         'notification' => [
-                                'title'=>'Accept your Offer',
+                                'title'=>'Offer Accepted',
                                 'body'=>'Your Offer has been accepted by the '.$carrierData->first_name.' '.$carrierData->last_name,
                                 'sound' => 'default'
-                                ]
+                                ],
+                        'data'=>$message
                         ])                            
                      ->setDevicesToken($carrierData->device_token)
                      //->setDevicesToken('ffHkTtZCMBI:APA91bFty3aqRWwZYg3DMfPjMSfmXDr6B4ZFse4OTlSJy8goIWfvpC8Kf2xVjI1wRKO21xOPUDz7-YloW5wAYOhVWqcwr3yQ33pP9_53oOowfYpXjNgKSW3HhTiYRYc8cJOdGvb9dKjd')
@@ -2630,14 +2686,25 @@ class AndroidController extends AppController
                                 ->leftJoin('users as u','u.id','=','shipping_quotes.carrier_id')
                                 ->where('shipping_quotes.shipping_id',$shippingId)
                                 ->where('shipping_quotes.id','!=',$quoteId)->get();
+                    $message=array();
+                    $message['data']=json_encode(array('quoteId' => $quoteId,
+                                                        'shippingId' => $shippingId,
+                                                        'title'=>'Offer Rejected', 
+                                                        'type'=>'Reject Offer', 
+                                                        'message'=>'Your Offer has been rejected by the '.$rejectData->first_name.' '.$rejectData->last_name, 
+                                                        'is_background'=>'true',
+                                                        'payload'=>'dataPayload', 
+                                                        'imageUrl'=>'', 
+                                                        'timestamp'=>$currentTime));
                 
                 foreach($rejectUsers as $rejectData){
                     $response =  $push->setMessage([
                         'notification' => [
-                                'title'=>'Reject your Offer',
+                                'title'=>'Offer Rejected',
                                 'body'=>'Your Offer has been rejected by the '.$rejectData->first_name.' '.$rejectData->last_name,
                                 'sound' => 'default'
-                                ]
+                                ],
+                        'data'=>$message
                         ])                            
                      ->setDevicesToken($rejectData->device_token)
                      ->send();
@@ -2690,13 +2757,25 @@ class AndroidController extends AppController
                                 ->leftJoin('users as u','u.id','=','shipping_quotes.carrier_id')
                                 ->where('shipping_quotes.id',$quoteId)->first();
                 
+                $message=array();
+                $currentTime = strtotime(date("Y-m-d H:i:s"));
+                $message['data']=json_encode(array('quoteId' => $quoteId,
+                                                    'title'=>'Offer Accepted', 
+                                                    'type'=>'Accept Offer', 
+                                                    'message'=>'Your Offer has been rejected by the '.$carrierData->first_name.' '.$carrierData->last_name, 
+                                                    'is_background'=>'true',
+                                                    'payload'=>'dataPayload', 
+                                                    'imageUrl'=>'', 
+                                                    'timestamp'=>$currentTime));
+                
                 $push = new PushNotification('fcm');
                 $response =  $push->setMessage([
                         'notification' => [
                                 'title'=>'Accept your Offer',
                                 'body'=>'Your Offer has been rejected by the '.$carrierData->first_name.' '.$carrierData->last_name,
                                 'sound' => 'default'
-                                ]
+                                ],
+                        'data'=>$message
                         ])                            
                      ->setDevicesToken($carrierData->device_token)
                      ->send();
@@ -2805,6 +2884,35 @@ class AndroidController extends AppController
                 $ques->question = $question;
                 $ques->status =1;
                 $ques->save();
+                $questionId = $ques->id;
+                
+                # Send notification to user for the question asked by partner
+                $offerNotification = ShippingDetail::select('u.device_token')
+                                    ->leftJoin('users as u','u.id','=','shipping_details.user_id')
+                                    ->where('shipping_details.id',$shippingId)->first();                
+                
+                $message=array();
+                $currentTime = strtotime(date("Y-m-d H:i:s"));
+                $message['data']=json_encode(array('shippingId' => $shippingId,
+                                                    'questionId' => $questionId,
+                                                    'title'=>'New Question', 
+                                                    'type'=>'New Question', 
+                                                    'message'=>'A new Question has arrived on your post from Haulitps.', 
+                                                    'is_background'=>'true', 
+                                                    'payload'=>'dataPayload',
+                                                    'imageUrl'=>'', 
+                                                    'timestamp'=>$currentTime));
+                $push = new PushNotification('fcm');
+                $response =  $push->setMessage([
+                        'notification' => [
+                               'title'=>'New Question',
+                                'body'=>'A new Question has arrived on your post from Haulitps.',
+                                'sound' => 'default'
+                        ],
+                        'data'=>$message
+                        ])                            
+                     ->setDevicesToken($offerNotification->device_token)
+                     ->send();
                 
                 if($masterQuesId){                                        
                   $msg['responseCode'] = "200";
@@ -2856,6 +2964,35 @@ class AndroidController extends AppController
                 $data->save();
                 
                 $answerId = $data->id;
+                
+                # Send notification to Partner for the answer of his question
+                $offerNotification = TblQuesMaster::select('u.device_token', 'sd.id' ,'u.first_name','u.last_name')
+                                    ->leftJoin('users as u','u.id','=','sd.user_id')
+                                    ->leftJoin('shipping_details as sd','sd.id','=','tbl_ques_masters.shipping_id')
+                                    ->where('tbl_ques_masters.id',$qmId)->first();                
+                
+                $message=array();
+                $currentTime = strtotime(date("Y-m-d H:i:s"));
+                $message['data']=json_encode(array('shippingId' => $offerNotification->id,
+                                                    'questionId' => $quesId,
+                                                    'title'=>'Get Answer', 
+                                                    'type'=>'Get Answer', 
+                                                    'message'=>$offerNotification->first_name.' '.$offerNotification->last_name.' Answered for your question.', 
+                                                    'is_background'=>'true', 
+                                                    'payload'=>'dataPayload',
+                                                    'imageUrl'=>'', 
+                                                    'timestamp'=>$currentTime));
+                $push = new PushNotification('fcm');
+                $response =  $push->setMessage([
+                        'notification' => [
+                               'title'=>'Get Answer',
+                                'body'=> $offerNotification->first_name.' '.$offerNotification->last_name.' Answered for your question.',
+                                'sound' => 'default'
+                        ],
+                        'data'=>$message
+                        ])                            
+                     ->setDevicesToken($offerNotification->device_token)
+                     ->send();                
                 
                 if($answerId){                                        
                   $msg['responseCode'] = "200";
