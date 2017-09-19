@@ -30,10 +30,10 @@ use Helper;
 
 class UserController extends FrontController
 {
+
     public function profile(){
       $data['user'] = Auth::User();
       $data['user_detail'] = UserDetail::where('user_id', Auth::User()->id)->first();
-      return Helper::setDefaultImage('uploads/user/', 'user_icon.pn');
       return view('user.profile', $data);
     }
 
@@ -65,6 +65,8 @@ class UserController extends FrontController
     }
 
     public function myDeliveries($status){
+      if(Auth::user()->user_type_id <> 3 || !Auth::check()) return redirect('/');
+
       $sts_arr = array("active" => "1", "deleted" => "2");
       $sts_label_arr = array("all-status" => "All Status", "active" => "Active", "deleted" => "Deleted", "delivered" => "Delivered");
       $data['st_label'] = $sts_label_arr[$status];
@@ -92,6 +94,8 @@ class UserController extends FrontController
     }
     
     public function deliveryDetail($id){
+      if(Auth::user()->user_type_id <> 3 || !Auth::check()) return redirect('/');
+
       $shipmentDetail = ShippingDetail::select('shipping_details.id', 'shipping_details.payments_status', 'shipping_details.status', 'shipping_details.table_name', 'shipping_price as price','shipping_details.created_at as published', 'spd.pickup_address', 'spd.pickup_date','sdd.delivery_address', 'sdd.delivery_date', 'pm.method as paymnentType', 'vcat.category_name', 'vscat.category_name as subcat_name')
                   ->leftJoin('shipping_pickup_details as spd','spd.shipping_id','=','shipping_details.id')
                   ->leftJoin('shipping_delivery_details as sdd','sdd.shipping_id','=','shipping_details.id')
@@ -117,6 +121,8 @@ class UserController extends FrontController
     }
 
     public function deliveryDelete($id){
+      if(Auth::user()->user_type_id <> 3 || !Auth::check()) return redirect('/');
+
       $shipping_detail = ShippingDetail::where('id', $id)
                                   ->where('user_id', Auth::User()->id);
       if($shipping_detail->count()) $shipping_detail->update(['status' => 2]);
@@ -124,6 +130,8 @@ class UserController extends FrontController
     }
 
     public function allQuotation($id){
+      if(Auth::user()->user_type_id <> 3 || !Auth::check()) return redirect('/');
+
       $data = array();
       // check shipping id belongs to logged in user
       if(!ShippingDetail::isShippingIdBelongsToLoggedInUser($id, Auth::User()->id))
@@ -148,6 +156,8 @@ class UserController extends FrontController
     }
 
     public function quotationDetail($quoteId){
+      if(Auth::user()->user_type_id <> 3 || !Auth::check()) return redirect('/');
+
       $data = array();
       $offerData = ShippingQuote::select('shipping_quotes.quote_status','sd.created_at','sd.id as shippingId','spd.pickup_date','shipping_quotes.quote_price')
                   ->leftJoin('shipping_details as sd','sd.id','=','shipping_quotes.shipping_id')
@@ -171,6 +181,8 @@ class UserController extends FrontController
     }
 
     public function quotationStatusChange(Request $request, $quot_id){
+      if(Auth::user()->user_type_id <> 3 || !Auth::check()) return redirect('/');
+
       $shipping_quote = ShippingQuote::where('id', $quot_id);
       
       // check shipping id belongs to logged in user
@@ -232,6 +244,8 @@ class UserController extends FrontController
     }
 
     public function relistShipment(Request $request, $shipping_id){
+      if(Auth::user()->user_type_id <> 3 || !Auth::check()) return redirect('/');
+
       // check shipping id belongs to logged in user
       if(!ShippingDetail::isShippingIdBelongsToLoggedInUser($shipping_id, Auth::User()->id))
         return redirect('user/home');
@@ -283,6 +297,8 @@ class UserController extends FrontController
 
     // Get Bank Info
     public function bankInformation(){
+      if((Auth::user()->user_type_id <> 3 && Auth::user()->user_type_id <> 2)  || !Auth::check()) return redirect('/');
+
       $data['bank_infos'] = PayInfo::where('user_id', Auth::User()->id)
                                       ->orderBy('id', 'desc')->get();
       return view('user.bank-information', $data);
@@ -290,6 +306,8 @@ class UserController extends FrontController
 
     // Delete bank info with 
     public function bankInformationDelete(Request $request, $bank_info_id){
+      if((Auth::user()->user_type_id <> 3 && Auth::user()->user_type_id <> 2)  || !Auth::check()) return redirect('/');
+
       $bank_info = PayInfo::where('user_id', Auth::User()->id)
                             ->where('id', $bank_info_id);
       if($bank_info->delete()){
@@ -304,6 +322,8 @@ class UserController extends FrontController
     }
 
     public function bankInformationAdd(Request $request){
+      if((Auth::user()->user_type_id <> 3 && Auth::user()->user_type_id <> 2)  || !Auth::check()) return redirect('/');
+
       if($request->isMethod('post')){
         $this->validate($request, [
             'name' => 'required|max:100',
@@ -334,10 +354,11 @@ class UserController extends FrontController
 
     // Profile edit
     public function profileEdit(Request $request){
+      if((Auth::user()->user_type_id <> 3 && Auth::user()->user_type_id <> 2)  || !Auth::check()) return redirect('/');
+
       $rules = array (
         'first_name' => 'required|max:200',
         'last_name' => 'required|max:200',
-        'mobile_number' => 'required|numeric',
         'street' => 'required',
         'city' => 'required',
         'location' => 'required',
@@ -351,7 +372,6 @@ class UserController extends FrontController
           $user = User::find(Auth::User()->id);
           $user->first_name = $request->get('first_name');
           $user->last_name = $request->get('last_name');
-          $user->mobile_number = $request->get('mobile_number');
 
           $user_detail_updt = UserDetail::where('user_id', Auth::User()->id)
                               ->update([
@@ -377,12 +397,44 @@ class UserController extends FrontController
     }
 
     public function getTransactionHistory(){
+      if((Auth::user()->user_type_id <> 3 && Auth::user()->user_type_id <> 2)  || !Auth::check()) return redirect('/');
+
       $data['transaction_history'] = ShippingDetail::select('shipping_details.id', 'shipping_details.order_id', 'shipping_details.table_name','pd.created_at','pd.amount','pd.status')                            
                                     ->Join('payment_details as pd','pd.shipping_id','=','shipping_details.id')
                                     ->where('shipping_details.user_id', Auth::User()->id)->get();
       return view('user.transactionhistory', $data);
     }
 
+    public function myOffer(){
+      if(Auth::user()->user_type_id <> 2  || !Auth::check()) return redirect('/');
+
+      $offerData = ShippingQuote::select('shipping_quotes.id','shipping_quotes.shipping_id','shipping_quotes.quote_status','shipping_quotes.quote_price','sd.table_name','sd.subcategory_id','sd.category_id')
+                            ->leftJoin('shipping_details as sd','sd.id','=','shipping_quotes.shipping_id')
+                            ->where('shipping_quotes.carrier_id', Auth::User()->id)->get();
+                
+      if(count($offerData) > 0){
+        foreach($offerData as $key=>$offer){ 
+           $shippingId = $offer->shipping_id;
+           $shippingData = DB::table($offer->table_name)->select('delivery_title','item_image')->where('shipping_id', $shippingId)->first();
+
+           $image = explode(',', $shippingData->item_image);
+           $status = array("Pending", "Accepted", "Rejected");
+
+           $offerData[$key]->quoteId = $offer->id;
+           $offerData[$key]->shippingId = $shippingId;
+           $offerData[$key]->title = $shippingData->delivery_title;
+           $offerData[$key]->image = Helper::setDefaultImage('public/uploads/userimages/', $image[0], 'n');
+           $offerData[$key]->category = (empty($offer->category_id)) ? 'N/A' : ShippingDetail::getCategoryName($offer->category_id, 'id', 'category_name','vehicle_categories');
+           $offerData[$key]->subcategory = (empty($offer->subcategory_id)) ? 'N/A' : ShippingDetail::getCategoryName($offer->subcategory_id, 'id', 'category_name','vehicle_categories');
+           $offerData[$key]->status = $status[$offer->quote_status];
+           $offerData[$key]->quotePrice = $offer->quote_price;
+        }
+      }
+
+      $data['offers'] = $offerData;
+
+      return view('user.my-offer', $data);
+    }
 
     private function getLatLong($address){
         $url = "http://maps.google.com/maps/api/geocode/json?address=".urlencode($address)."&sensor=false";

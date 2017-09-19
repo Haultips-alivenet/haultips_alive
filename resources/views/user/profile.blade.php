@@ -54,7 +54,7 @@
                     <div class="col-md-8">
                         <div class="_me_dis">{{ $user->country_code }}-<span id="mobile_number_spn">{{ $user->mobile_number }}</span></div>
                         <div class="_me_input">
-                            {!! Form::text('mobile_number', $user->mobile_number, array('class'=>'form-control', 'id'=>'mobile_number')) !!}
+                            <span class="form-control">{{ $user->country_code . '-' . $user->mobile_number }}</span>
                         </div>
                     </div>
                 </div>
@@ -208,7 +208,8 @@ $(document).ready(function() {
             success: function(msg) {
                 var alertmsg = '';
                 if(msg.id > 0){
-                    var fields = ['first_name', "last_name", "mobile_number", "street", "city", "location", "pincode", "pincode", "country"];
+                    $('.usrnm').html(msg.first_name + ' ' +  msg.last_name);
+                    var fields = ['first_name', "last_name", "street", "city", "location", "pincode", "pincode", "country"];
                     fields.forEach(function(field) {
                         $('#' + field + '_spn').html(msg[field]);
                     });

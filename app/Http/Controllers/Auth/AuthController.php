@@ -3,11 +3,13 @@
 namespace App\Http\Controllers\Auth;
 
 use App\User;
+use App\UserDetail;
 use Validator;
 use App\Http\Controllers\Controller;
 use Illuminate\Foundation\Auth\ThrottlesLogins;
 use Illuminate\Foundation\Auth\AuthenticatesAndRegistersUsers;
 use Session;
+
 
 class AuthController extends Controller
 {
@@ -29,7 +31,8 @@ class AuthController extends Controller
     protected $redirectAfterLogout = 'admin/login';
     
     public function authenticated($request , $user){
-        
+        $user_detail = UserDetail::select('image')->where('user_id', $user->id)->first();
+        $request->session()->put('userimage', $user_detail->image);
         $getoffer=$request->session()->get('check_getofferpage');
         if($getoffer=="") {
             if($user->user_type_id=='1'){            

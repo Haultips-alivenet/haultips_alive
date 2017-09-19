@@ -62,20 +62,11 @@
             </div>
             <!-- Collect the nav links, forms, and other content for toggling -->
             <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-                <ul class="nav navbar-nav navbar-left">
-                    <li>
-                        <a href="#about">How to works</a>
-                    </li>
-                    <li>
-                        <a href="#services">Deliveries</a>
-                    </li>
-                    
-                </ul>
-
+                
                 <ul class="nav navbar-nav navbar-right">
-                    <?php $tempArr = Session::get('currentUser'); ?>
+                    <?php $tempArr = Session::get('currentUser');?>
                     <li class="pro_im">
-                        <a href="#"><span><img src="{{asset('public/user/img/sign-up-icon.png')}}" alt=""></span>{{$tempArr["first_name"]." ".$tempArr["last_name"]}}</a>
+                        <a href="#"><span><img src="{{ Helper::setDefaultImage($path = 'user/img/', $file = Session::get('userimage'), $type = 'u') }}" alt=""></span><span class="usrnm">{{$tempArr["first_name"]." ".$tempArr["last_name"]}}</span></a>
                     </li>
                     <li>
                         <a href="JavaScript:void(0);" id="menu-toggle" class="toggle" ><img src="{{asset('public/user/img/nav-menu.png')}}"></a>
@@ -96,8 +87,14 @@
         <div class="row">
            <div class="col-md-4">
             <div class="_dash_lft _dash_m">
+                <div class="_d_mg">
+                    <img src="{{ Helper::setDefaultImage($path = 'user/img/', $file = Session::get('userimage'), $type = 'u') }}" alt="">
+                </div>
+                <h4 class="text-center"><a href="#" class="usrnm">{{$tempArr["first_name"]." ".$tempArr["last_name"]}}</a></h4>
+                <div class="clearfix"></div>
+
                 <ul>
-                   <li><a href="{{url('user/home')}}"><span><i class="fa fa-tachometer"></i></span>Dashboard</a></li>
+                @if(Auth::user()->user_type_id == 3)
                    <li class="toggle"><a href="javascript:void();" onclick="toggle(1);">
                        <span><i class="fa fa-check-square" aria-hidden="true"></i></span>My Deliveries <span class="pull-right"><i class="fa fa-angle-down" aria-hidden="true"></i></span></a>
                         <ul class="ulist1">
@@ -106,8 +103,13 @@
                             <li><a href="{{ url('user/my-deliveries/delivered') }}">Delivered</a></li>
                             <li><a href="{{ url('user/my-deliveries/deleted') }}">Deleted</a></li>
                         </ul>
-
                     </li>
+                @endif
+
+                @if(Auth::user()->user_type_id == 2)
+                    <li><a href="{{ url('user/my-offers') }}"><span><i class="fa fa-university" aria-hidden="true"></i></span>My Offers</a></li>
+                @endif
+
                     <li><a href="{{ url('user/bank-infomation') }}"><span><i class="fa fa-university" aria-hidden="true"></i></span>Bank Information</a></li>
                     <li><a href="{{url('user/transactionhistory')}}"><span><i class="fa fa-credit-card" aria-hidden="true"></i></span>Transaction History</a></li>
                     <li class="toggle"><a href="javascript:void();" onclick="toggle(2);"><span><i class="fa fa-cog" aria-hidden="true"></i></span>Setting <span class="pull-right"><i class="fa fa-angle-down" aria-hidden="true"></i></span></a>

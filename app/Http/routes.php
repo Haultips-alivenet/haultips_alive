@@ -14,7 +14,6 @@ Route::get('/', 'Front\UserHomeController@index');
 Route::resource('user/dashboard', 'Front\UserHomeController@index');
 Route::resource('user/home', 'Front\UserHomeController@userdashboard');
 Route::resource('user/faq', 'Front\UserHomeController@faq');
-Route::resource('user/notification', 'Front\UserHomeController@notification');
 Route::get('getquesAns', 'Front\UserHomeController@getquesAns');
 
 // User login panel 
@@ -36,6 +35,10 @@ Route::get('user/bank-infomation/add', 'Front\UserController@bankInformationAdd'
 Route::post('user/bank-infomation/add', 'Front\UserController@bankInformationAdd');
 Route::get('user/transactionhistory', 'Front\UserController@getTransactionHistory');
 // User login panel end
+
+// Partner login panel
+Route::get('user/my-offers', 'Front\UserController@myOffer');
+// 
 
 #User
 

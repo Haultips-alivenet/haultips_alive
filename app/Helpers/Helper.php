@@ -6,7 +6,7 @@ class Helper
 {
     public static function setDefaultImage($path = '', $file = '', $type = 'n'){
         $filename = public_path($path . $file);
-        $type_arr = array('n' => 'not-available.jpeg', 'u' => 'user_icon.png');
+        $type_arr = array('n' => 'not-available.jpg', 'u' => 'customer_img.png');
         if (file_exists($filename) && !empty($file))
             return url($path . $file);     
         else
