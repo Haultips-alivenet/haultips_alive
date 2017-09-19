@@ -38,7 +38,7 @@ Route::get('user/transactionhistory', 'Front\UserController@getTransactionHistor
 // User login panel end
 
 #User
-
+Route::resource('user/find/deliveries', 'Front\FindDeliveriesController');
 Route::resource('user/login', 'Front\LoginController');
 Route::resource('user/signup', 'Front\LoginController@signup');
 Route::resource('user/customer', 'Front\LoginController@customer');
@@ -67,12 +67,6 @@ Route::post('others', 'Front\ShipmentController@others');
 Route::get('home/{id}', 'Front\ShipmentController@home');
 Route::post('home', 'Front\ShipmentController@home');
 Route::post('truckbooking', 'Front\ShipmentController@truckbooking');
-
-Route::resource('user/find/deliveries', 'Front\FindDeliveriesController@index');
-Route::post('user/find/deliveries', 'Front\FindDeliveriesController@index');
-Route::get('getsubcategory ', 'Front\FindDeliveriesController@getsubcategory');
-
-
 #Admin
 Route::get('/admin/login', function () {
     if(Auth::check()){return Redirect::to('admin/dashboard');}

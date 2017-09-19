@@ -22,8 +22,10 @@ use App\ShippingDeliveryDetail;
 use App\PayInfo;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Input;
+use App\library\Smsapi;
 use Response;
 use DB;
+use Helper;
 
 
 class UserController extends FrontController
@@ -31,7 +33,7 @@ class UserController extends FrontController
     public function profile(){
       $data['user'] = Auth::User();
       $data['user_detail'] = UserDetail::where('user_id', Auth::User()->id)->first();
-
+      return Helper::setDefaultImage('uploads/user/', 'user_icon.pn');
       return view('user.profile', $data);
     }
 
@@ -182,23 +184,25 @@ class UserController extends FrontController
           $sts_updt = $shipping_quote->update(['quote_status' => 1]);
 
           #Accept offer Notification
-          $carrierData = ShippingQuote::select('u.device_token','u.first_name','u.last_name')
+          $carrierData = ShippingQuote::select('u.device_token','u.first_name','u.last_name','u.mobile_number')
                           ->leftJoin('users as u','u.id','=','shipping_quotes.carrier_id')
                           ->where('shipping_quotes.id', $quot_id)->first();
-          $msg = 'Your Offer has been accepted by the '.$carrierData->first_name.' '.$carrierData->last_name;                           
+          $otpMsg = 'Your Offer has been accepted by the '.$carrierData->first_name.' '.$carrierData->last_name;                           
           
-          // Send message functionality                     
-
+          // Send message functionality   
+          $smsObj = new Smsapi();
+          $smsObj->sendsms_api('+91'.$carrierData->mobile_number, $otpMsg);                  
 
           #Reject offer Notification
-          $rejectUsers = ShippingQuote::select('u.device_token','u.first_name','u.last_name')
+          $rejectUsers = ShippingQuote::select('u.device_token','u.first_name','u.last_name','u.mobile_number')
                           ->leftJoin('users as u','u.id','=','shipping_quotes.carrier_id')
                           ->where('shipping_quotes.shipping_id', $sq->shipping_id)
                           ->where('shipping_quotes.id','!=', $quot_id)->get();
-          
           foreach($rejectUsers as $rejectData){
-              $msg = 'Your Offer has been rejected by the '.$rejectData->first_name.' '.$rejectData->last_name;
-              // Send message functionality
+            $otpMsg = 'Your Offer has been rejected by the '.$rejectData->first_name.' '.$rejectData->last_name;
+            // Send message functionality
+            $smsObj = new Smsapi();
+            $smsObj->sendsms_api('+91'.$rejectData->mobile_number, $otpMsg);
 
           }
         }
@@ -206,12 +210,14 @@ class UserController extends FrontController
         if($request->get('quot_sts') == 2){
           $sts_updt = $shipping_quote->update(['quote_status' => 2]);
 
-          $carrierData = ShippingQuote::select('u.device_token','u.first_name','u.last_name')
+          $carrierData = ShippingQuote::select('u.device_token','u.first_name','u.last_name','u.mobile_number')
                           ->leftJoin('users as u','u.id','=','shipping_quotes.carrier_id')
-                          ->where('shipping_quotes.id',$quoteId)->first();
+                          ->where('shipping_quotes.id', $quot_id)->first();
           
-          $msg = 'Your Offer has been rejected by the '.$carrierData->first_name.' '.$carrierData->last_name;
+          $otpMsg = 'Your Offer has been rejected by the '.$carrierData->first_name.' '.$carrierData->last_name;
           // send sms
+          $smsObj = new Smsapi();
+          $smsObj->sendsms_api('+91'.$carrierData->mobile_number, $otpMsg);
         }
 
         if($sts_updt){
@@ -237,17 +243,17 @@ class UserController extends FrontController
             'pickup_date' => 'required|date|after:yesterday',
             'delivery_date' => 'required|date|after:pickup_date',
         ]);
+        $picklatlong = $this->getLatLong($request->get('pickup_address'));
+        $delivlatlong = $this->getLatLong($request->get('delivery_address'));
         try{
           DB::beginTransaction();
-          $picklatlong = $this->getLatLong($request->get('pickup_address'));
           $pick_updt = ShippingPickupDetail::where('shipping_id', $shipping_id)->update([
                           'pickup_address' => $request->get('pickup_address'),
                           'pickup_date' => $request->get('pickup_date'),
                           'latitude' => $picklatlong['lat'],
                           'longitutde' => $picklatlong['lng'],
                         ]);
-
-          $delivlatlong = $this->getLatLong($request->get('delivery_address'));
+          
           $ship_updt =  ShippingDeliveryDetail::where('shipping_id', $shipping_id)->update([
                           'delivery_address' => $request->get('delivery_address'),
                           'delivery_date' => $request->get('delivery_date'),
@@ -264,7 +270,7 @@ class UserController extends FrontController
           DB::rollback();
           echo $e->getMessage();
         } 
-        return redirect('user/relist-shipment/' . $shipping_id);
+        //return redirect('user/relist-shipment/' . $shipping_id);
       }
 
       // Get shipment details
@@ -345,6 +351,7 @@ class UserController extends FrontController
           $user = User::find(Auth::User()->id);
           $user->first_name = $request->get('first_name');
           $user->last_name = $request->get('last_name');
+          $user->mobile_number = $request->get('mobile_number');
 
           $user_detail_updt = UserDetail::where('user_id', Auth::User()->id)
                               ->update([
@@ -355,14 +362,30 @@ class UserController extends FrontController
                                     'country' => $request->get('country'),
                                   ]);
           
-
-          return ($user->save() && $user_detail_updt) ? 1 : 0;
+          if($user->save() && $user_detail_updt){
+            /*$request->session()->flash('alert_type', 'success');
+            $request->session()->flash('alert_msg', 'Profile is updated successfully!');*/
+            $user->street = $request->get('street');
+            $user->location = $request->get('location');
+            $user->city = $request->get('city');
+            $user->pincode = $request->get('pincode');
+            $user->country = $request->get('country');
+            return $user;
+          }
+          else return 0;
       }
+    }
+
+    public function getTransactionHistory(){
+      $data['transaction_history'] = ShippingDetail::select('shipping_details.id', 'shipping_details.order_id', 'shipping_details.table_name','pd.created_at','pd.amount','pd.status')                            
+                                    ->Join('payment_details as pd','pd.shipping_id','=','shipping_details.id')
+                                    ->where('shipping_details.user_id', Auth::User()->id)->get();
+      return view('user.transactionhistory', $data);
     }
 
 
     private function getLatLong($address){
-        $url = "http://maps.google.com/maps/api/geocode/json?address=".urlencode($address)."&sensor=false&region=India";
+        $url = "http://maps.google.com/maps/api/geocode/json?address=".urlencode($address)."&sensor=false";
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $url);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
@@ -372,8 +395,14 @@ class UserController extends FrontController
         $response = curl_exec($ch);
         curl_close($ch);
         $response_a = json_decode($response);
-        return array( 'lat' => $response_a->results[0]->geometry->location->lat,
+        if($response_a->results){
+          return array( 'lat' => $response_a->results[0]->geometry->location->lat,
                       'lng' => $response_a->results[0]->geometry->location->lng);
+        }
+        else{
+          return array( 'lat' => '', 'lng' => '');
+        }
+        
     }
 
 }

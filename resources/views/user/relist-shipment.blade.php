@@ -133,8 +133,6 @@ $('#relist_ship_form').validate({
             autocomplete.inputId = acInputs[i].id;
             google.maps.event.addListener(autocomplete, 'place_changed', function () {
                 //document.getElementById("log").innerHTML = 'You used input with id ' + this.inputId;
-                var place = autocomplete.getPlace();
-                alert(place);
             });
         }
         

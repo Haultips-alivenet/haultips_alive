@@ -246,7 +246,7 @@ India - 201007</address>
      {!! Html::script('public/admin/js/jquery.nicescroll.js') !!}
      {!! Html::script('public/user/js/moment.js') !!}
      {!! Html::script('public/user/js/bootstrap-datetimepicker.js') !!}
-     {!! Html::script('https://maps.googleapis.com/maps/api/js?key=AIzaSyDr-iGaiLmD2zCzCvl11pPRKgeFHxY8b7I&libraries=places&sensor=false&region=India') !!}
+     {!! Html::script('https://maps.googleapis.com/maps/api/js?key=AIzaSyDr-iGaiLmD2zCzCvl11pPRKgeFHxY8b7I&libraries=places') !!}
      <!-- {!! Html::script('public/admin/js/bootstrap-select.min.js') !!} -->
 
     @yield('script')

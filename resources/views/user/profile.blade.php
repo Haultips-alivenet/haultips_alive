@@ -15,12 +15,17 @@
             {!! Form::open(array('url'=>'user/profile/edit', 'id'=>'prf_edt_frm')) !!}
              <h4>Your personal information</h4>
                 <span id="alertmsg">
-                    
+                    @if(Session::has('alert_msg'))
+                        <div class="alert alert-{{ Session::get('alert_type') }}">
+                            <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+                            {{ Session::get('alert_msg') }}
+                        </div>
+                    @endif
                 </span>
                 <div class="form-group col-md-12">
                     <div class="col-md-4"><label for="">First Name</label></div>
                     <div class="col-md-8">
-                        <div class="_me_dis">{{ $user->first_name }}</div>
+                        <div class="_me_dis" id="first_name_spn">{{ $user->first_name }}</div>
                         <div class="_me_input">
                             {!! Form::text('first_name', $user->first_name, array('class'=>'form-control', 'id'=>'first_name')) !!}
                         </div> 
@@ -29,7 +34,7 @@
                 <div class="form-group col-md-12">
                     <div class="col-md-4"><label for="">Last Name</label></div>
                     <div class="col-md-8">
-                        <div class="_me_dis">{{ $user->last_name }}</div>
+                        <div class="_me_dis" id="last_name_spn">{{ $user->last_name }}</div>
                         <div class="_me_input">
                             {!! Form::text('last_name', $user->last_name, array('class'=>'form-control', 'id'=>'last_name')) !!}
                         </div>
@@ -38,7 +43,7 @@
                 <div class="form-group col-md-12">
                     <div class="col-md-4"><label for="">Email Id</label></div>
                     <div class="col-md-8">
-                        <div class="_me_dis">{{ $user->email }}</div>
+                        <div class="_me_dis" id="first_name_spn">{{ $user->email }}</div>
                         <div class="_me_input">
                             <span class="form-control">{{ $user->email }}</span>
                         </div>
@@ -47,7 +52,7 @@
                 <div class="form-group col-md-12">
                     <div class="col-md-4"><label for="">Phone No</label></div>
                     <div class="col-md-8">
-                        <div class="_me_dis">{{ $user->country_code . '-' . $user->mobile_number }}</div>
+                        <div class="_me_dis">{{ $user->country_code }}-<span id="mobile_number_spn">{{ $user->mobile_number }}</span></div>
                         <div class="_me_input">
                             {!! Form::text('mobile_number', $user->mobile_number, array('class'=>'form-control', 'id'=>'mobile_number')) !!}
                         </div>
@@ -59,7 +64,7 @@
                 <div class="form-group col-md-12">
                     <div class="col-md-4"><label for="">Street</label></div>
                     <div class="col-md-8">
-                        <div class="_me_dis">{{ $user_detail->street }}</div>
+                        <div class="_me_dis" id="street_spn">{{ $user_detail->street }}</div>
                         <div class="_me_input">
                             {!! Form::text('street', $user_detail->street, array('class'=>'form-control', 'id'=>'street')) !!}
                         </div>
@@ -69,7 +74,7 @@
                 <div class="form-group col-md-12">
                     <div class="col-md-4"><label for="">City</label></div>
                     <div class="col-md-8"> 
-                        <div class="_me_dis">{{ $user_detail->city }}</div>
+                        <div class="_me_dis" id="city_spn">{{ $user_detail->city }}</div>
                         <div class="_me_input">
                             {!! Form::text('city', $user_detail->city, array('class'=>'form-control', 'id'=>'city')) !!}
                         </div>
@@ -79,7 +84,7 @@
                 <div class="form-group col-md-12">
                     <div class="col-md-4"><label for="">Enter a Location</label></div>
                     <div class="col-md-8">
-                        <div class="_me_dis">{{ $user_detail->location }}</div>
+                        <div class="_me_dis" id="location_spn">{{ $user_detail->location }}</div>
                         <div class="_me_input">
                             {!! Form::text('location', $user_detail->location, array('class'=>'form-control', 'id'=>'location')) !!}
                         </div>
@@ -89,7 +94,7 @@
                 <div class="form-group col-md-12">
                     <div class="col-md-4"><label for="">Pin Code</label></div>
                     <div class="col-md-8">
-                        <div class="_me_dis">{{ $user_detail->pincode }}</div>
+                        <div class="_me_dis" id="pincode_spn">{{ $user_detail->pincode }}</div>
                         <div class="_me_input">
                             {!! Form::text('pincode', $user_detail->pincode, array('class'=>'form-control', 'id'=>'pincode')) !!}
                         </div>
@@ -99,7 +104,7 @@
                 <div class="form-group col-md-12">
                     <div class="col-md-4"><label for="">Country</label></div>
                     <div class="col-md-8">
-                        <div class="_me_dis">{{ $user_detail->country }}</div>
+                        <div class="_me_dis" id="country_spn">{{ $user_detail->country }}</div>
                         <div class="_me_input">
                             {!! Form::text('country', $user_detail->country, array('class'=>'form-control', 'id'=>'country')) !!}
                         </div>
@@ -202,7 +207,11 @@ $(document).ready(function() {
             dataType: "json",
             success: function(msg) {
                 var alertmsg = '';
-                if(msg == 1){
+                if(msg.id > 0){
+                    var fields = ['first_name', "last_name", "mobile_number", "street", "city", "location", "pincode", "pincode", "country"];
+                    fields.forEach(function(field) {
+                        $('#' + field + '_spn').html(msg[field]);
+                    });
                     alertmsg += '<div class="alert alert-success">';
                     alertmsg += 'Profile is updated successfully.';
                 }

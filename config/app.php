@@ -202,6 +202,8 @@ return [
         'JWTAuth'   => Tymon\JWTAuth\Facades\JWTAuth::class,
         'JWTFactory' => Tymon\JWTAuth\Facades\JWTFactory::class,
         'PushNotification' => Edujugon\PushNotification\Facades\PushNotification::class,
+        // Custom Helper
+        'Helper' => App\Helpers\Helper::class,
     ],
 
 ];
