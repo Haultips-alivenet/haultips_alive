@@ -536,6 +536,26 @@ class UserController extends FrontController
         return view('user.faq',$data);
     }
 
+    public function shipmentNew(){
+      if(Auth::user()->user_type_id <> 3 || !Auth::check()) return redirect('/');
+
+      $data['vehicle_cat'] = VehicleCategory::where('parent_id', 0)->get();
+
+      $user_detail = UserDetail::where('user_id', Auth::User()->id)->first();
+      $data['profile_pic'] = $this->setDefaultImage('public/uploads/userimages/', $user_detail->image, 'u');
+      return view('user.new-shipment', $data);
+    }
+
+    public function shipmentNewSubcat($cat_id){
+      if(Auth::user()->user_type_id <> 3 || !Auth::check()) return redirect('/');
+
+      $data['vehicle_subcat'] = VehicleCategory::where('parent_id', $cat_id)->get();
+
+      $user_detail = UserDetail::where('user_id', Auth::User()->id)->first();
+      $data['profile_pic'] = $this->setDefaultImage('public/uploads/userimages/', $user_detail->image, 'u');
+      return view('user.new-shipment-subcat', $data);
+    }
+
     private function getLatLong($address){
         $url = "http://maps.google.com/maps/api/geocode/json?address=".urlencode($address)."&sensor=false";
         $ch = curl_init();

@@ -95,6 +95,7 @@
 
                 <ul>
                 @if(Auth::user()->user_type_id == 3)
+                    <li><a href="{{ url('user/new-shipment') }}"><span><i class="fa fa-truck" aria-hidden="true"></i></span>New Shipment</a></li>
                    <li class="toggle"><a href="javascript:void();" onclick="toggle(1);">
                        <span><i class="fa fa-check-square" aria-hidden="true"></i></span>My Deliveries <span class="pull-right"><i class="fa fa-angle-down" aria-hidden="true"></i></span></a>
                         <ul class="ulist1">

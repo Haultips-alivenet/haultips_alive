@@ -34,6 +34,8 @@ Route::get('user/bank-infomation/delete/{bank_info_id}', 'Front\UserController@b
 Route::get('user/bank-infomation/add', 'Front\UserController@bankInformationAdd');
 Route::post('user/bank-infomation/add', 'Front\UserController@bankInformationAdd');
 Route::get('user/transactionhistory', 'Front\UserController@getTransactionHistory');
+Route::get('user/new-shipment', 'Front\UserController@shipmentNew');
+Route::get('user/new-shipment', 'Front\UserController@shipmentNew');
 // User login panel end
 
 // Partner login panel

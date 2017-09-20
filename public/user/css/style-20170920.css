@@ -2941,32 +2941,6 @@ ul.ulist2 > li:hover a {
     vertical-align: middle;
     width: 180px;
 }
-._ship_inner{
-	    box-shadow: 2px 0 10px rgba(204, 204, 204, 0.8);
-    display: inline-block;
-    padding: 20px;
-    position: relative;
-    width: 100%;
-    z-index: 4;
-    background: #fff;
-    margin-top: 50px;
-}
-._ship_inner ul li .bx_img {
-    transition: all 0.4s ease-in-out 0s;
-        height: 150px;
-       width: 200px;
-}
-._ship_inner ul li{
-	margin-left:0;
-	margin-right:30px;
-	
-}
-._ship_inner > ul {
-    margin: 0 auto;
-    padding: 0;
-    float: none;
-    width: 50rem;
-}
 
 @media (max-width: 1280px) {
 
