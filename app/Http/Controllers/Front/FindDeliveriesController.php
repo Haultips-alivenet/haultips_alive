@@ -9,9 +9,12 @@ use App\Http\Controllers\FrontController;
 use Auth;
 use Session;
 use App\User;
+use App\TblQuestion;
+use App\TblQuesMaster;
 use App\ShippingQuote;
 use App\ShippingDetail;
 use App\VehicleCategory;
+use App\library\Smsapi;
 use DB;
 
 class FindDeliveriesController extends FrontController
@@ -112,8 +115,12 @@ class FindDeliveriesController extends FrontController
       echo json_encode($data);
     }
     
-    public function delivery_details($shippingId){
-        
+    public function delivery_details(Request $request,$shippingId){
+            $tempArr = Session::get('currentUser');
+            if($tempArr["id"]!="") {
+                $request->session()->forget('check_findDelivery');
+                if($tempArr["user_type_id"]==2) {
+                 
                     $shippingData = ShippingDetail::select('shipping_details.id','shipping_details.order_id', 'table_name', 'u.id as userId', 'u.first_name', 'u.last_name' , 'shipping_details.created_at', 'spd.pickup_address', 'spd.pickup_date',  'sdd.delivery_date', 'spd.latitude as pickupLat', 'spd.longitutde as pickupLong', 'sdd.delivery_address', 'sdd.latitude as deliveryLat', 'sdd.longitutde as deliveryLong', 'vc.category_name as category', 'vsc.category_name as subCategory','pm.method as payment_method')
                                     ->leftJoin('users as u','u.id','=','shipping_details.user_id')                            
                                     ->leftJoin('shipping_pickup_details as spd','spd.shipping_id','=','shipping_details.id')                            
@@ -189,9 +196,75 @@ class FindDeliveriesController extends FrontController
                      }
                         
                         $msg['details'] = $data;  
-                        $msg['detailsItem'] = $data1;  
-        return view('user.finddeliveriesdetails',$msg);
+                        $msg['detailsItem'] = $data1; 
+                        $msg["shiping_id"] = $shippingId;
+                        return view('user.finddeliveriesdetails',$msg);
+                } else {
+                     Session::flash('success', 'Only Partner Can See the Details!');
+                    return redirect(url('user/find/deliveries'));
+                }       
+            } else {
+                $request->session()->put('check_findDelivery', $shippingId); 
+                return redirect(url('user/login'));
+            }
     }
 
+    public function bidoffer($shipingid){
+        
+       $msg["miid"] = ShippingQuote::where('shipping_id',$shipingid)->select((DB::raw('min(quote_price) as minimumBid')))->first();
+       $msg["shiping_id"] = $shipingid;  
+       return view('user.bidDetails',$msg);
+    }
+    public function bidoffersave(Request $request){
+        
+        $shippingDetail = DB::table("shipping_details as s")
+                ->join('users as u','s.user_id','=','u.id')
+                ->where('s.id',$request->shipingid)->select('u.mobile_number')->first();
+        $customer_mobile=$shippingDetail->mobile_number;
+        
+        $tempArr = Session::get('currentUser');
+        $quote = new ShippingQuote;
+        $quote->shipping_id = $request->shipingid;
+        $quote->carrier_id = $tempArr["id"];
+        $quote->quote_price = $request->bidvalue;
+        $quote->lowest_quote_price = $request->minbid;
+        $quote->quote_status = 0;
+        $msg="A new Quotation has arrived on your post from Haulitps.";
+        $smsObj = new Smsapi();
+        $smsObj->sendsms_api('+91'.$customer_mobile,$msg);  
+        
+        $quote->save();
+        $quotationId= $quote->id;
+        Session::flash('success', 'Bids Submitted Sucessfully!');
+        return redirect(url('user/find/deliveries'));
+    }
     
+    public function partner_question_save(Request $request){
+        
+            $userDetail = ShippingDetail::where('id',$request->ship_id)->select('user_id')->first();
+            $customerId = $userDetail->user_id;
+            $userdetails = User::where('id',$customerId)->select('mobile_number')->first();
+            $customer_mobile = $userdetails->mobile_number;
+            $tempArr = Session::get('currentUser');
+            
+            $queMaster = new TblQuesMaster;
+            $queMaster->shipping_id = $request->ship_id;
+            $queMaster->user_id = $customerId;
+            $queMaster->carrier_id = $tempArr["id"];
+            $queMaster->save();
+            $masterQuesId = $queMaster->id;
+
+            $ques = new TblQuestion;
+            $ques->ques_master_id = $masterQuesId;
+            $ques->question = $request->question;
+            $ques->status =1;
+            $ques->save();
+            $questionId = $ques->id;
+            
+            $msg="A new Question has arrived on your post from Haulitps.";
+            $smsObj = new Smsapi();
+            $smsObj->sendsms_api('+91'.$customer_mobile,$msg); 
+            Session::flash('success', 'Question Submitted Sucessfully!');
+            return redirect(url('user/find/deliveries/details/'.$request->ship_id));
+    }
 }

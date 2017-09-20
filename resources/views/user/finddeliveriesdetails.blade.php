@@ -13,6 +13,12 @@
           <div class="col-md-12">
               <h2>Using haultips to Book Loads is Easy!</h2>
                <br>
+                          @if(Session::has('success'))
+                            <div class="alert alert-success">
+                                <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+                                {{Session::get('success')}}
+                            </div>
+                        @endif
           </div>
 
           <div class="clearfix"></div>
@@ -178,7 +184,7 @@ which helps you book more loads.
         </div>
     <div class="row">
         <div class="goods_info">
-            <h3><span>Motorcycles :</span> Pulsar 150 </h3>
+            <h3><span>{{$detailsItem["deliveryTitle"]}} :</span> </h3>
             <div class="clearfix"></div>
  <?php foreach($detailsItem as $key=>$value) { if($key!="itemImage" && $key!="additionalDetail") { ?>
             <div class="col-md-12">
@@ -208,32 +214,32 @@ which helps you book more loads.
             <h3>Additional Information</h3>
             <p>{{$detailsItem["additionalDetail"]}}</p>
         </div>
-        <br>
-        <div class="_ad_info_faq">
-            <h3>Ask the Question and Answer</h3>
-            <small>There are currently no questions about this shipment </small>
-
-
-
-            <ul>
-                <li><strong>Lorem ipsum dolor sit amet, consectetur adipisicing elit,</strong></li>
-                <li>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commod consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non roident, sunt in culpa qui officia deserunt mollit anim id est laborum.</li>
-
-                <li><strong>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore</strong></li>
-                <li>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commod consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non roident, sunt in culpa qui officia deserunt mollit anim id est laborum.</li>
-
-                <li><strong>Lorem ipsum dolor sit amet, consectetur adipisicing elit,</strong></li>
-                <li>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commod consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non roident, sunt in culpa qui officia deserunt mollit anim id est laborum.</li>
-
-                <li><strong>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor</strong></li>
-                <li>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commod consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non roident, sunt in culpa qui officia deserunt mollit anim id est laborum.</li>
-            </ul>
-            <div class="clearfix"></div>
-            <a href="#">View All</a>
-        </div>
+        <br><div class="clearfix"></div>
+        
         <div class="clearfix"></div>
    
     </div>
+           
+           <div class="row">
+               {!! Form::open(array('url'=>'partner/question/save','id'=>'bid_form','method'=>'post')) !!}
+        <div class="goods_info">
+            <h3>Ask the Question</h3>
+            
+ 
+            <div class="col-md-12">
+                 <textarea name="question" placeholder="Write Question" class="form-control"></textarea>
+                 <input type="hidden" name="ship_id" value="{{$shiping_id}}">
+            </div><div class="col-md-12"><br></div>
+            <div class="col-md-12">
+                <div class="col-md-4">
+                {!! Form::submit('Submit',['class'=>"btn btn-color"]) !!}
+                </div>
+            </div><div class="col-md-12"><br></div>
+ <div class="clearfix"></div>
+        </div>
+               {!! Form::close() !!}
+    </div>
+           
        </div>
     </div>
 </section>
@@ -242,7 +248,7 @@ which helps you book more loads.
 <section class="_make_btn">
     <div class="container">
         <div class="row">
-             <button class="btn btn-color">Make Offer Now</button>
+             <a href="{{url('bid/offer/'.$shiping_id)}}" class="btn btn-color">Make Offer Now</a>
         </div>
     </div>
 </section>

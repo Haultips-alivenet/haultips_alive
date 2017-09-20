@@ -77,6 +77,15 @@ Route::post('truckbooking', 'Front\ShipmentController@truckbooking');
 Route::resource('user/find/deliveries', 'Front\FindDeliveriesController@index');
 Route::post('user/find/deliveries', 'Front\FindDeliveriesController@index');
 Route::get('getsubcategory ', 'Front\FindDeliveriesController@getsubcategory');
+Route::get('user/find/deliveries/details/{id}', 'Front\FindDeliveriesController@delivery_details');
+Route::get('user/mobileCheck', 'Front\UserHomeController@mobileCheck');
+Route::get('user/verifyotp/{id}', 'Front\LoginController@verifyotp');
+Route::get('user/resend/opt/{id}', 'Front\LoginController@resendotp');
+Route::post('user/checkotp', 'Front\LoginController@checkotp');
+Route::get('bid/offer/{id}', 'Front\FindDeliveriesController@bidoffer');
+Route::post('bid/offer/save', 'Front\FindDeliveriesController@bidoffersave');
+Route::post('partner/question/save', 'Front\FindDeliveriesController@partner_question_save');
+//sds
 
 
 #Admin

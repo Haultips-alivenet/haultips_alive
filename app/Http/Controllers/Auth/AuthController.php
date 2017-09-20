@@ -32,9 +32,18 @@ class AuthController extends Controller
     
     public function authenticated($request , $user){
         $user_detail = UserDetail::select('image')->where('user_id', $user->id)->first();
+        if($user_detail) {
         $request->session()->put('userimage', $user_detail->image);
+        } else {
+            $request->session()->put('userimage', "");
+        }
         $getoffer=$request->session()->get('check_getofferpage');
-        if($getoffer=="") {
+        $finddelivery=$request->session()->get('check_findDelivery');
+        if($getoffer!="") {
+            return redirect(url('user/getoffer'));  
+        } else if($finddelivery!=""){
+            return redirect(url('user/find/deliveries/details/'.$finddelivery)); 
+        } else {    
             if($user->user_type_id=='1'){            
                 return redirect('admin/dashboard') ;
             }elseif($user->user_type_id=='2'){
@@ -43,9 +52,7 @@ class AuthController extends Controller
                 //return redirect()->route('user/dashboard') ;
                  return redirect(url('user/my-deliveries/all-status'));
             }
-        } else {
-           return redirect(url('user/getoffer'));  
-        }
+        } 
     }
     
     

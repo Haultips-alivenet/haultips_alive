@@ -131,7 +131,14 @@
                 </div>
 
             </div>
+            
             <div class="col-lg-9 col-md-9">
+                        @if(Session::has('success'))
+                            <div class="alert alert-success">
+                                <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+                                {{Session::get('success')}}
+                            </div>
+                        @endif
                 <div class="_fn_mp_rft">
                     <div class="panel panel-primary">
                         <div class="panel-heading">
