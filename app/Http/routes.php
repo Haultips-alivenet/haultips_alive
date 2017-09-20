@@ -13,7 +13,7 @@
 Route::get('/', 'Front\UserHomeController@index');
 Route::resource('user/dashboard', 'Front\UserHomeController@index');
 Route::resource('user/home', 'Front\UserHomeController@userdashboard');
-Route::resource('user/faq', 'Front\UserHomeController@faq');
+Route::resource('user/faq', 'Front\UserController@faq');
 Route::get('getquesAns', 'Front\UserHomeController@getquesAns');
 
 // User login panel 

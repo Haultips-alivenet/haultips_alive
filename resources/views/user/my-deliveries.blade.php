@@ -22,7 +22,7 @@
         @if(count($shippings))
           @foreach($shippings as $shipping)
             <tr style="cursor: pointer;" onclick="window.location.href='{{ url("user/delivery-detail/" . $shipping->id) }}';">
-                 <td><span><img src="{{ url('public/uploads/userimages/' . $shipping->image) }}" alt=""></span></td>
+                 <td><span><img src="{{ $shipping->image }}" alt=""></span></td>
                  <td>{{ $shipping->title }}</td>
                  <td>INR {{ $shipping->price }}</td>
                  <td>{{ ($shipping->payment_status == 1) ? 'Paid' : 'Unpaid' }}</td>

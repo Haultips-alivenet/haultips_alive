@@ -66,10 +66,10 @@
                 <ul class="nav navbar-nav navbar-right">
                     <?php $tempArr = Session::get('currentUser');?>
                     <li class="pro_im">
-                        <a href="#"><span><img src="{{ Helper::setDefaultImage($path = 'user/img/', $file = Session::get('userimage'), $type = 'u') }}" alt=""></span><span class="usrnm">{{$tempArr["first_name"]." ".$tempArr["last_name"]}}</span></a>
+                        <a href="#"><span><img src="{{ $profile_pic }}" alt=""></span><span class="usrnm">{{$tempArr["first_name"]." ".$tempArr["last_name"]}}</span></a>
                     </li>
                     <li>
-                        <a href="JavaScript:void(0);" id="menu-toggle" class="toggle" ><img src="{{asset('public/user/img/nav-menu.png')}}"></a>
+                        <a href="{{ url('auth/logout') }}" id="menu-toggle1" class="toggle" ><i class="fa fa-power-off" style="font-size:30px;"></i></a>
                     </li>
                     
                 </ul>
@@ -88,7 +88,7 @@
            <div class="col-md-4">
             <div class="_dash_lft _dash_m">
                 <div class="_d_mg">
-                    <img src="{{ Helper::setDefaultImage($path = 'user/img/', $file = Session::get('userimage'), $type = 'u') }}" alt="">
+                    <img src="{{ $profile_pic }}" alt="">
                 </div>
                 <h4 class="text-center"><a href="#" class="usrnm">{{$tempArr["first_name"]." ".$tempArr["last_name"]}}</a></h4>
                 <div class="clearfix"></div>

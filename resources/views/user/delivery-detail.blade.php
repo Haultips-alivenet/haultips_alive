@@ -11,7 +11,7 @@
         <div class="form-group row">
             <div class="col-md-4">
                <div class="_m_gr">
-                    <img src="{{ url('public/uploads/userimages/' . $shippingDetail->image) }}" alt="">
+                    <img src="{{ $shippingDetail->image }}" alt="">
                </div>
             </div>
 

@@ -43,23 +43,7 @@ class UserHomeController extends FrontController
     {
         return view('user.userdashboard');
     }
-    public function faq()
-    {
-        $tempArr = Session::get('currentUser');
-         $data["quesdetails"] = TblQuesMaster::select('tq.question', 'u.first_name','u.last_name','ud.image','sd.table_name','sd.id as shippingId','tq.id as quesId','tbl_ques_masters.carrier_id')                            
-                                    ->leftJoin('tbl_questions as tq','tq.ques_master_id','=','tbl_ques_masters.id')
-                                    ->leftJoin('users as u','u.id','=','tbl_ques_masters.carrier_id')
-                                    ->leftJoin('user_details as ud','ud.user_id','=','tbl_ques_masters.carrier_id')
-                                    ->leftJoin('shipping_details as sd','sd.id','=','tbl_ques_masters.shipping_id')                                   
-                                    ->orderBy('tq.id', 'desc')
-                                    ->groupBy('tbl_ques_masters.carrier_id')
-                                    ->groupBy('tbl_ques_masters.shipping_id')
-                                    ->where('tq.status',1)
-                                    ->where('tbl_ques_masters.user_id',$tempArr["id"])->get();
-         
-        
-        return view('user.faq',$data);
-    }
+    
     public function getquesAns(Request $request){
          $quesDetail = TblQuesMaster::select('tq.question','tq.created_at as quesTime','u.first_name as cfname','u.last_name as clname','ta.answer','ta.created_at as ansTime','uc.first_name as ufname','uc.last_name as ulname')
                                     ->leftJoin('tbl_questions as tq','tq.ques_master_id','=','tbl_ques_masters.id')

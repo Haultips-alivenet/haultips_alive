@@ -35,7 +35,9 @@ class UserController extends FrontController
       if((Auth::user()->user_type_id <> 3 && Auth::user()->user_type_id <> 2)  || !Auth::check()) return redirect('/');
 
       $data['user'] = Auth::User();
-      $data['user_detail'] = UserDetail::where('user_id', Auth::User()->id)->first();
+      $user_detail = UserDetail::where('user_id', Auth::User()->id)->first();
+      $data['user_detail'] = $user_detail;
+      $data['profile_pic'] = $this->setDefaultImage('public/uploads/userimages/', $user_detail->image, 'u');
       return view('user.profile', $data);
     }
 
@@ -65,7 +67,10 @@ class UserController extends FrontController
 
         return redirect('user/changepassword');
       }
-      return view('user.changepassword');
+
+      $user_detail = UserDetail::where('user_id', Auth::User()->id)->first();
+      $data['profile_pic'] = $this->setDefaultImage('public/uploads/userimages/', $user_detail->image, 'u');
+      return view('user.changepassword', $data);
     }
 
     public function myDeliveries($status){
@@ -87,13 +92,17 @@ class UserController extends FrontController
               $image = explode(',', $shippingData->item_image);
               $statuss = array("Inactive","Active","Process","Complete");
               $shiipings[$key]->title = $shippingData->delivery_title;
-              $shiipings[$key]->image = $image[0];
+              $shiipings[$key]->image = $this->setDefaultImage('public/uploads/userimages/', $image[0], 'n');
               $shiipings[$key]->status = $statuss[$shipping->status];
               $shiipings[$key]->postDate = date('d-F-Y', strtotime($shipping->created_at));
             }
          }
       }
       $data['shippings'] = $shiipings;
+
+      $user_detail = UserDetail::where('user_id', Auth::User()->id)->first();
+      $data['profile_pic'] = $this->setDefaultImage('public/uploads/userimages/', $user_detail->image, 'u');
+
       return view('user.my-deliveries', $data);
     }
     
@@ -114,13 +123,17 @@ class UserController extends FrontController
         $image = explode(',', $shippingData->item_image);
         $status = array("Inactive","Active","Process","Complete");
         $shipmentDetail->title = $shippingData->delivery_title;
-        $shipmentDetail->image = $image[0];
+        $shipmentDetail->image = $this->setDefaultImage('public/uploads/userimages/', $image[0], 'n');
         $shipmentDetail->status = $status[$shipmentDetail->status];
         $shipmentDetail->postDate = date('d-F-Y', strtotime($shipmentDetail->published));
       }
 
       $data['quotation_count'] = ShippingQuote::where('shipping_id', $id)->count();
       $data['shippingDetail'] = $shipmentDetail; 
+
+      $user_detail = UserDetail::where('user_id', Auth::User()->id)->first();
+      $data['profile_pic'] = $this->setDefaultImage('public/uploads/userimages/', $user_detail->image, 'u');
+
       return view('user.delivery-detail', $data);                    
     }
 
@@ -156,6 +169,10 @@ class UserController extends FrontController
         }
       }
       $data['quoteDetails'] = $quoteDetails;
+
+      $user_detail = UserDetail::where('user_id', Auth::User()->id)->first();
+      $data['profile_pic'] = $this->setDefaultImage('public/uploads/userimages/', $user_detail->image, 'u');
+
       return view('user.all-quotation', $data);
     }
 
@@ -181,6 +198,10 @@ class UserController extends FrontController
       $offerData->status = $status[$offerData->quote_status];
 
       $data['offerData'] = $offerData;
+
+      $user_detail = UserDetail::where('user_id', Auth::User()->id)->first();
+      $data['profile_pic'] = $this->setDefaultImage('public/uploads/userimages/', $user_detail->image, 'u');
+
       return view('user.quotation-detail', $data);
     }
 
@@ -288,7 +309,7 @@ class UserController extends FrontController
           DB::rollback();
           echo $e->getMessage();
         } 
-        //return redirect('user/relist-shipment/' . $shipping_id);
+        return redirect('user/relist-shipment/' . $shipping_id);
       }
 
       // Get shipment details
@@ -296,6 +317,10 @@ class UserController extends FrontController
       $data['shipDelivDetail'] = ShippingDeliveryDetail::where('shipping_id', $shipping_id)->first();
       if(count($data['shipPickDetail']) <= 0 || count($data['shipDelivDetail']) <= 0)
         return redirect('user/delivery-detail/' . $shipping_id);
+
+      $user_detail = UserDetail::where('user_id', Auth::User()->id)->first();
+      $data['profile_pic'] = $this->setDefaultImage('public/uploads/userimages/', $user_detail->image, 'u');
+
       return view('user.relist-shipment', $data);
     }
 
@@ -305,6 +330,10 @@ class UserController extends FrontController
 
       $data['bank_infos'] = PayInfo::where('user_id', Auth::User()->id)
                                       ->orderBy('id', 'desc')->get();
+
+      $user_detail = UserDetail::where('user_id', Auth::User()->id)->first();
+      $data['profile_pic'] = $this->setDefaultImage('public/uploads/userimages/', $user_detail->image, 'u');
+
       return view('user.bank-information', $data);
     }
 
@@ -353,7 +382,10 @@ class UserController extends FrontController
         return redirect('user/bank-infomation');
       }
 
-      return view('user.bank-information-add');
+      $user_detail = UserDetail::where('user_id', Auth::User()->id)->first();
+      $data['profile_pic'] = $this->setDefaultImage('public/uploads/userimages/', $user_detail->image, 'u');
+
+      return view('user.bank-information-add', $data);
     }
 
     // Profile edit
@@ -406,6 +438,10 @@ class UserController extends FrontController
       $data['transaction_history'] = ShippingDetail::select('shipping_details.id', 'shipping_details.order_id', 'shipping_details.table_name','pd.created_at','pd.amount','pd.status')                            
                                     ->Join('payment_details as pd','pd.shipping_id','=','shipping_details.id')
                                     ->where('shipping_details.user_id', Auth::User()->id)->get();
+
+      $user_detail = UserDetail::where('user_id', Auth::User()->id)->first();
+      $data['profile_pic'] = $this->setDefaultImage('public/uploads/userimages/', $user_detail->image, 'u');
+
       return view('user.transactionhistory', $data);
     }
 
@@ -427,7 +463,7 @@ class UserController extends FrontController
            $offerData[$key]->quoteId = $offer->id;
            $offerData[$key]->shippingId = $shippingId;
            $offerData[$key]->title = $shippingData->delivery_title;
-           $offerData[$key]->image = Helper::setDefaultImage('public/uploads/userimages/', $image[0], 'n');
+           $offerData[$key]->image = $this->setDefaultImage('public/uploads/userimages/', $image[0], 'n');
            $offerData[$key]->category = (empty($offer->category_id)) ? 'N/A' : ShippingDetail::getCategoryName($offer->category_id, 'id', 'category_name','vehicle_categories');
            $offerData[$key]->subcategory = (empty($offer->subcategory_id)) ? 'N/A' : ShippingDetail::getCategoryName($offer->subcategory_id, 'id', 'category_name','vehicle_categories');
            $offerData[$key]->status = $status[$offer->quote_status];
@@ -436,6 +472,9 @@ class UserController extends FrontController
       }
 
       $data['offers'] = $offerData;
+
+      $user_detail = UserDetail::where('user_id', Auth::User()->id)->first();
+      $data['profile_pic'] = $this->setDefaultImage('public/uploads/userimages/', $user_detail->image, 'u');
 
       return view('user.my-offer', $data);
     }
@@ -470,7 +509,31 @@ class UserController extends FrontController
       }
 
       $data['offer'] = $offerData;
+
+      $user_detail = UserDetail::where('user_id', Auth::User()->id)->first();
+      $data['profile_pic'] = $this->setDefaultImage('public/uploads/userimages/', $user_detail->image, 'u');
+
       return view('user.my-offer-detail', $data);
+    }
+
+    public function faq()
+    {
+        $tempArr = Session::get('currentUser');
+         $data["quesdetails"] = TblQuesMaster::select('tq.question', 'u.first_name','u.last_name','ud.image','sd.table_name','sd.id as shippingId','tq.id as quesId','tbl_ques_masters.carrier_id')                            
+                                    ->leftJoin('tbl_questions as tq','tq.ques_master_id','=','tbl_ques_masters.id')
+                                    ->leftJoin('users as u','u.id','=','tbl_ques_masters.carrier_id')
+                                    ->leftJoin('user_details as ud','ud.user_id','=','tbl_ques_masters.carrier_id')
+                                    ->leftJoin('shipping_details as sd','sd.id','=','tbl_ques_masters.shipping_id')                                   
+                                    ->orderBy('tq.id', 'desc')
+                                    ->groupBy('tbl_ques_masters.carrier_id')
+                                    ->groupBy('tbl_ques_masters.shipping_id')
+                                    ->where('tq.status',1)
+                                    ->where('tbl_ques_masters.user_id',$tempArr["id"])->get();
+         
+        $user_detail = UserDetail::where('user_id', Auth::User()->id)->first();
+        $data['profile_pic'] = $this->setDefaultImage('public/uploads/userimages/', $user_detail->image, 'u');
+
+        return view('user.faq',$data);
     }
 
     private function getLatLong($address){
@@ -492,6 +555,16 @@ class UserController extends FrontController
           return array( 'lat' => '', 'lng' => '');
         }
         
+    }
+
+    public function setDefaultImage($path = '', $file = '', $type = 'n'){
+        $filename = public_path($path . $file);
+        // n=>Normal no image, u=>User icon image
+        $type_arr = array('n' => 'not-available.jpg', 'u' => 'customer_img.png');
+        if (file_exists($filename) && !empty($file))
+            return url($path . $file);     
+        else
+            return asset('public/user/img/' . $type_arr[$type]);
     }
 
 }
