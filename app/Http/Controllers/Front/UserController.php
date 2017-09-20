@@ -32,12 +32,16 @@ class UserController extends FrontController
 {
 
     public function profile(){
+      if((Auth::user()->user_type_id <> 3 && Auth::user()->user_type_id <> 2)  || !Auth::check()) return redirect('/');
+
       $data['user'] = Auth::User();
       $data['user_detail'] = UserDetail::where('user_id', Auth::User()->id)->first();
       return view('user.profile', $data);
     }
 
     public function changepassword(Request $request){
+      if((Auth::user()->user_type_id <> 3 && Auth::user()->user_type_id <> 2)  || !Auth::check()) return redirect('/');
+
       if($request->isMethod('post')){
         $this->validate($request, [
             'old_password' => 'required',
@@ -434,6 +438,39 @@ class UserController extends FrontController
       $data['offers'] = $offerData;
 
       return view('user.my-offer', $data);
+    }
+
+    public function myOfferDetail($quote_id){
+      $offerData = ShippingQuote::select('shipping_quotes.shipping_id','shipping_quotes.quote_status','sd.order_id','sd.category_id','sd.subcategory_id','sd.order_id','sd.table_name','sd.created_at','u.first_name','u.last_name','u.email','u.mobile_number','spd.pickup_date','spd.pickup_address','sdd.delivery_address')
+                            ->leftJoin('shipping_details as sd','sd.id','=','shipping_quotes.shipping_id')
+                            ->leftJoin('users as u','u.id','=','sd.user_id')
+                            ->leftJoin('shipping_pickup_details as spd','spd.shipping_id','=','shipping_quotes.shipping_id')
+                            ->leftJoin('shipping_delivery_details as sdd','sdd.shipping_id','=','shipping_quotes.shipping_id')
+                            ->where('shipping_quotes.id', $quote_id)
+                            ->where('shipping_quotes.carrier_id', Auth::User()->id)->first();
+               
+      if(count($offerData)){
+           $shippingId = $offerData->shipping_id;
+           $shippingData = DB::table($offerData->table_name)->select('delivery_title')->where('shipping_id',$shippingId)->first();
+
+           $status = array("Pending","Accepted","Rejected");
+
+           $offerData->customer = $offerData->first_name. ' '.$offerData->last_name;
+           $offerData->email = $offerData->email;
+           $offerData->mobileNumber = $offerData->mobile_number;
+           $offerData->validTill = date('d-F-Y', strtotime($offerData->pickup_date));
+           $offerData->developed = date('d-F-Y', strtotime($offerData->created_at));
+           $offerData->status = $status[$offerData->quote_status];
+           $offerData->category = (empty($offerData->category_id)) ? 'N/A' : ShippingDetail::getCategoryName($offerData->category_id, 'id', 'category_name','vehicle_categories');
+           $offerData->subcategory = (empty($offerData->subcategory_id)) ? 'N/A' : ShippingDetail::getCategoryName($offerData->subcategory_id, 'id', 'category_name','vehicle_categories');
+           $offerData->orderNo = strtoupper($offerData->order_id);
+           $offerData->title = $shippingData->delivery_title;
+           $offerData->takeAway = $offerData->pickup_address;
+           $offerData->deliver = $offerData->delivery_address;
+      }
+
+      $data['offer'] = $offerData;
+      return view('user.my-offer-detail', $data);
     }
 
     private function getLatLong($address){

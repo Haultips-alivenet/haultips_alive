@@ -38,6 +38,7 @@ Route::get('user/transactionhistory', 'Front\UserController@getTransactionHistor
 
 // Partner login panel
 Route::get('user/my-offers', 'Front\UserController@myOffer');
+Route::get('user/my-offer/{quote_id}', 'Front\UserController@myOfferDetail');
 // 
 
 #User
