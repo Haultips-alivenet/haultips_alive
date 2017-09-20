@@ -41,7 +41,11 @@ class ShippingDetail extends Model
         
         $itemName = '';
         $dineInName = DB::table($table)->select($selectField)->where($searchField, $id)->first();
+        if($dineInName) {
         $itemName =  $dineInName->$selectField;            
+        } else {
+          $itemName='NA';  
+        }
         
         return $itemName;
       }

@@ -230,7 +230,27 @@ $('#carrer_type2').click(function(){
    
 this.checked?$('#transport_div').show():$('#transport_div').hide(); //time for show
 });
-
+ $.validator.addMethod("uniqueMobile", function(value, element) {
+         var isSuccess = false;
+            $.ajax({
+                type: "GET",
+                url: '{{url('user/mobileCheck')}}',
+                data: "checkMobile="+value,
+                async: false,
+                //dataType:"html",
+                success: function(msg)
+                { 
+                    //If username exists, set response to true
+                    //response = (msg === 'true') ? true : false;
+                    isSuccess = msg === "true" ?  false : true;
+                    
+                }
+             });
+            return isSuccess;
+        },
+        "Partner Mobile is Already Taken"
+    );
+  
 $('#newPartneraaa').validate({
 
             rules: {
@@ -250,7 +270,8 @@ $('#newPartneraaa').validate({
                 mobile:{
                     required : true,
                     minlength:10,
-                    number:true
+                    number:true,
+                    uniqueMobile: true
                 },
 
                 password:{

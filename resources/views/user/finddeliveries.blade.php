@@ -245,8 +245,8 @@
                         <thead>
                             <tr>
 
-                                <th style="width:25%">Title</th>
-                                <th style="width:15%">Min Bids Price</th>
+                                <th style="width:20%">Title</th>
+                                <th style="width:20%">Min Bids Price</th>
                                 <th style="width:15%">Origin</th>
                                 <th style="width:20%">Destination</th>
                                 <th style="width:10%">Distance</th>
@@ -257,8 +257,7 @@
                         <tbody style="display: table-row-group;">
                             <?php foreach($diliveries as $value) { ?>
                             <tr>
-                                <td> <img src="{{asset('public/user/img/furnichure_icon.png')}}" alt="" class="pull-left"> <span class="_details">
-                                        {{$value["title"]}}</span></td>
+                                <td> <span class="_quote"><a href="{{URL :: asset('user/find/deliveries/details/'.$value["shippingId"])}}">{{$value["title"]}}</a></span></td>
                                 <td><span class="_quote"> INR {{$value["minimumBid"]}}</span> </td>
                                 <td><span>{{$value["pickupAddress"]}}</span></td>
                                 <td><span>{{$value["deliveryAddress"]}}</span></td>
@@ -462,3 +461,4 @@ function cleansearch(){
     location = url; 
 }
 </script>
+

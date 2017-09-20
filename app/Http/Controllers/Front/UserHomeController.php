@@ -147,6 +147,15 @@ class UserHomeController extends FrontController
         return view('user/subCategory/index', ['category'=>$category, 'subCategories'=>$subCategories]);
         }
     }
-   
+   public function mobileCheck(Request $request){
+        $mobile = $request->checkMobile;
+        $query = User::where('mobile_number', $mobile)->select('id')->first();
+        if($query){
+             echo "true";
+        } else {
+            echo "false";
+        }
+       
+    }
 }
 

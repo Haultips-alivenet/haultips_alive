@@ -86,11 +86,16 @@ class LoginController extends FrontController
             $user->country_code = '+91';
             $userSucess = $user->save();  
             $insertedId = $user->id;
-            $string = '1234567890';
+            $string = '123456789';
             $string_shuffled = str_shuffle($string);
             $otp = substr($string_shuffled, 1, 5);
             $otpMsg = 'Your Otp is '.$otp;
             
+            $userverify= new UserVerification;
+            $userverify->user_id = $insertedId;
+            $userverify->otp = $otp;
+            $userverify->email = $email;
+            $userSucess1 = $userverify->save();
             if($userSucess == 1){
                   
 
@@ -105,7 +110,7 @@ class LoginController extends FrontController
             }else{
                Session::flash('success', 'Error occur ! Please try again.');
             }            
-            return redirect(url('user/login'));
+            return redirect(url('user/verifyotp/'.urlencode(base64_encode($insertedId))));
     }
     public function partner_registration(Request $request){
       // print_r($_POST);die;
@@ -116,8 +121,8 @@ class LoginController extends FrontController
                'mobile' => 'required|min:10|max:10|Regex: /^[0-9]{1,45}$/',
                'password' => 'required|min:6|max:12',
                'cpassword' => 'required|min:6|same:password',
-               'state' => 'required|max:255|Regex:/^[a-z-.]+( [a-z-.]+)*$/i',
-               'city' => 'required|max:255|Regex:/^[a-z-.]+( [a-z-.]+)*$/i',
+               'state' => 'required|max:255',
+               'city' => 'required|max:255',
                'total_vehicle' => 'required',
                'attached_vehicle' => 'required',
                //'carrer_type2' => 'required'
@@ -200,7 +205,7 @@ class LoginController extends FrontController
                 DB::rollback();
             }
             
-            $string = '1234567890';
+            $string = '123456789';
             $string_shuffled = str_shuffle($string);
             $otp = substr($string_shuffled, 1, 5);
             $otpMsg = 'Your Otp is '.$otp;
@@ -227,7 +232,53 @@ class LoginController extends FrontController
                 Session::flash('success', 'User created successfully');                
             }else{
                Session::flash('success', 'Error occur ! Please try again.');
-            }            
-            return redirect(url('user/login'));
+            }  
+           
+            
+            return redirect(url('user/verifyotp/'.urlencode(base64_encode($insertedId))));
+    }
+    
+    public function verifyotp($id){
+        $data["userid"]=base64_decode(urldecode($id));
+         return view('user.login.veryfyotp',$data);
+    }
+    
+    public function resendotp($id){
+        
+        $string = '123456789';
+        $string_shuffled = str_shuffle($string);
+        $otp = substr($string_shuffled, 1, 5);
+        $otpMsg = 'Your Otp is '.$otp;
+        $user = User::find($id); 
+        $mobile= $user->mobile_number;
+        
+        DB::table('user_verifications')->where('user_id', $id)->update(['otp' => $otp]);
+        
+        $smsObj = new Smsapi();
+        $smsObj->sendsms_api('+91'.$mobile,$otpMsg); 
+        Session::flash('success', 'Otp Send successfully On '.$mobile);  
+        return redirect(url('user/verifyotp/'.urlencode(base64_encode($id))));
+    }
+    
+    public function checkotp(Request $request){
+       
+         $data =   DB::table('user_verifications')
+                        ->where('user_id',$request->userid)
+                        ->where('otp',$request->userotp)
+                        ->select('id')
+                        ->first();
+         
+         if($data) {
+        $user = User::find($request->userid); 
+        $user->status=1;
+        $userSucess = $user->save(); 
+        Session::flash('success', 'User Verify successfully'); 
+        return redirect(url('user/login'));
+        } else {
+             Session::flash('success', 'Error occur ! Wrong Otp!'); 
+              return redirect(url('user/verifyotp/'.urlencode(base64_encode($request->userid))));
+         }
+       
+        
     }
 }

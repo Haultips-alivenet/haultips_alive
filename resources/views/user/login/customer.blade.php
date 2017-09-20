@@ -73,7 +73,26 @@
 @endsection
 @section('script')
 <script>
-  
+ $.validator.addMethod("uniqueMobile", function(value, element) {
+         var isSuccess = false;
+            $.ajax({
+                type: "GET",
+                url: '{{url('user/mobileCheck')}}',
+                data: "checkMobile="+value,
+                async: false,
+                //dataType:"html",
+                success: function(msg)
+                { 
+                    //If username exists, set response to true
+                    //response = (msg === 'true') ? true : false;
+                    isSuccess = msg === "true" ?  false : true;
+                    
+                }
+             });
+            return isSuccess;
+        },
+        "User Mobile is Already Taken"
+    ); 
  
 $('#newCustomer').validate({
 
@@ -93,7 +112,8 @@ $('#newCustomer').validate({
 
                 mobile:{
                     required : true,
-                    minlength:10
+                    minlength:10,
+                    uniqueMobile: true
                 },
 
                 password:{
