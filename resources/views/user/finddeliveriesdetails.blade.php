@@ -73,8 +73,11 @@ which helps you book more loads.
 
             <div class="col-md-3 border-right no-padding">
                 <div class="_g_d_img">
-                    <?php $img=explode(",",$detailsItem["itemImage"]);?>
+                    <?php $img=explode(",",$detailsItem["itemImage"]); if($img[0]) { ?>
                     <img src="{{asset('public/uploads/userimages/'.$img[0])}}" alt="" style="height:150px;weight:240px;">
+                    <?php } else { ?>
+                    <img src="{{asset('public/user/img/not-available.jpg')}}" alt="" style="height:150px;weight:240px;">
+                    <?php } ?>
                     <div class="_g_d_d">
                        {{$detailsItem["deliveryTitle"]}}
                     </div>  

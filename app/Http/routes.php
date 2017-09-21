@@ -116,6 +116,13 @@ Route::post('admin/Category-Save', 'CategoryController@store');
 Route::get('admin/category/{id}/update', 'CategoryController@create');
 Route::get('admin/category/{id}/delete', 'CategoryController@destroy');
 
+# Admin Materials
+Route::resource('admin/materials', 'MaterialsController');
+Route::post('admin/materials-Save', 'MaterialsController@store');
+Route::get('admin/materials/{id}/update', 'MaterialsController@create');
+Route::get('admin/materials/{id}/delete', 'MaterialsController@destroy');
+Route::get('admin/materials/status/{id}', 'MaterialsController@changesttus');
+
 # Admin Sub Category
 Route::resource('admin/subcategory', 'SubCategoryController');
 Route::post('admin/subCategory-Save', 'SubCategoryController@store');

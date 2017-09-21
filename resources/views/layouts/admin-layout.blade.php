@@ -81,6 +81,7 @@ License URL: http://creativecommons.org/licenses/by/3.0/
                             <li><a href="{{url('admin/subcategory/create')}}">Add New Sub Category</a></li>
                             <li><a href="{{url('admin/trucklength/create')}}">Add Truck length</a></li>
                             <li><a href="{{url('admin/truckcapacity/create')}}">Add Truck Capacity</a></li>
+                            <li><a href="{{url('admin/materials/create')}}">Add Materials</a></li>
                         </ul>
                     </li>
                     <li><a href="{{url('admin/transaction/history')}}"><i class="fa fa-exchange"></i> <span>Transaction History</span></a></li>
