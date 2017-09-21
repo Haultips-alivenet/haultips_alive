@@ -138,6 +138,7 @@ return [
         Illuminate\View\ViewServiceProvider::class,
         Illuminate\Html\HtmlServiceProvider::class,
         Edujugon\PushNotification\Providers\PushNotificationServiceProvider::class,
+        Softon\Indipay\IndipayServiceProvider::class,
         /*
          * Application Service Providers...
          */
@@ -202,6 +203,7 @@ return [
         'JWTAuth'   => Tymon\JWTAuth\Facades\JWTAuth::class,
         'JWTFactory' => Tymon\JWTAuth\Facades\JWTFactory::class,
         'PushNotification' => Edujugon\PushNotification\Facades\PushNotification::class,
+        'Indipay' => Softon\Indipay\Facades\Indipay::class,
         // Custom Helper
         //'Helper' => App\Helpers\Helper::class,
     ],

@@ -47,6 +47,7 @@ use App\TblAnswer;
 use App\TblQuestion;
 use App\TblQuesMaster;
 use App\PartnerKyc;
+use App\Notification;
 use DB;
 use Hash;
 
@@ -1385,7 +1386,7 @@ class AndroidController extends AppController
                    }
                    
                    #Send notification to Partners for new delivery
-                   $notificationData = User::whereIn('carrier_type_id',$carrierType)->where('user_type_id',2)->select('device_token')->get();
+                   $notificationData = User::whereIn('carrier_type_id',$carrierType)->where('user_type_id',2)->select('id','device_token')->get();
                    
                    $message=array();
                     $currentTime = strtotime(date("Y-m-d H:i:s"));
@@ -1397,15 +1398,21 @@ class AndroidController extends AppController
                                                         'payload'=>'dataPayload', 
                                                         'imageUrl'=>'', 
                                                         'timestamp'=>$currentTime));
-                   
+                    
                    foreach($notificationData as $nData){
+                       $newData = new Notification;
+                        $newData->user_id = $nData->id;
+                        $newData->data = $message['data'];
+                        $newData->save();
+                       
                        $push = new PushNotification('fcm');
                         $response =  $push->setMessage([
                                 'notification' => [
                                         'title'=>'New Delivery',
                                         'body'=>'A new Shipment has arrived for delivery from Haulitps.',
                                         'sound' => 'default'
-                                        ]
+                                        ],
+                                'data'=>$message
                                 ])                            
                              ->setDevicesToken($nData->device_token)
                              ->send();
@@ -1562,23 +1569,13 @@ class AndroidController extends AppController
                 $msg['responseCode'] = "0";
                 $msg['responseMessage'] = "userId required.";
             }else{            
-                    $quoteDetails = ShippingDetail::select('shipping_details.id','u.first_name','u.last_name', 'sq.quote_price','sq.created_at','shipping_details.table_name')                            
-                            ->leftJoin('shipping_quotes as sq','sq.shipping_id','=','shipping_details.id')
-                            ->leftJoin('users as u','u.id','=','sq.carrier_id')
-                            ->where('shipping_details.user_id',$userId)->get();
+                    $quoteDetails = Notification::select('data')->where('user_id',$userId)->where('status',1)->get();
                     $quoteArray = $quoteDetails->toArray();
                 
                     if(count($quoteArray) > 0){
-                        foreach($quoteDetails as $quotes){
-                            if($quotes['first_name']){
-                                $shippingData = DB::table($quotes->table_name)->select('delivery_title')->where('shipping_id',$quotes->id)->first();
-
-                                $data[$i]['partnerName'] = $quotes['first_name'].' '.$quotes['last_name'];
-                                $data[$i]['title'] = $shippingData->delivery_title;
-                                $data[$i]['price'] = $quotes['quote_price'];
-                                $data[$i]['time'] = date('d-F-Y h:i:s', strtotime($quotes['created_at'])); 
-                                $i++;
-                            }
+                        foreach($quoteDetails as $quotes){                                                       
+                            $data[$i]['data'] = $quotes['data'];
+                            $i++;                            
                         }
                         $msg['responseCode'] = "200";
                         $msg['responseMessage'] = "Notifications get successfully";               
@@ -2286,12 +2283,18 @@ class AndroidController extends AppController
                     }
                     
                     #Send notification to User for new quotation
-                    $offerNotification = ShippingDetail::select('u.device_token','u.first_name','u.last_name')
+                    $offerNotification = ShippingDetail::select('u.id','u.device_token','u.first_name','u.last_name')
                                     ->leftJoin('users as u','u.id','=','shipping_details.user_id')
                                     ->where('shipping_details.id',$shippingId)->first();
                     $message=array();
                     $currentTime = strtotime(date("Y-m-d H:i:s"));
                     $message['data']=json_encode(array('quoteId' => $quotationId, 'title'=>'Get Offer', 'type'=>'Get Offer', 'message'=>'A new Quotation has arrived on your post from Haulitps.', 'is_background'=>'true', 'payload'=>'dataPayload', 'imageUrl'=>'', 'timestamp'=>$currentTime));
+                    
+                    $newData = new Notification;
+                    $newData->user_id = $offerNotification->id;
+                    $newData->data = $message['data'];
+                    $newData->save();
+                    
                     $push = new PushNotification('fcm');
                     $response =  $push->setMessage([
                             'notification' => [
@@ -2305,7 +2308,7 @@ class AndroidController extends AppController
                          ->send();
                     
                     #Send notifications to partner for minimum bid information
-                    $maximumQuotes = ShippingQuote::select('shipping_quotes.id','u.device_token')
+                    $maximumQuotes = ShippingQuote::select('shipping_quotes.id','u.device_token','u.id')
                                                  ->leftJoin('users as u','u.id','=','shipping_quotes.carrier_id')
                                                  ->where('shipping_quotes.shipping_id',$shippingId)
                                                  ->where('shipping_quotes.quote_price', '>', $quotation)->get();
@@ -2321,6 +2324,11 @@ class AndroidController extends AppController
                                                             'payload'=>'dataPayload', 
                                                             'imageUrl'=>'', 
                                                             'timestamp'=>$currentTime));
+                        
+                        $newData = new Notification;
+                        $newData->user_id = $maximumQuote->id;
+                        $newData->data = $message['data'];
+                        $newData->save();
                         
                         $push = new PushNotification('fcm');
                         $response =  $push->setMessage([
@@ -2651,9 +2659,10 @@ class AndroidController extends AppController
                 $acceptBid = ShippingQuote::where('id',$quoteId)->update(['quote_status'=>1]);
                 
                 #Accept offer Notification
-                $carrierData = ShippingQuote::select('u.device_token','u.mobile_number','u.first_name','u.last_name')
+                $carrierData = ShippingQuote::select('u.id','u.device_token','u.mobile_number','u.first_name','u.last_name')
                                 ->leftJoin('users as u','u.id','=','shipping_quotes.carrier_id')
-                                ->where('shipping_quotes.id',$quoteId)->first();
+                                ->where('shipping_quotes.id',$quoteId)->first();                
+                
                 $message=array();
                 $currentTime = strtotime(date("Y-m-d H:i:s"));
                 $message['data']=json_encode(array('quoteId' => $quoteId,
@@ -2665,6 +2674,11 @@ class AndroidController extends AppController
                                                     'payload'=>'dataPayload', 
                                                     'imageUrl'=>'', 
                                                     'timestamp'=>$currentTime));
+                $newData = new Notification;
+                $newData->user_id = $carrierData->id;
+                $newData->data = $message['data'];
+                $newData->save();
+                
                 $push = new PushNotification('fcm');
                 $response =  $push->setMessage([
                         'notification' => [
@@ -2682,10 +2696,13 @@ class AndroidController extends AppController
                 $smsObj->sendsms_api('+91'.$carrierData->mobile_number,'Your Offer has been accepted by the '.$carrierData->first_name.' '.$carrierData->last_name);        
                 
                 #Reject offer Notification
-                $rejectUsers = ShippingQuote::select('u.device_token','u.first_name','u.last_name')
+                $rejectUsers = ShippingQuote::select('u.id','u.device_token','u.first_name','u.last_name')
                                 ->leftJoin('users as u','u.id','=','shipping_quotes.carrier_id')
                                 ->where('shipping_quotes.shipping_id',$shippingId)
                                 ->where('shipping_quotes.id','!=',$quoteId)->get();
+               $rejectArray = $rejectUsers->toArray();
+                
+                if(count($rejectArray) > 0){
                     $message=array();
                     $message['data']=json_encode(array('quoteId' => $quoteId,
                                                         'shippingId' => $shippingId,
@@ -2698,6 +2715,12 @@ class AndroidController extends AppController
                                                         'timestamp'=>$currentTime));
                 
                 foreach($rejectUsers as $rejectData){
+                    
+                    $newRejectData = new Notification;
+                    $newRejectData->user_id = $rejectData->id;
+                    $newRejectData->data = $message['data'];
+                    $newRejectData->save();
+                    
                     $response =  $push->setMessage([
                         'notification' => [
                                 'title'=>'Offer Rejected',
@@ -2710,7 +2733,7 @@ class AndroidController extends AppController
                      ->send();
                 }
                 
-                
+                }
                                 
                 if($acceptBid){                                        
                   $msg['responseCode'] = "200";
@@ -2753,7 +2776,7 @@ class AndroidController extends AppController
                 
                 $rejectOffer = ShippingQuote::where('id',$quoteId)->update(['quote_status'=>2]);
                 
-                $carrierData = ShippingQuote::select('u.device_token','u.mobile_number','u.first_name','u.last_name')
+                $carrierData = ShippingQuote::select('u.id','u.device_token','u.mobile_number','u.first_name','u.last_name')
                                 ->leftJoin('users as u','u.id','=','shipping_quotes.carrier_id')
                                 ->where('shipping_quotes.id',$quoteId)->first();
                 
@@ -2767,6 +2790,11 @@ class AndroidController extends AppController
                                                     'payload'=>'dataPayload', 
                                                     'imageUrl'=>'', 
                                                     'timestamp'=>$currentTime));
+                
+                $newRejectData = new Notification;
+                $newRejectData->user_id = $carrierData->id;
+                $newRejectData->data = $message['data'];
+                $newRejectData->save();
                 
                 $push = new PushNotification('fcm');
                 $response =  $push->setMessage([
@@ -2887,7 +2915,7 @@ class AndroidController extends AppController
                 $questionId = $ques->id;
                 
                 # Send notification to user for the question asked by partner
-                $offerNotification = ShippingDetail::select('u.device_token')
+                $offerNotification = ShippingDetail::select('u.id','u.device_token')
                                     ->leftJoin('users as u','u.id','=','shipping_details.user_id')
                                     ->where('shipping_details.id',$shippingId)->first();                
                 
@@ -2895,6 +2923,7 @@ class AndroidController extends AppController
                 $currentTime = strtotime(date("Y-m-d H:i:s"));
                 $message['data']=json_encode(array('shippingId' => $shippingId,
                                                     'questionId' => $questionId,
+                                                    'partnerId' => $userId,
                                                     'title'=>'New Question', 
                                                     'type'=>'New Question', 
                                                     'message'=>'A new Question has arrived on your post from Haulitps.', 
@@ -2902,6 +2931,12 @@ class AndroidController extends AppController
                                                     'payload'=>'dataPayload',
                                                     'imageUrl'=>'', 
                                                     'timestamp'=>$currentTime));
+                
+                $newData = new Notification;
+                $newData->user_id = $offerNotification->id;
+                $newData->data = $message['data'];
+                $newData->save();
+                
                 $push = new PushNotification('fcm');
                 $response =  $push->setMessage([
                         'notification' => [
@@ -2966,9 +3001,9 @@ class AndroidController extends AppController
                 $answerId = $data->id;
                 
                 # Send notification to Partner for the answer of his question
-                $offerNotification = TblQuesMaster::select('u.device_token', 'sd.id' ,'u.first_name','u.last_name')
-                                    ->leftJoin('users as u','u.id','=','sd.user_id')
+                $offerNotification = TblQuesMaster::select('u.id','u.device_token', 'sd.id' ,'u.first_name','u.last_name')                                    
                                     ->leftJoin('shipping_details as sd','sd.id','=','tbl_ques_masters.shipping_id')
+                                    ->leftJoin('users as u','u.id','=','sd.user_id')
                                     ->where('tbl_ques_masters.id',$qmId)->first();                
                 
                 $message=array();
@@ -2982,6 +3017,12 @@ class AndroidController extends AppController
                                                     'payload'=>'dataPayload',
                                                     'imageUrl'=>'', 
                                                     'timestamp'=>$currentTime));
+                
+                $newData = new Notification;
+                $newData->user_id = $offerNotification->id;
+                $newData->data = $message['data'];
+                $newData->save();
+                
                 $push = new PushNotification('fcm');
                 $response =  $push->setMessage([
                         'notification' => [
