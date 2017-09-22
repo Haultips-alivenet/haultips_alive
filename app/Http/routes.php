@@ -26,7 +26,8 @@ Route::get('user/delivery-detail/{shipping_id}', 'Front\UserController@deliveryD
 Route::get('user/my-delivery-delete/{shipping_id}', 'Front\UserController@deliveryDelete');
 Route::get('user/all-quotation/{shipping_id}', 'Front\UserController@allQuotation');
 Route::get('user/quotation-offer/{quote_id}', 'Front\UserController@quotationDetail');
-Route::post('user/quotation-offer/{quote_id}', 'Front\UserController@quotationStatusChange');
+Route::get('user/quotation-offer/accept/{quote_id}', 'Front\UserController@quotationOfferAccept');
+Route::get('user/quotation-offer/reject/{quote_id}', 'Front\UserController@quotationOfferReject');
 Route::get('user/relist-shipment/{shipping_id}', 'Front\UserController@relistShipment');
 Route::post('user/relist-shipment/{shipping_id}', 'Front\UserController@relistShipment');
 Route::get('user/bank-infomation', 'Front\UserController@bankInformation');
@@ -35,7 +36,10 @@ Route::get('user/bank-infomation/add', 'Front\UserController@bankInformationAdd'
 Route::post('user/bank-infomation/add', 'Front\UserController@bankInformationAdd');
 Route::get('user/transactionhistory', 'Front\UserController@getTransactionHistory');
 Route::get('user/new-shipment', 'Front\UserController@shipmentNew');
-Route::get('user/new-shipment', 'Front\UserController@shipmentNew');
+Route::get('user/find-delivery', 'Front\UserController@shipmentNew');
+Route::post('user/payment', 'Front\UserController@payment');
+Route::post('user/payment/success', 'Front\UserController@success');
+Route::post('user/payment/failure', 'Front\UserController@failure');
 // User login panel end
 
 // Partner login panel

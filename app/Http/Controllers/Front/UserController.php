@@ -18,11 +18,13 @@ use App\TblQuesMaster;
 use App\ShippingDetail;
 use App\ShippingQuote;
 use App\ShippingPickupDetail;
+use App\PaymentDetail;
 use App\ShippingDeliveryDetail;
 use App\PayInfo;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Input;
 use App\library\Smsapi;
+use Indipay;
 use Response;
 use DB;
 use Helper;
@@ -37,7 +39,7 @@ class UserController extends FrontController
       $data['user'] = Auth::User();
       $user_detail = UserDetail::where('user_id', Auth::User()->id)->first();
       $data['user_detail'] = $user_detail;
-      $data['profile_pic'] = $this->setDefaultImage('public/uploads/userimages/', $user_detail->image, 'u');
+      $data['profile_pic'] = $this->setDefaultImage('public/uploads/userimages/', ($user_detail) ? $user_detail->image : '', 'u');
       return view('user.profile', $data);
     }
 
@@ -69,7 +71,7 @@ class UserController extends FrontController
       }
 
       $user_detail = UserDetail::where('user_id', Auth::User()->id)->first();
-      $data['profile_pic'] = $this->setDefaultImage('public/uploads/userimages/', $user_detail->image, 'u');
+      $data['profile_pic'] = $this->setDefaultImage('public/uploads/userimages/', ($user_detail) ? $user_detail->image : '', 'u');
       return view('user.changepassword', $data);
     }
 
@@ -80,7 +82,7 @@ class UserController extends FrontController
       $sts_label_arr = array("all-status" => "All Status", "active" => "Active", "deleted" => "Deleted", "delivered" => "Delivered");
       $data['st_label'] = $sts_label_arr[$status];
       $userId = Auth::User()->id;
-      $shiipings = ShippingDetail::where('user_id', $userId);
+      $shiipings = ShippingDetail::where('user_id', $userId)->orderBy('id', 'desc');
       if($status == 'delivered') $shiipings->where('payments_status', 1);
       if (array_key_exists($status, $sts_arr)) $shiipings->where('status', $sts_arr[$status]);
       $shiipings = $shiipings->get();
@@ -92,6 +94,7 @@ class UserController extends FrontController
               $image = explode(',', $shippingData->item_image);
               $statuss = array("Inactive","Active","Process","Complete");
               $shiipings[$key]->title = $shippingData->delivery_title;
+              $shiipings[$key]->price = ($shipping->shipping_price > 0) ? 'INR ' . $shipping->shipping_price : 'N/A';
               $shiipings[$key]->image = $this->setDefaultImage('public/uploads/userimages/', $image[0], 'n');
               $shiipings[$key]->status = $statuss[$shipping->status];
               $shiipings[$key]->postDate = date('d-F-Y', strtotime($shipping->created_at));
@@ -101,7 +104,7 @@ class UserController extends FrontController
       $data['shippings'] = $shiipings;
 
       $user_detail = UserDetail::where('user_id', Auth::User()->id)->first();
-      $data['profile_pic'] = $this->setDefaultImage('public/uploads/userimages/', $user_detail->image, 'u');
+      $data['profile_pic'] = $this->setDefaultImage('public/uploads/userimages/', ($user_detail) ? $user_detail->image : '', 'u');
 
       return view('user.my-deliveries', $data);
     }
@@ -132,7 +135,7 @@ class UserController extends FrontController
       $data['shippingDetail'] = $shipmentDetail; 
 
       $user_detail = UserDetail::where('user_id', Auth::User()->id)->first();
-      $data['profile_pic'] = $this->setDefaultImage('public/uploads/userimages/', $user_detail->image, 'u');
+      $data['profile_pic'] = $this->setDefaultImage('public/uploads/userimages/', ($user_detail) ? $user_detail->image : '', 'u');
 
       return view('user.delivery-detail', $data);                    
     }
@@ -171,7 +174,7 @@ class UserController extends FrontController
       $data['quoteDetails'] = $quoteDetails;
 
       $user_detail = UserDetail::where('user_id', Auth::User()->id)->first();
-      $data['profile_pic'] = $this->setDefaultImage('public/uploads/userimages/', $user_detail->image, 'u');
+      $data['profile_pic'] = $this->setDefaultImage('public/uploads/userimages/', ($user_detail) ? $user_detail->image : '', 'u');
 
       return view('user.all-quotation', $data);
     }
@@ -200,9 +203,69 @@ class UserController extends FrontController
       $data['offerData'] = $offerData;
 
       $user_detail = UserDetail::where('user_id', Auth::User()->id)->first();
-      $data['profile_pic'] = $this->setDefaultImage('public/uploads/userimages/', $user_detail->image, 'u');
+      $data['profile_pic'] = $this->setDefaultImage('public/uploads/userimages/', ($user_detail) ? $user_detail->image : '', 'u');
 
       return view('user.quotation-detail', $data);
+    }
+
+    public function quotationOfferAccept($quoteId){
+      if(Auth::user()->user_type_id <> 3 || !Auth::check()) return redirect('/');
+
+      $data = array();
+      $offerData = ShippingQuote::select('shipping_quotes.quote_status','sd.created_at','sd.id as shippingId','spd.pickup_date','shipping_quotes.quote_price')
+                  ->leftJoin('shipping_details as sd','sd.id','=','shipping_quotes.shipping_id')
+                  ->leftJoin('shipping_pickup_details as spd','spd.shipping_id','=','shipping_quotes.shipping_id')
+                  ->where('shipping_quotes.id', $quoteId)->first();
+      
+      // check shipping id belongs to logged in user
+      if(!ShippingDetail::isShippingIdBelongsToLoggedInUser($offerData->shippingId, Auth::User()->id))
+        return redirect('user/home');
+
+      $status = array("Pending","Accepted","Rejected");
+      $offerData->quoteId = $quoteId;
+      $offerData->shippingId = $offerData->shippingId;
+      $offerData->price = $offerData->quote_price;
+      $offerData->validTill = date('d-F-Y', strtotime($offerData->pickup_date));
+      $offerData->developed = date('d-F-Y', strtotime($offerData->created_at));
+      $offerData->status = $status[$offerData->quote_status];
+
+      $data['offerData'] = $offerData;
+
+      $user_detail = UserDetail::where('user_id', Auth::User()->id)->first();
+      $data['profile_pic'] = $this->setDefaultImage('public/uploads/userimages/', ($user_detail) ? $user_detail->image : '', 'u');
+
+      return view('user.accept-offer', $data);
+    }
+
+    public function quotationOfferReject($quot_id){
+      if(Auth::user()->user_type_id <> 3 || !Auth::check()) return redirect('/');
+
+      $shipping_quote = ShippingQuote::where('id', $quot_id);
+      
+      // check shipping id belongs to logged in user
+      $sq = $shipping_quote->first();
+      if(!ShippingDetail::isShippingIdBelongsToLoggedInUser($sq->shipping_id, Auth::User()->id))
+        return redirect('user/home');
+
+      if($shipping_quote->count()){
+        $sts_updt = $shipping_quote->update(['quote_status' => 2]);
+
+        if($sts_updt){
+          $carrierData = ShippingQuote::select('u.device_token','u.first_name','u.last_name','u.mobile_number')
+                          ->leftJoin('users as u','u.id','=','shipping_quotes.carrier_id')
+                          ->where('shipping_quotes.id', $quot_id)->first();
+          
+          $otpMsg = 'Your Offer has been rejected by the '.$carrierData->first_name.' '.$carrierData->last_name;
+          // send sms
+          $smsObj = new Smsapi();
+          $smsObj->sendsms_api('+91'.$carrierData->mobile_number, $otpMsg);
+
+          $request->session()->flash('alert_type', 'success');
+          $request->session()->flash('alert_msg', "Quotation is rejected successfully!");
+        }
+
+      } 
+      return redirect("user/quotation-offer/$quot_id");
     }
 
     public function quotationStatusChange(Request $request, $quot_id){
@@ -319,7 +382,7 @@ class UserController extends FrontController
         return redirect('user/delivery-detail/' . $shipping_id);
 
       $user_detail = UserDetail::where('user_id', Auth::User()->id)->first();
-      $data['profile_pic'] = $this->setDefaultImage('public/uploads/userimages/', $user_detail->image, 'u');
+      $data['profile_pic'] = $this->setDefaultImage('public/uploads/userimages/', ($user_detail) ? $user_detail->image : '', 'u');
 
       return view('user.relist-shipment', $data);
     }
@@ -332,7 +395,7 @@ class UserController extends FrontController
                                       ->orderBy('id', 'desc')->get();
 
       $user_detail = UserDetail::where('user_id', Auth::User()->id)->first();
-      $data['profile_pic'] = $this->setDefaultImage('public/uploads/userimages/', $user_detail->image, 'u');
+      $data['profile_pic'] = $this->setDefaultImage('public/uploads/userimages/', ($user_detail) ? $user_detail->image : '', 'u');
 
       return view('user.bank-information', $data);
     }
@@ -383,7 +446,7 @@ class UserController extends FrontController
       }
 
       $user_detail = UserDetail::where('user_id', Auth::User()->id)->first();
-      $data['profile_pic'] = $this->setDefaultImage('public/uploads/userimages/', $user_detail->image, 'u');
+      $data['profile_pic'] = $this->setDefaultImage('public/uploads/userimages/', ($user_detail) ? $user_detail->image : '', 'u');
 
       return view('user.bank-information-add', $data);
     }
@@ -440,7 +503,7 @@ class UserController extends FrontController
                                     ->where('shipping_details.user_id', Auth::User()->id)->get();
 
       $user_detail = UserDetail::where('user_id', Auth::User()->id)->first();
-      $data['profile_pic'] = $this->setDefaultImage('public/uploads/userimages/', $user_detail->image, 'u');
+      $data['profile_pic'] = $this->setDefaultImage('public/uploads/userimages/', ($user_detail) ? $user_detail->image : '', 'u');
 
       return view('user.transactionhistory', $data);
     }
@@ -474,7 +537,7 @@ class UserController extends FrontController
       $data['offers'] = $offerData;
 
       $user_detail = UserDetail::where('user_id', Auth::User()->id)->first();
-      $data['profile_pic'] = $this->setDefaultImage('public/uploads/userimages/', $user_detail->image, 'u');
+      $data['profile_pic'] = $this->setDefaultImage('public/uploads/userimages/', ($user_detail) ? $user_detail->image : '', 'u');
 
       return view('user.my-offer', $data);
     }
@@ -511,7 +574,7 @@ class UserController extends FrontController
       $data['offer'] = $offerData;
 
       $user_detail = UserDetail::where('user_id', Auth::User()->id)->first();
-      $data['profile_pic'] = $this->setDefaultImage('public/uploads/userimages/', $user_detail->image, 'u');
+      $data['profile_pic'] = $this->setDefaultImage('public/uploads/userimages/', ($user_detail) ? $user_detail->image : '', 'u');
 
       return view('user.my-offer-detail', $data);
     }
@@ -531,29 +594,28 @@ class UserController extends FrontController
                                     ->where('tbl_ques_masters.user_id',$tempArr["id"])->get();
          
         $user_detail = UserDetail::where('user_id', Auth::User()->id)->first();
-        $data['profile_pic'] = $this->setDefaultImage('public/uploads/userimages/', $user_detail->image, 'u');
+        $data['profile_pic'] = $this->setDefaultImage('public/uploads/userimages/', ($user_detail) ? $user_detail->image : '', 'u');
 
         return view('user.faq',$data);
     }
 
     public function shipmentNew(){
-      if(Auth::user()->user_type_id <> 3 || !Auth::check()) return redirect('/');
+      if((Auth::user()->user_type_id <> 2 && Auth::user()->user_type_id <> 3) || !Auth::check()) return redirect('/');
 
-      $data['vehicle_cat'] = VehicleCategory::where('parent_id', 0)->get();
+      $vehicle_cat = VehicleCategory::where('parent_id', 0);
+
+      // Partner category
+      if(Auth::user()->user_type_id == 2){
+        if(Auth::user()->carrier_type_id == 1) $vehicle_cat->whereIn('id', [2, 3]);
+        if(Auth::user()->carrier_type_id == 2) $vehicle_cat->whereIn('id', [1, 4]);
+      }
+
+      $data['vehicle_cat'] = $vehicle_cat->get();
 
       $user_detail = UserDetail::where('user_id', Auth::User()->id)->first();
-      $data['profile_pic'] = $this->setDefaultImage('public/uploads/userimages/', $user_detail->image, 'u');
+      $data['profile_pic'] = $this->setDefaultImage('public/uploads/userimages/', ($user_detail) ? $user_detail->image : '', 'u');
+      
       return view('user.new-shipment', $data);
-    }
-
-    public function shipmentNewSubcat($cat_id){
-      if(Auth::user()->user_type_id <> 3 || !Auth::check()) return redirect('/');
-
-      $data['vehicle_subcat'] = VehicleCategory::where('parent_id', $cat_id)->get();
-
-      $user_detail = UserDetail::where('user_id', Auth::User()->id)->first();
-      $data['profile_pic'] = $this->setDefaultImage('public/uploads/userimages/', $user_detail->image, 'u');
-      return view('user.new-shipment-subcat', $data);
     }
 
     private function getLatLong($address){
@@ -585,6 +647,110 @@ class UserController extends FrontController
             return url($path . $file);     
         else
             return asset('public/user/img/' . $type_arr[$type]);
+    }
+
+    public function payment(Request $request){
+      if(Auth::user()->user_type_id <> 3 || !Auth::check()) return redirect('/');
+
+      $parameters = [
+        'amount' => $request->amount, 
+        'firstname' => Auth::user()->first_name,
+        'lastname' => Auth::user()->last_name,
+        'email' => Auth::user()->email,
+        'phone' => Auth::user()->mobile_number,
+        'productinfo' => 'Offer',
+        'udf1' => $request->quot_id,
+        'allow_repeated_payments' => false
+      ];
+      $request->session()->put('pay_process', 1);
+      $order = Indipay::prepare($parameters);
+      return Indipay::process($order);
+    }
+
+    public function success(Request $request){
+      if(Auth::user()->user_type_id <> 3 || !Auth::check()) return redirect('/');
+
+      // For default Gateway
+      $response = Indipay::response($request);
+      if($response['status'] == 'success' && $request->session()->has('pay_process')){
+        $quot_id = $response['udf1'];
+        $shipping_quote = ShippingQuote::where('id', $quot_id);
+
+        // check shipping id belongs to logged in user
+        $sq = $shipping_quote->first();
+        if(!ShippingDetail::isShippingIdBelongsToLoggedInUser($sq->shipping_id, Auth::User()->id))
+          return redirect('user/home');
+          
+          // reject other quotes
+          $rejectOther = ShippingQuote::where('shipping_id', $sq->shipping_id)->update(['quote_status'=>2]);
+
+          // Update shipping quotes status
+          $shipping_quote->update(['quote_status' => 1]);
+
+          // Update shipping details
+          ShippingDetail::where('id', $sq->shipping_id)->update(['payment_method_id' => 2, 'shipping_price' => $response['amount'],'payments_status' => 1]);
+
+          // insert payment details
+          $pay_det = new PaymentDetail;
+          $pay_det->shipping_id = $sq->shipping_id;
+          $pay_det->transaction_id = $response['txnid'];
+          $pay_det->amount = $response['amount'];
+          $pay_det->card_type = '';
+          $pay_det->name_on_card = $response['name_on_card'];
+          $pay_det->card_number = $response['cardnum'];
+          $pay_det->expiry_date = '';
+          $pay_det->account_number = '';
+          $pay_det->status = $response['status'];
+          $pay_det->created_at = $response['addedon'];
+          $pay_det->save();
+
+          #Accept offer Notification
+          $carrierData = ShippingQuote::select('u.device_token','u.first_name','u.last_name','u.mobile_number')
+                          ->leftJoin('users as u','u.id','=','shipping_quotes.carrier_id')
+                          ->where('shipping_quotes.id', $quot_id)->first();
+          $otpMsg = 'Your Offer has been accepted by the '.$carrierData->first_name.' '.$carrierData->last_name;                           
+          
+          // Send message functionality   
+          $smsObj = new Smsapi();
+          $smsObj->sendsms_api('+91'.$carrierData->mobile_number, $otpMsg);                  
+
+          #Reject offer Notification
+          $rejectUsers = ShippingQuote::select('u.device_token','u.first_name','u.last_name','u.mobile_number')
+                          ->leftJoin('users as u','u.id','=','shipping_quotes.carrier_id')
+                          ->where('shipping_quotes.shipping_id', $sq->shipping_id)
+                          ->where('shipping_quotes.id','!=', $quot_id)->get();
+          foreach($rejectUsers as $rejectData){
+            $otpMsg = 'Your Offer has been rejected by the '.$rejectData->first_name.' '.$rejectData->last_name;
+            // Send message functionality
+            $smsObj = new Smsapi();
+            $smsObj->sendsms_api('+91'.$rejectData->mobile_number, $otpMsg);
+          }
+
+          // destroy session restrict backend process on refresh
+          $request->session()->forget('pay_process');
+      }
+      
+      // For Otherthan Default Gateway
+      //$response = Indipay::gateway('payumoney')->response($request);
+
+      //dd($response);
+      $user_detail = UserDetail::where('user_id', Auth::User()->id)->first();
+      $response['profile_pic'] = $this->setDefaultImage('public/uploads/userimages/', ($user_detail) ? $user_detail->image : '', 'u');
+      return view('user/payment-success', $response);
+    }
+
+    public function failure(Request $request){
+      // For default Gateway
+      $response = Indipay::response($request);
+      
+      
+      // For Otherthan Default Gateway
+      //$response = Indipay::gateway('payumoney')->response($request);
+
+      //dd($response);
+      $user_detail = UserDetail::where('user_id', Auth::User()->id)->first();
+      $response['profile_pic'] = $this->setDefaultImage('public/uploads/userimages/', ($user_detail) ? $user_detail->image : '', 'u');
+      return view('user/payment-failure', $response);
     }
 
 }

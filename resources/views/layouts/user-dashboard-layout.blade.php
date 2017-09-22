@@ -58,7 +58,7 @@
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                <a class="navbar-brand topnav" href="{{url('user/home')}}" title="HAULTIPS"><img src="{{asset('public/user/img/logo.png')}}" alt="HAULTIPS"></a>
+                <a class="navbar-brand topnav" href="{{url('/')}}" title="HAULTIPS"><img src="{{asset('public/user/img/logo.png')}}" alt="HAULTIPS"></a>
             </div>
             <!-- Collect the nav links, forms, and other content for toggling -->
             <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
@@ -108,6 +108,7 @@
                 @endif
 
                 @if(Auth::user()->user_type_id == 2)
+                    <li><a href="{{ url('user/find-delivery') }}"><span><i class="fa fa-truck" aria-hidden="true"></i></span>Find Delivery</a></li>
                     <li><a href="{{ url('user/my-offers') }}"><span><i class="fa fa-university" aria-hidden="true"></i></span>My Offers</a></li>
                 @endif
 

@@ -16,7 +16,12 @@
                 <div class="discription">
                     <h4>{{ $cat->category_name }}</h4>
                     <div class="readmore"> 
+                    @if(Auth::user()->user_type_id == 3)
                         <a href="{{ url('subCategory/' . $cat->id) }}">Read More <img src="{{ asset('img/readmore.png') }}" alt=""></a>
+                    @endif
+                    @if(Auth::user()->user_type_id == 2)
+                        <a href="javascript:void(0);" onclick="findDeliv('{{ $cat->id }}')">Find Delivery <img src="{{ asset('img/readmore.png') }}" alt=""></a>
+                    @endif
                     </div>
                 </div>
             </li>
@@ -24,9 +29,22 @@
         </ul>
     </div>
 </div>
+
+{!! Form::open(array('url'=>'user/find/deliveries', 'id'=>'find_deliv_form')) !!}
+    {!! Form::hidden('categoryIdAll', '', array('id'=>'categoryIdAll')) !!}
+    {!! Form::hidden('orderByAll', '', array('id'=>'orderByAll')) !!}
+    {!! Form::hidden('pickupaddressAll', '', array('id'=>'pickupaddressAll')) !!}
+    {!! Form::hidden('deliveryaddressAll', '', array('id'=>'deliveryaddressAll')) !!}
+{!!Form::close()!!}
+
 @endsection
 
 @section('script')
-
+<script type="text/javascript">
+function findDeliv(cat_id){
+    $('#categoryIdAll').val(cat_id);
+    $('#find_deliv_form').submit();
+}
+</script>
 @endsection
 

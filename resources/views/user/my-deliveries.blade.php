@@ -24,8 +24,8 @@
             <tr style="cursor: pointer;" onclick="window.location.href='{{ url("user/delivery-detail/" . $shipping->id) }}';">
                  <td><span><img src="{{ $shipping->image }}" alt=""></span></td>
                  <td>{{ $shipping->title }}</td>
-                 <td>INR {{ $shipping->price }}</td>
-                 <td>{{ ($shipping->payment_status == 1) ? 'Paid' : 'Unpaid' }}</td>
+                 <td>{{ $shipping->price }}</td>
+                 <td>{{ ($shipping->payments_status == 1) ? 'Paid' : 'Unpaid' }}</td>
                  <td>{{ $shipping->postDate }}</td>
              </tr>
           @endforeach

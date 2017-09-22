@@ -37,18 +37,13 @@
             <br>
                
             <div class="form-group _re_all_de text-center"> 
-                @if($offerData->quote_status <> 1)
-                <button class="btn btn-color" onclick="quoteStsChange(1);">Accept Offer</button>
-                @endif
-                @if($offerData->quote_status <> 2)
-                <button class="btn btn-color" onclick="quoteStsChange(2);">Reject Offer</button>
+                @if($offerData->quote_status == 0)
+                <a href="{{ url('user/quotation-offer/accept/' . $offerData->quoteId) }}" class="btn btn-color">Accept Offer</a>
+                <a href="{{ url('user/quotation-offer/reject/' . $offerData->quoteId) }}" class="btn btn-color">Reject Offer</a>
                 @endif
                 <button class="btn btn-color" onclick="window.location.href='{{ url("user/all-quotation/" . $offerData->shippingId) }}';">Go Back</button>
             </div>
 
-            {!! Form::open(array('url'=>'user/quotation-offer/' . $offerData->quoteId, 'id'=>'ch_pass_form')) !!}
-                {!! Form::hidden('quot_sts', '', array('id' => 'quot_sts')) !!}
-            {!! Form::close() !!}
 
         </div>
     </div>
@@ -56,11 +51,6 @@
 @endsection
 
 @section('script')
-<script type="text/javascript">
-function quoteStsChange(sts){
-    $('#quot_sts').val(sts);
-    $('#ch_pass_form').submit();
-}   
-</script>
+
 @endsection
 

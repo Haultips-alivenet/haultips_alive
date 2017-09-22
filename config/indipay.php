@@ -10,7 +10,7 @@ return [
     |   view    = File
     */
 
-    'gateway' => 'InstaMojo',                // Replace with the name of default gateway you want to use
+    'gateway' => 'payumoney',                // Replace with the name of default gateway you want to use
 
     'testMode'  => true,                   // True for Testing the Gateway [For production false]
 
@@ -28,13 +28,13 @@ return [
     ],
 
     'payumoney' => [                         // PayUMoney Parameters
-        'merchantKey'  => env('INDIPAY_MERCHANT_KEY', ''),
-        'salt'  => env('INDIPAY_SALT', ''),
+        'merchantKey'  => env('INDIPAY_MERCHANT_KEY', 'rjQUPktU'),
+        'salt'  => env('INDIPAY_SALT', 'e5iIg1jwi8'),
         'workingKey' => env('INDIPAY_WORKING_KEY', ''),
 
         // Should be route address for url() function
-        'successUrl' => env('INDIPAY_SUCCESS_URL', 'indipay/response'),
-        'failureUrl' => env('INDIPAY_FAILURE_URL', 'indipay/response'),
+        'successUrl' => env('INDIPAY_SUCCESS_URL', 'user/payment/success'),
+        'failureUrl' => env('INDIPAY_FAILURE_URL', 'user/payment/failure'),
     ],
 
     'ebs' => [                         // EBS Parameters
