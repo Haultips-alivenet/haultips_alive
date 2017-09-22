@@ -2655,91 +2655,91 @@ class AndroidController extends AppController
                 $msg['responseCode'] = "0";
                 $msg['responseMessage'] = "$fieldName required.";
             }else{
-                
-                $rejectOther = ShippingQuote::where('shipping_id',$shippingId)->update(['quote_status'=>2]);
-                $acceptBid = ShippingQuote::where('id',$quoteId)->update(['quote_status'=>1]);
-                
-                #Accept offer Notification
-                $carrierData = ShippingQuote::select('u.id','u.device_token','u.mobile_number','u.first_name','u.last_name')
-                                ->leftJoin('users as u','u.id','=','shipping_quotes.carrier_id')
-                                ->where('shipping_quotes.id',$quoteId)->first();                
-                
-                $message=array();
-                $currentTime = strtotime(date("Y-m-d H:i:s"));
-                $message['data']=json_encode(array('quoteId' => $quoteId,
-                                                    'shippingId' => $shippingId,
-                                                    'title'=>'Offer Accepted', 
-                                                    'type'=>'Accept Offer', 
-                                                    'message'=>'Your Offer has been accepted by the '.$carrierData->first_name.' '.$carrierData->last_name, 
-                                                    'is_background'=>'true',
-                                                    'payload'=>'dataPayload', 
-                                                    'imageUrl'=>'', 
-                                                    'timestamp'=>$currentTime));
-                $newData = new Notification;
-                $newData->user_id = $carrierData->id;
-                $newData->data = $message['data'];
-                $newData->save();
-                
-                $push = new PushNotification('fcm');
-                $response =  $push->setMessage([
-                        'notification' => [
-                                'title'=>'Offer Accepted',
-                                'body'=>'Your Offer has been accepted by the '.$carrierData->first_name.' '.$carrierData->last_name,
-                                'sound' => 'default'
-                                ],
-                        'data'=>$message
-                        ])                            
-                     ->setDevicesToken($carrierData->device_token)
-                     //->setDevicesToken('ffHkTtZCMBI:APA91bFty3aqRWwZYg3DMfPjMSfmXDr6B4ZFse4OTlSJy8goIWfvpC8Kf2xVjI1wRKO21xOPUDz7-YloW5wAYOhVWqcwr3yQ33pP9_53oOowfYpXjNgKSW3HhTiYRYc8cJOdGvb9dKjd')
-                     ->send();
-                
-                $smsObj = new Smsapi();
-                $smsObj->sendsms_api('+91'.$carrierData->mobile_number,'Your Offer has been accepted by the '.$carrierData->first_name.' '.$carrierData->last_name);        
-                
-                #Reject offer Notification
-                $rejectUsers = ShippingQuote::select('u.id','u.device_token','u.first_name','u.last_name')
-                                ->leftJoin('users as u','u.id','=','shipping_quotes.carrier_id')
-                                ->where('shipping_quotes.shipping_id',$shippingId)
-                                ->where('shipping_quotes.id','!=',$quoteId)->get();
-               $rejectArray = $rejectUsers->toArray();
-                
-                if(count($rejectArray) > 0){
-                    $message=array();
-                    foreach($rejectUsers as $rejectData){
-                    $message['data']=json_encode(array('quoteId' => $quoteId,
-                                                        'shippingId' => $shippingId,
-                                                        'title'=>'Offer Rejected', 
-                                                        'type'=>'Reject Offer', 
-                                                        'message'=>'Your Offer has been rejected by the '.$rejectData->first_name.' '.$rejectData->last_name, 
-                                                        'is_background'=>'true',
-                                                        'payload'=>'dataPayload', 
-                                                        'imageUrl'=>'', 
-                                                        'timestamp'=>$currentTime));
-                
-                
-                    
-                    $newRejectData = new Notification;
-                    $newRejectData->user_id = $rejectData->id;
-                    $newRejectData->data = $message['data'];
-                    $newRejectData->save();
-                    
-                    $response =  $push->setMessage([
-                        'notification' => [
-                                'title'=>'Offer Rejected',
-                                'body'=>'Your Offer has been rejected by the '.$rejectData->first_name.' '.$rejectData->last_name,
-                                'sound' => 'default'
-                                ],
-                        'data'=>$message
-                        ])                            
-                     ->setDevicesToken($rejectData->device_token)
-                     ->send();
-                }
-                
-                }
+                $acceptBid = 1;
+//                $rejectOther = ShippingQuote::where('shipping_id',$shippingId)->update(['quote_status'=>2]);
+//                $acceptBid = ShippingQuote::where('id',$quoteId)->update(['quote_status'=>1]);
+//                
+//                #Accept offer Notification
+//                $carrierData = ShippingQuote::select('u.id','u.device_token','u.mobile_number','u.first_name','u.last_name')
+//                                ->leftJoin('users as u','u.id','=','shipping_quotes.carrier_id')
+//                                ->where('shipping_quotes.id',$quoteId)->first();                
+//                
+//                $message=array();
+//                $currentTime = strtotime(date("Y-m-d H:i:s"));
+//                $message['data']=json_encode(array('quoteId' => $quoteId,
+//                                                    'shippingId' => $shippingId,
+//                                                    'title'=>'Offer Accepted', 
+//                                                    'type'=>'Accept Offer', 
+//                                                    'message'=>'Your Offer has been accepted by the '.$carrierData->first_name.' '.$carrierData->last_name, 
+//                                                    'is_background'=>'true',
+//                                                    'payload'=>'dataPayload', 
+//                                                    'imageUrl'=>'', 
+//                                                    'timestamp'=>$currentTime));
+//                $newData = new Notification;
+//                $newData->user_id = $carrierData->id;
+//                $newData->data = $message['data'];
+//                $newData->save();
+//                
+//                $push = new PushNotification('fcm');
+//                $response =  $push->setMessage([
+//                        'notification' => [
+//                                'title'=>'Offer Accepted',
+//                                'body'=>'Your Offer has been accepted by the '.$carrierData->first_name.' '.$carrierData->last_name,
+//                                'sound' => 'default'
+//                                ],
+//                        'data'=>$message
+//                        ])                            
+//                     ->setDevicesToken($carrierData->device_token)
+//                     //->setDevicesToken('ffHkTtZCMBI:APA91bFty3aqRWwZYg3DMfPjMSfmXDr6B4ZFse4OTlSJy8goIWfvpC8Kf2xVjI1wRKO21xOPUDz7-YloW5wAYOhVWqcwr3yQ33pP9_53oOowfYpXjNgKSW3HhTiYRYc8cJOdGvb9dKjd')
+//                     ->send();
+//                
+//                $smsObj = new Smsapi();
+//                $smsObj->sendsms_api('+91'.$carrierData->mobile_number,'Your Offer has been accepted by the '.$carrierData->first_name.' '.$carrierData->last_name);        
+//                
+//                #Reject offer Notification
+//                $rejectUsers = ShippingQuote::select('u.id','u.device_token','u.first_name','u.last_name')
+//                                ->leftJoin('users as u','u.id','=','shipping_quotes.carrier_id')
+//                                ->where('shipping_quotes.shipping_id',$shippingId)
+//                                ->where('shipping_quotes.id','!=',$quoteId)->get();
+//               $rejectArray = $rejectUsers->toArray();
+//                
+//                if(count($rejectArray) > 0){
+//                    $message=array();
+//                    foreach($rejectUsers as $rejectData){
+//                    $message['data']=json_encode(array('quoteId' => $quoteId,
+//                                                        'shippingId' => $shippingId,
+//                                                        'title'=>'Offer Rejected', 
+//                                                        'type'=>'Reject Offer', 
+//                                                        'message'=>'Your Offer has been rejected by the '.$rejectData->first_name.' '.$rejectData->last_name, 
+//                                                        'is_background'=>'true',
+//                                                        'payload'=>'dataPayload', 
+//                                                        'imageUrl'=>'', 
+//                                                        'timestamp'=>$currentTime));
+//                
+//                
+//                    
+//                    $newRejectData = new Notification;
+//                    $newRejectData->user_id = $rejectData->id;
+//                    $newRejectData->data = $message['data'];
+//                    $newRejectData->save();
+//                    
+//                    $response =  $push->setMessage([
+//                        'notification' => [
+//                                'title'=>'Offer Rejected',
+//                                'body'=>'Your Offer has been rejected by the '.$rejectData->first_name.' '.$rejectData->last_name,
+//                                'sound' => 'default'
+//                                ],
+//                        'data'=>$message
+//                        ])                            
+//                     ->setDevicesToken($rejectData->device_token)
+//                     ->send();
+//                }
+//                
+//                }
                                 
                 if($acceptBid){                                        
                   $msg['responseCode'] = "200";
-                  $msg['responseMessage'] = "Offer Accepted successfully";
+                  $msg['responseMessage'] = "Select payment to accept offer.";
                 }else{
                   $msg['responseCode'] = "0";
                   $msg['responseMessage'] = "Some Error occur! Please try again";
@@ -3462,5 +3462,225 @@ class AndroidController extends AppController
         }
     }
     
+    public function paymentSucess(){
+        // For default Gateway
+      $response = Indipay::response($request);
+       if($response['status'] == 'success'){
+            $quot_id = $response['udf1'];
+            $shipping_quote = ShippingQuote::where('id', $quot_id);
+
+            // check shipping id belongs to logged in user
+            $sq = $shipping_quote->first();
+            
+            // reject other quotes
+            $rejectOther = ShippingQuote::where('shipping_id', $sq->shipping_id)->update(['quote_status'=>2]);
+
+            // Update shipping quotes status
+            $shipping_quote->update(['quote_status' => 1]);
+
+            // Update shipping details
+            ShippingDetail::where('id', $sq->shipping_id)->update(['payment_method_id' => 2, 'shipping_price' => $response['amount'],'payments_status' => 1]);
+
+            // insert payment details
+            $pay_det = new PaymentDetail;
+            $pay_det->shipping_id = $sq->shipping_id;
+            $pay_det->transaction_id = $response['txnid'];
+            $pay_det->amount = $response['amount'];
+            $pay_det->card_type = '';
+            $pay_det->name_on_card = $response['name_on_card'];
+            $pay_det->card_number = $response['cardnum'];
+            $pay_det->expiry_date = '';
+            $pay_det->account_number = '';
+            $pay_det->status = $response['status'];
+            $pay_det->created_at = $response['addedon'];
+            $pay_det->save();
+
+           #Accept offer Notification
+            $carrierData = ShippingQuote::select('u.id','u.device_token','u.mobile_number','u.first_name','u.last_name')
+                            ->leftJoin('users as u','u.id','=','shipping_quotes.carrier_id')
+                            ->where('shipping_quotes.id',$quot_id)->first();                
+                
+            $message=array();
+            $currentTime = strtotime(date("Y-m-d H:i:s"));
+            $message['data']=json_encode(array('quoteId' => $quot_id,
+                                                'shippingId' => $sq->shipping_id,
+                                                'title'=>'Offer Accepted', 
+                                                'type'=>'Accept Offer', 
+                                                'message'=>'Your Offer has been accepted by the '.$carrierData->first_name.' '.$carrierData->last_name, 
+                                                'is_background'=>'true',
+                                                'payload'=>'dataPayload', 
+                                                'imageUrl'=>'', 
+                                                'timestamp'=>$currentTime));
+            $newData = new Notification;
+            $newData->user_id = $carrierData->id;
+            $newData->data = $message['data'];
+            $newData->save();
+                
+            $push = new PushNotification('fcm');
+            $response =  $push->setMessage([
+                    'notification' => [
+                            'title'=>'Offer Accepted',
+                            'body'=>'Your Offer has been accepted by the '.$carrierData->first_name.' '.$carrierData->last_name,
+                            'sound' => 'default'
+                            ],
+                    'data'=>$message
+                    ])                            
+                 ->setDevicesToken($carrierData->device_token)                     
+                 ->send();
+                
+                
+                
+                #Reject offer Notification
+                $rejectUsers = ShippingQuote::select('u.id','u.device_token','u.first_name','u.last_name')
+                                ->leftJoin('users as u','u.id','=','shipping_quotes.carrier_id')
+                                ->where('shipping_quotes.shipping_id',$sq->shipping_id)
+                                ->where('shipping_quotes.id','!=',$quot_id)->get();
+               $rejectArray = $rejectUsers->toArray();
+                
+                if(count($rejectArray) > 0){
+                    $message=array();
+                    foreach($rejectUsers as $rejectData){
+                    $message['data']=json_encode(array('quoteId' => $quot_id,
+                                                        'shippingId' => $sq->shipping_id,
+                                                        'title'=>'Offer Rejected', 
+                                                        'type'=>'Reject Offer', 
+                                                        'message'=>'Your Offer has been rejected by the '.$rejectData->first_name.' '.$rejectData->last_name, 
+                                                        'is_background'=>'true',
+                                                        'payload'=>'dataPayload', 
+                                                        'imageUrl'=>'', 
+                                                        'timestamp'=>$currentTime));
+                
+                
+                    
+                    $newRejectData = new Notification;
+                    $newRejectData->user_id = $rejectData->id;
+                    $newRejectData->data = $message['data'];
+                    $newRejectData->save();
+                    
+                    $response =  $push->setMessage([
+                        'notification' => [
+                                'title'=>'Offer Rejected',
+                                'body'=>'Your Offer has been rejected by the '.$rejectData->first_name.' '.$rejectData->last_name,
+                                'sound' => 'default'
+                                ],
+                        'data'=>$message
+                        ])                            
+                     ->setDevicesToken($rejectData->device_token)
+                     ->send();
+                }
+                
+                }
+      }
+      $result = json_encode($response);
+            echo $result; 
+    }
+    
+    public function paymentFailure(){
+        // For default Gateway
+      $response = Indipay::response($request);
+      $result = json_encode($response);
+            echo $result; 
+    }
+    
+    public function paymentByCod(Request $request) {
+        $msg = array();
+        $quot_id = $request->quot_id;
+        $shipping_quote = ShippingQuote::where('id', $quot_id);
+
+        // check shipping id belongs to logged in user
+        $sq = $shipping_quote->first();
+        
+        if($shipping_quote->count()){
+        $rejectOther = ShippingQuote::where('shipping_id', $sq->shipping_id)->update(['quote_status'=>2]);
+        $sts_updt = $shipping_quote->update(['quote_status' => 1]);
+
+        // Update shipping details
+        ShippingDetail::where('id', $sq->shipping_id)->update(['payment_method_id' => 1, 'shipping_price' => $sq->quote_price, 'payments_status' => 0]);
+
+        #Accept offer Notification
+            $carrierData = ShippingQuote::select('u.id','u.device_token','u.mobile_number','u.first_name','u.last_name')
+                            ->leftJoin('users as u','u.id','=','shipping_quotes.carrier_id')
+                            ->where('shipping_quotes.id',$quot_id)->first();                
+                
+            $message=array();
+            $currentTime = strtotime(date("Y-m-d H:i:s"));
+            $message['data']=json_encode(array('quoteId' => $quot_id,
+                                                'shippingId' => $sq->shipping_id,
+                                                'title'=>'Offer Accepted', 
+                                                'type'=>'Accept Offer', 
+                                                'message'=>'Your Offer has been accepted by the '.$carrierData->first_name.' '.$carrierData->last_name, 
+                                                'is_background'=>'true',
+                                                'payload'=>'dataPayload', 
+                                                'imageUrl'=>'', 
+                                                'timestamp'=>$currentTime));
+            $newData = new Notification;
+            $newData->user_id = $carrierData->id;
+            $newData->data = $message['data'];
+            $newData->save();
+                
+            $push = new PushNotification('fcm');
+            $response =  $push->setMessage([
+                    'notification' => [
+                            'title'=>'Offer Accepted',
+                            'body'=>'Your Offer has been accepted by the '.$carrierData->first_name.' '.$carrierData->last_name,
+                            'sound' => 'default'
+                            ],
+                    'data'=>$message
+                    ])                            
+                 ->setDevicesToken($carrierData->device_token)                     
+                 ->send();
+                
+                
+                
+                #Reject offer Notification
+                $rejectUsers = ShippingQuote::select('u.id','u.device_token','u.first_name','u.last_name')
+                                ->leftJoin('users as u','u.id','=','shipping_quotes.carrier_id')
+                                ->where('shipping_quotes.shipping_id',$sq->shipping_id)
+                                ->where('shipping_quotes.id','!=',$quot_id)->get();
+               $rejectArray = $rejectUsers->toArray();
+                
+                if(count($rejectArray) > 0){
+                    $message=array();
+                    foreach($rejectUsers as $rejectData){
+                    $message['data']=json_encode(array('quoteId' => $quot_id,
+                                                        'shippingId' => $sq->shipping_id,
+                                                        'title'=>'Offer Rejected', 
+                                                        'type'=>'Reject Offer', 
+                                                        'message'=>'Your Offer has been rejected by the '.$rejectData->first_name.' '.$rejectData->last_name, 
+                                                        'is_background'=>'true',
+                                                        'payload'=>'dataPayload', 
+                                                        'imageUrl'=>'', 
+                                                        'timestamp'=>$currentTime));
+                
+                
+                    
+                    $newRejectData = new Notification;
+                    $newRejectData->user_id = $rejectData->id;
+                    $newRejectData->data = $message['data'];
+                    $newRejectData->save();
+                    
+                    $response =  $push->setMessage([
+                        'notification' => [
+                                'title'=>'Offer Rejected',
+                                'body'=>'Your Offer has been rejected by the '.$rejectData->first_name.' '.$rejectData->last_name,
+                                'sound' => 'default'
+                                ],
+                        'data'=>$message
+                        ])                            
+                     ->setDevicesToken($rejectData->device_token)
+                     ->send();
+                }
+                
+                }
+        
+        if($sts_updt){
+            $msg['responseCode'] = "200";
+            $msg['responseMessage'] = "Quotation is accepted successfully!"; 
+        }
+
+      }
+      $result = json_encode($msg);
+            echo $result; 
+    }
 }
     

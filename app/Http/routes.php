@@ -27,6 +27,7 @@ Route::get('user/my-delivery-delete/{shipping_id}', 'Front\UserController@delive
 Route::get('user/all-quotation/{shipping_id}', 'Front\UserController@allQuotation');
 Route::get('user/quotation-offer/{quote_id}', 'Front\UserController@quotationDetail');
 Route::get('user/quotation-offer/accept/{quote_id}', 'Front\UserController@quotationOfferAccept');
+Route::post('user/quotation-offer/accept/cod', 'Front\UserController@quotationOfferAcceptCod');
 Route::get('user/quotation-offer/reject/{quote_id}', 'Front\UserController@quotationOfferReject');
 Route::get('user/relist-shipment/{shipping_id}', 'Front\UserController@relistShipment');
 Route::post('user/relist-shipment/{shipping_id}', 'Front\UserController@relistShipment');
@@ -252,4 +253,7 @@ Route::post('webservices/kycUpdate', 'AndroidController@kycUpdate');
 Route::post('webservices/viewKYC', 'AndroidController@viewKYC');
 Route::post('webservices/partnerProfileView', 'AndroidController@partnerProfileView');
 Route::post('webservices/deleteBankInfo', 'AndroidController@deleteBankInfo');
+Route::post('webservices/paymentSucess', 'AndroidController@paymentSucess');
+Route::post('webservices/paymentFailure', 'AndroidController@paymentFailure');
+Route::post('webservices/paymentByCod', 'AndroidController@paymentByCod');
 Route::post('webservices/test', 'AndroidController@test');

@@ -1,5 +1,9 @@
 <?php
 
+
+$actual_link =  explode('/', $_SERVER['REQUEST_URI']);
+$sucessUrl = ($actual_link[2] == 'user') ? 'user/payment/success' : 'webservices/paymentSucess';
+$failureUrl = ($actual_link[2] == 'user') ? 'user/payment/failure' : 'webservices/paymentFailure';
 return [
 
     /*
@@ -10,7 +14,7 @@ return [
     |   view    = File
     */
 
-    'gateway' => 'payumoney',                // Replace with the name of default gateway you want to use
+    'gateway' => 'PayUMoney',                // Replace with the name of default gateway you want to use
 
     'testMode'  => true,                   // True for Testing the Gateway [For production false]
 
@@ -33,8 +37,8 @@ return [
         'workingKey' => env('INDIPAY_WORKING_KEY', ''),
 
         // Should be route address for url() function
-        'successUrl' => env('INDIPAY_SUCCESS_URL', 'user/payment/success'),
-        'failureUrl' => env('INDIPAY_FAILURE_URL', 'user/payment/failure'),
+        'successUrl' => env('INDIPAY_SUCCESS_URL', $sucessUrl),
+        'failureUrl' => env('INDIPAY_FAILURE_URL', $failureUrl),
     ],
 
     'ebs' => [                         // EBS Parameters
