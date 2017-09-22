@@ -45,7 +45,7 @@ class RegistrationController extends Controller
             $user->where(DB::raw('DATE_FORMAT(users.created_at,"%Y-%m-%d")'), '>=', $request->FromDate);
         }
         
-        $user = $user->where('user_type_id',3)->paginate(10);
+        $user = $user->where('user_type_id',3)->where('is_deleted',0)->paginate(10);
         $page = $user->toArray();
         return view('admin.user.index')->with([
                     'users' => $user,
@@ -190,7 +190,7 @@ class RegistrationController extends Controller
      */
     public function destroy($id)
     {
-        $query = User::where('id', $id)->delete();
+        $query = User::where('id', $id)->update(['is_deleted'=>1]);
         if($query == 1){
             Session::flash('success', 'User deleted successfully');            
         }else{

@@ -2286,6 +2286,7 @@ class AndroidController extends AppController
                     $offerNotification = ShippingDetail::select('u.id','u.device_token','u.first_name','u.last_name')
                                     ->leftJoin('users as u','u.id','=','shipping_details.user_id')
                                     ->where('shipping_details.id',$shippingId)->first();
+                  
                     $message=array();
                     $currentTime = strtotime(date("Y-m-d H:i:s"));
                     $message['data']=json_encode(array('quoteId' => $quotationId, 'title'=>'Get Offer', 'type'=>'Get Offer', 'message'=>'A new Quotation has arrived on your post from Haulitps.', 'is_background'=>'true', 'payload'=>'dataPayload', 'imageUrl'=>'', 'timestamp'=>$currentTime));
@@ -2704,6 +2705,7 @@ class AndroidController extends AppController
                 
                 if(count($rejectArray) > 0){
                     $message=array();
+                    foreach($rejectUsers as $rejectData){
                     $message['data']=json_encode(array('quoteId' => $quoteId,
                                                         'shippingId' => $shippingId,
                                                         'title'=>'Offer Rejected', 
@@ -2714,7 +2716,7 @@ class AndroidController extends AppController
                                                         'imageUrl'=>'', 
                                                         'timestamp'=>$currentTime));
                 
-                foreach($rejectUsers as $rejectData){
+                
                     
                     $newRejectData = new Notification;
                     $newRejectData->user_id = $rejectData->id;
@@ -3003,7 +3005,7 @@ class AndroidController extends AppController
                 # Send notification to Partner for the answer of his question
                 $offerNotification = TblQuesMaster::select('u.id','u.device_token', 'sd.id' ,'u.first_name','u.last_name')                                    
                                     ->leftJoin('shipping_details as sd','sd.id','=','tbl_ques_masters.shipping_id')
-                                    ->leftJoin('users as u','u.id','=','sd.user_id')
+                                    ->leftJoin('users as u','u.id','=','tbl_ques_masters.carrier_id')
                                     ->where('tbl_ques_masters.id',$qmId)->first();                
                 
                 $message=array();

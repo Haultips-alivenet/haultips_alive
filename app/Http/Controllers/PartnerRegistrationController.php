@@ -51,7 +51,7 @@ class PartnerRegistrationController extends Controller
         }
         
           
-        $user = $user->where('user_type_id',2)->paginate(10);
+        $user = $user->where('user_type_id',2)->where('is_deleted',0)->paginate(10);
         $page = $user->toArray();
         return view('admin.partner.index')->with([
                     'users' => $user,
@@ -339,7 +339,7 @@ class PartnerRegistrationController extends Controller
      */
     public function destroy($id)
     {
-        $query = User::where('id', $id)->delete();
+        $query = User::where('id', $id)->update(['is_deleted'=>1]);
         $query1 = DB::table('user_vehicle_details')->where('user_id', $id)->delete(); 
         if($query == 1){
             Session::flash('success', 'Partner deleted successfully');            
