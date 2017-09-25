@@ -30,29 +30,41 @@ class AuthController extends Controller
     protected $loginPath = 'admin/login';
     protected $redirectAfterLogout = 'admin/login';
     
-    public function authenticated($request , $user){
-        $user_detail = UserDetail::select('image')->where('user_id', $user->id)->first();
-        if($user_detail) {
-        $request->session()->put('userimage', $user_detail->image);
-        } else {
-            $request->session()->put('userimage', "");
-        }
-        $getoffer=$request->session()->get('check_getofferpage');
-        $finddelivery=$request->session()->get('check_findDelivery');
-        if($getoffer!="") {
-            return redirect(url('user/getoffer'));  
-        } else if($finddelivery!=""){
-            return redirect(url('user/find/deliveries/details/'.$finddelivery)); 
-        } else {    
-            if($user->user_type_id=='1'){            
-                return redirect('admin/dashboard') ;
-            }elseif($user->user_type_id=='2'){
-                return redirect(url('user/my-offers'));
-            }elseif($user->user_type_id=='3'){
-                //return redirect()->route('user/dashboard') ;
-                 return redirect(url('user/my-deliveries/all-status'));
+    public function authenticated($request , $user){ 
+    
+        if($user->status=='1'){    
+            $user_detail = UserDetail::select('image')->where('user_id', $user->id)->first();
+
+            if($user_detail) {
+            $request->session()->put('userimage', $user_detail->image);
+            } else {
+                $request->session()->put('userimage', "");
             }
-        } 
+
+            $getoffer=$request->session()->get('check_getofferpage');
+            $finddelivery=$request->session()->get('check_findDelivery');
+
+            if($getoffer!="") {
+                return redirect(url('user/getoffer'));  
+            } else if($finddelivery!=""){
+                return redirect(url('user/find/deliveries/details/'.$finddelivery)); 
+            } else {    
+                if($user->user_type_id=='1'){            
+                    return redirect('admin/dashboard') ;
+                }elseif($user->user_type_id=='2'){
+                    return redirect(url('user/my-offers'));
+                }elseif($user->user_type_id=='3'){
+                    //return redirect()->route('user/dashboard') ;
+                     return redirect(url('user/my-deliveries/all-status'));
+                }
+            } 
+        }else{
+            return redirect($this->loginPath($request->user))
+            ->withInput($request->only($this->loginUsername(), 'remember'))
+            ->withErrors([
+                $this->loginUsername() => 'Verify your mobile number to login',
+            ]);
+        }
     }
     
     

@@ -1491,7 +1491,7 @@ class AndroidController extends AppController
                             ->leftJoin('shipping_delivery_details as sdd','sdd.shipping_id','=','shipping_details.id')
                             ->leftJoin('payment_methods as pm','pm.id','=','shipping_details.payment_method_id')
                             ->where('shipping_details.id', $shipmentId)->first();
-                $shippingQuote = ShippingQuote::where('shipping_id',$shipmentId)->select('id')->first();
+                $shippingQuote = ShippingQuote::where('shipping_id',$shipmentId)->select('id')->first();                
                 $haveQuote = ($shippingQuote) ? 'Yes' : 'No';
                 
                $msg['responseCode'] = "200";
@@ -3587,14 +3587,14 @@ class AndroidController extends AppController
         $quot_id = $request->quot_id;
         $shipping_quote = ShippingQuote::where('id', $quot_id);
 
-        // check shipping id belongs to logged in user
+        # Check shipping id belongs to logged in user
         $sq = $shipping_quote->first();
         
         if($shipping_quote->count()){
         $rejectOther = ShippingQuote::where('shipping_id', $sq->shipping_id)->update(['quote_status'=>2]);
         $sts_updt = $shipping_quote->update(['quote_status' => 1]);
 
-        // Update shipping details
+        # Update shipping details
         ShippingDetail::where('id', $sq->shipping_id)->update(['payment_method_id' => 1, 'shipping_price' => $sq->quote_price, 'payments_status' => 0]);
 
         #Accept offer Notification
