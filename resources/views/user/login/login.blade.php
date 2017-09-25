@@ -29,7 +29,7 @@
                         @endif
                    <div class="clearfix"></div>
                     <div class="_cus_bx _cus_login">
-                        <p>Don't have an account? <a href="signup.html">Haultips Sign Up</a></p>
+                        <p>Don't have an account? <a href="{{url('user/signup')}}">Haultips Sign Up</a></p>
                            {!! Form::open(array('url'=>'/auth/login','id'=>'login-form')) !!}
                             {!! csrf_field() !!}
                             <div class="form-group ">
@@ -54,7 +54,7 @@
                                 </div>
                                 <div class="col-md-6">
                                     <div class="rft_ps">
-                                        <a href="#">Forgot password1?</a>
+<!--                                        <a href="#">Forgot password1?</a>-->
                                     </div>
                                 </div>
                             </div>

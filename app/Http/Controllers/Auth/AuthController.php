@@ -59,6 +59,7 @@ class AuthController extends Controller
                 }
             } 
         }else{
+            $this->getLogout();
             return redirect($this->loginPath($request->user))
             ->withInput($request->only($this->loginUsername(), 'remember'))
             ->withErrors([
