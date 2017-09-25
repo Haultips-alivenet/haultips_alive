@@ -21,6 +21,9 @@ use App\ShippingPickupDetail;
 use App\PaymentDetail;
 use App\ShippingDeliveryDetail;
 use App\PayInfo;
+use App\TblQuestion;
+use App\TblAnswer;
+use App\PartnerKyc;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Input;
 use App\library\Smsapi;
@@ -41,6 +44,91 @@ class UserController extends FrontController
       $data['user_detail'] = $user_detail;
       $data['profile_pic'] = $this->setDefaultImage('public/uploads/userimages/', ($user_detail) ? $user_detail->image : '', 'u');
       return view('user.profile', $data);
+    }
+
+    public function partner_profile_kyc(){
+      if((Auth::user()->user_type_id <> 3 && Auth::user()->user_type_id <> 2)  || !Auth::check()) return redirect('/');
+      $data["kycdata"] = DB::table('partner_kycs')->where('user_id', Auth::User()->id)->first();
+      $data['user'] = Auth::User();
+      $user_detail = UserDetail::where('user_id', Auth::User()->id)->first();
+      $data['user_detail'] = $user_detail;
+      $data['profile_pic'] = $this->setDefaultImage('public/uploads/userimages/', ($user_detail) ? $user_detail->image : '', 'u');
+      return view('user.profile_kyc',$data);
+    }
+
+    public function partner_profile_kyc_upload(Request $request){
+        
+         $destinationPath=public_path()."/admin/kyc/"; 
+       $user_id=Auth::User()->id;
+       $rc_photo = $request->file('rc_photo');
+       $pancard = $request->file('pancard');
+       $businesscard = $request->file('businesscard');
+       $kycdata = DB::table('partner_kycs')->where('user_id', $user_id)->first();
+      
+      if($rc_photo) {
+            
+            $filename=$rc_photo->getClientOriginalName();
+            $t=time();
+            $rc_photofilename="RC_".$user_id.'_'.$t.'_'.$filename; 
+            $request->file('rc_photo')->move($destinationPath,$rc_photofilename);
+        } else if(@$kycdata->rc_photo){
+            $rc_photofilename=$kycdata->rc_photo;
+        } else {
+            $rc_photofilename='';
+        }
+        if($pancard) {
+            
+            $filename=$pancard->getClientOriginalName();
+            $t=time();
+            $pancard_filename="Pan_".$user_id.'_'.$t.'_'.$filename; 
+            $request->file('pancard')->move($destinationPath,$pancard_filename);
+        } else if(@$kycdata->pancart){
+            $pancard_filename=$kycdata->rc_photo;
+        }else {
+            $pancard_filename='';
+        }
+        if($businesscard) {
+            
+            $filename=$businesscard->getClientOriginalName();
+            $t=time();
+            $businesscard_filename="Business_".$user_id.'_'.$t.'_'.$filename; 
+            $request->file('businesscard')->move($destinationPath,$businesscard_filename);
+        } else if(@$kycdata->business_card){
+            $businesscard_filename=$kycdata->business_card;
+        } else {
+            $businesscard_filename='';
+        }
+        
+        $kyc1 = PartnerKyc::find(@$kycdata->id); 
+        if($kyc1){
+            
+            $kyc1->user_id = $user_id;
+            $kyc1->rc_photo = $rc_photofilename;
+            $kyc1->pancart = $pancard_filename;
+            $kyc1->business_card = $businesscard_filename;
+            $userSucess = $kyc1->save(); 
+        } else {
+            $kyc = new PartnerKyc; 
+            $kyc->user_id = $user_id;
+            $kyc->rc_photo = $rc_photofilename;
+            $kyc->pancart = $pancard_filename;
+            $kyc->business_card = $businesscard_filename;
+            $userSucess = $kyc->save(); 
+        }
+        $status=0;
+        //if($status==1){
+        $user = User::find($user_id); 
+        $user->documents_status = $status;
+        $statusupdate = $user->save(); 
+       // }
+         if($userSucess == 1){
+            Session::flash('success', 'Documents Uploaded successfully!');            
+        }else{
+           Session::flash('success', 'Error occur ! Please try again.');
+        }
+        return redirect(url('parner/profile/kyc'));
+   
+        
     }
 
     public function changepassword(Request $request){
@@ -85,7 +173,7 @@ class UserController extends FrontController
       $shiipings = ShippingDetail::where('user_id', $userId)->orderBy('id', 'desc');
       if($status == 'delivered') $shiipings->where('payments_status', 1);
       if (array_key_exists($status, $sts_arr)) $shiipings->where('status', $sts_arr[$status]);
-      $shiipings = $shiipings->get();
+      $shiipings = $shiipings->paginate(10);
       if(count($shiipings) > 0){
          foreach($shiipings as $key=>$shipping){
             $shippingId = $shipping->id; 
@@ -155,12 +243,12 @@ class UserController extends FrontController
       $data = array();
       // check shipping id belongs to logged in user
       if(!ShippingDetail::isShippingIdBelongsToLoggedInUser($id, Auth::User()->id))
-        return redirect('user/home');
+        return redirect('/');
 
       // Quote Details
       $quoteDetails = ShippingQuote::select('shipping_quotes.id as quoteId','u.first_name','u.last_name', 'quote_price', 'quote_status')
               ->leftJoin('users as u','u.id','=','shipping_quotes.carrier_id')
-              ->where('shipping_quotes.shipping_id', $id)->get();
+              ->where('shipping_quotes.shipping_id', $id)->paginate(10);
   
       if(count($quoteDetails) > 0){
         foreach($quoteDetails as $key=>$quotes){
@@ -190,7 +278,7 @@ class UserController extends FrontController
       
       // check shipping id belongs to logged in user
       if(!ShippingDetail::isShippingIdBelongsToLoggedInUser($offerData->shippingId, Auth::User()->id))
-        return redirect('user/home');
+        return redirect('/');
 
       $status = array("Pending","Accepted","Rejected");
       $offerData->quoteId = $quoteId;
@@ -219,7 +307,7 @@ class UserController extends FrontController
       
       // check shipping id belongs to logged in user
       if(!ShippingDetail::isShippingIdBelongsToLoggedInUser($offerData->shippingId, Auth::User()->id))
-        return redirect('user/home');
+        return redirect('/');
 
       $status = array("Pending","Accepted","Rejected");
       $offerData->quoteId = $quoteId;
@@ -237,7 +325,7 @@ class UserController extends FrontController
       return view('user.accept-offer', $data);
     }
 
-    public function quotationOfferReject($quot_id){
+    public function quotationOfferReject(Request $request, $quot_id){
       if(Auth::user()->user_type_id <> 3 || !Auth::check()) return redirect('/');
 
       $shipping_quote = ShippingQuote::where('id', $quot_id);
@@ -245,7 +333,7 @@ class UserController extends FrontController
       // check shipping id belongs to logged in user
       $sq = $shipping_quote->first();
       if(!ShippingDetail::isShippingIdBelongsToLoggedInUser($sq->shipping_id, Auth::User()->id))
-        return redirect('user/home');
+        return redirect('/');
 
       if($shipping_quote->count()){
         $sts_updt = $shipping_quote->update(['quote_status' => 2]);
@@ -268,63 +356,49 @@ class UserController extends FrontController
       return redirect("user/quotation-offer/$quot_id");
     }
 
-    public function quotationStatusChange(Request $request, $quot_id){
+    public function quotationOfferAcceptCod(Request $request){
       if(Auth::user()->user_type_id <> 3 || !Auth::check()) return redirect('/');
-
+      $quot_id = $request->quot_id;
       $shipping_quote = ShippingQuote::where('id', $quot_id);
       
       // check shipping id belongs to logged in user
       $sq = $shipping_quote->first();
       if(!ShippingDetail::isShippingIdBelongsToLoggedInUser($sq->shipping_id, Auth::User()->id))
-        return redirect('user/home');
+        return redirect('/');
 
       if($shipping_quote->count()){
-        if($request->get('quot_sts') == 1){
-          $rejectOther = ShippingQuote::where('shipping_id', $sq->shipping_id)->update(['quote_status'=>2]);
-          $sts_updt = $shipping_quote->update(['quote_status' => 1]);
+        $rejectOther = ShippingQuote::where('shipping_id', $sq->shipping_id)->update(['quote_status'=>2]);
+        $sts_updt = $shipping_quote->update(['quote_status' => 1]);
 
-          #Accept offer Notification
-          $carrierData = ShippingQuote::select('u.device_token','u.first_name','u.last_name','u.mobile_number')
-                          ->leftJoin('users as u','u.id','=','shipping_quotes.carrier_id')
-                          ->where('shipping_quotes.id', $quot_id)->first();
-          $otpMsg = 'Your Offer has been accepted by the '.$carrierData->first_name.' '.$carrierData->last_name;                           
-          
-          // Send message functionality   
+        // Update shipping details
+        ShippingDetail::where('id', $sq->shipping_id)->update(['payment_method_id' => 1, 'shipping_price' => $sq->quote_price, 'payments_status' => 0]);
+
+        #Accept offer Notification
+        $carrierData = ShippingQuote::select('u.device_token','u.first_name','u.last_name','u.mobile_number')
+                        ->leftJoin('users as u','u.id','=','shipping_quotes.carrier_id')
+                        ->where('shipping_quotes.id', $quot_id)->first();
+        $otpMsg = 'Your Offer has been accepted by the '.$carrierData->first_name.' '.$carrierData->last_name;                           
+        
+        // Send message functionality   
+        $smsObj = new Smsapi();
+        $smsObj->sendsms_api('+91'.$carrierData->mobile_number, $otpMsg);                  
+
+        #Reject offer Notification
+        $rejectUsers = ShippingQuote::select('u.device_token','u.first_name','u.last_name','u.mobile_number')
+                        ->leftJoin('users as u','u.id','=','shipping_quotes.carrier_id')
+                        ->where('shipping_quotes.shipping_id', $sq->shipping_id)
+                        ->where('shipping_quotes.id','!=', $quot_id)->get();
+        foreach($rejectUsers as $rejectData){
+          $otpMsg = 'Your Offer has been rejected by the '.$rejectData->first_name.' '.$rejectData->last_name;
+          // Send message functionality
           $smsObj = new Smsapi();
-          $smsObj->sendsms_api('+91'.$carrierData->mobile_number, $otpMsg);                  
+          $smsObj->sendsms_api('+91'.$rejectData->mobile_number, $otpMsg);
 
-          #Reject offer Notification
-          $rejectUsers = ShippingQuote::select('u.device_token','u.first_name','u.last_name','u.mobile_number')
-                          ->leftJoin('users as u','u.id','=','shipping_quotes.carrier_id')
-                          ->where('shipping_quotes.shipping_id', $sq->shipping_id)
-                          ->where('shipping_quotes.id','!=', $quot_id)->get();
-          foreach($rejectUsers as $rejectData){
-            $otpMsg = 'Your Offer has been rejected by the '.$rejectData->first_name.' '.$rejectData->last_name;
-            // Send message functionality
-            $smsObj = new Smsapi();
-            $smsObj->sendsms_api('+91'.$rejectData->mobile_number, $otpMsg);
-
-          }
         }
-
-        if($request->get('quot_sts') == 2){
-          $sts_updt = $shipping_quote->update(['quote_status' => 2]);
-
-          $carrierData = ShippingQuote::select('u.device_token','u.first_name','u.last_name','u.mobile_number')
-                          ->leftJoin('users as u','u.id','=','shipping_quotes.carrier_id')
-                          ->where('shipping_quotes.id', $quot_id)->first();
-          
-          $otpMsg = 'Your Offer has been rejected by the '.$carrierData->first_name.' '.$carrierData->last_name;
-          // send sms
-          $smsObj = new Smsapi();
-          $smsObj->sendsms_api('+91'.$carrierData->mobile_number, $otpMsg);
-        }
-
+        
         if($sts_updt){
-          $status = array("pending", "accepted", "rejected");
-          $sts_title = $status[$request->get('quot_sts')];
           $request->session()->flash('alert_type', 'success');
-          $request->session()->flash('alert_msg', "Quotation is $sts_title successfully!");
+          $request->session()->flash('alert_msg', "Quotation is accepted successfully!");
         }
 
       } 
@@ -336,7 +410,7 @@ class UserController extends FrontController
 
       // check shipping id belongs to logged in user
       if(!ShippingDetail::isShippingIdBelongsToLoggedInUser($shipping_id, Auth::User()->id))
-        return redirect('user/home');
+        return redirect('/');
 
       if($request->isMethod('post')){
         $this->validate($request, [
@@ -513,19 +587,25 @@ class UserController extends FrontController
 
       $offerData = ShippingQuote::select('shipping_quotes.id','shipping_quotes.shipping_id','shipping_quotes.quote_status','shipping_quotes.quote_price','sd.table_name','sd.subcategory_id','sd.category_id')
                             ->leftJoin('shipping_details as sd','sd.id','=','shipping_quotes.shipping_id')
-                            ->where('shipping_quotes.carrier_id', Auth::User()->id)->get();
+                            ->where('shipping_quotes.carrier_id', Auth::User()->id)->paginate(10);
                 
       if(count($offerData) > 0){
         foreach($offerData as $key=>$offer){ 
            $shippingId = $offer->shipping_id;
            $shippingData = DB::table($offer->table_name)->select('delivery_title','item_image')->where('shipping_id', $shippingId)->first();
 
+           // Edit bid amount permission
+           $offerData[$key]->edit_bid = ShippingQuote::where('shipping_id', $offer->shipping_id)
+                                      ->where('carrier_id', '<>', Auth::user()->id)
+                                      ->where('quote_price', '<', $offer->quote_price)
+                                      ->where('quote_status', 0)->count();
+
            $image = explode(',', $shippingData->item_image);
            $status = array("Pending", "Accepted", "Rejected");
 
            $offerData[$key]->quoteId = $offer->id;
            $offerData[$key]->shippingId = $shippingId;
-           $offerData[$key]->title = $shippingData->delivery_title;
+           $offerData[$key]->title = ucwords($shippingData->delivery_title);
            $offerData[$key]->image = $this->setDefaultImage('public/uploads/userimages/', $image[0], 'n');
            $offerData[$key]->category = (empty($offer->category_id)) ? 'N/A' : ShippingDetail::getCategoryName($offer->category_id, 'id', 'category_name','vehicle_categories');
            $offerData[$key]->subcategory = (empty($offer->subcategory_id)) ? 'N/A' : ShippingDetail::getCategoryName($offer->subcategory_id, 'id', 'category_name','vehicle_categories');
@@ -582,7 +662,19 @@ class UserController extends FrontController
     public function faq()
     {
         $tempArr = Session::get('currentUser');
-         $data["quesdetails"] = TblQuesMaster::select('tq.question', 'u.first_name','u.last_name','ud.image','sd.table_name','sd.id as shippingId','tq.id as quesId','tbl_ques_masters.carrier_id')                            
+         if($tempArr["user_type_id"]==2) {
+         $data["quesdetails"] = TblQuesMaster::select('tq.question','u.id as user_id','u.first_name','u.last_name','ud.image','sd.table_name','sd.id as shippingId','tq.id as quesId','tbl_ques_masters.carrier_id')                            
+                                    ->leftJoin('tbl_questions as tq','tq.ques_master_id','=','tbl_ques_masters.id')
+                                    ->leftJoin('users as u','u.id','=','tbl_ques_masters.user_id')
+                                    ->leftJoin('user_details as ud','ud.user_id','=','tbl_ques_masters.carrier_id')
+                                    ->leftJoin('shipping_details as sd','sd.id','=','tbl_ques_masters.shipping_id')                                   
+                                    ->orderBy('tq.id', 'desc')
+                                    ->groupBy('tbl_ques_masters.carrier_id')
+                                    ->groupBy('tbl_ques_masters.shipping_id')
+                                    ->where('tq.status',1)
+                                    ->where('tbl_ques_masters.carrier_id',$tempArr["id"])->get();
+        } else {
+            $data["quesdetails"] = TblQuesMaster::select('tq.question','u.id as user_id','u.first_name','u.last_name','ud.image','sd.table_name','sd.id as shippingId','tq.id as quesId','tbl_ques_masters.carrier_id')                            
                                     ->leftJoin('tbl_questions as tq','tq.ques_master_id','=','tbl_ques_masters.id')
                                     ->leftJoin('users as u','u.id','=','tbl_ques_masters.carrier_id')
                                     ->leftJoin('user_details as ud','ud.user_id','=','tbl_ques_masters.carrier_id')
@@ -592,11 +684,44 @@ class UserController extends FrontController
                                     ->groupBy('tbl_ques_masters.shipping_id')
                                     ->where('tq.status',1)
                                     ->where('tbl_ques_masters.user_id',$tempArr["id"])->get();
-         
+        }
         $user_detail = UserDetail::where('user_id', Auth::User()->id)->first();
         $data['profile_pic'] = $this->setDefaultImage('public/uploads/userimages/', ($user_detail) ? $user_detail->image : '', 'u');
+        if($tempArr["user_type_id"]==2) {
+             return view('user.faq',$data);
+        } else {
+        return view('user.faq_user',$data);
+        }
+    }
 
-        return view('user.faq',$data);
+    public function user_ans_save(Request $request){
+      
+        $data = new TblAnswer();
+        $data->ques_master_id = $request->question_master_id;
+        $data->ques_id = $request->question_id;
+        $data->answer = $request->answer;
+        $data->save();
+         Session::flash('success', 'Answer saved successfully'); 
+        return redirect('user/faq');
+    }
+
+    public function partner_question_save(Request $request){
+        $tempArr = Session::get('currentUser');
+        $queMaster = new TblQuesMaster;
+        $queMaster->shipping_id = $request->shiping_id;
+        $queMaster->user_id = $request->user_id;
+        $queMaster->carrier_id = $tempArr["id"];
+        $queMaster->save();
+        $masterQuesId = $queMaster->id;
+
+        $ques = new TblQuestion;
+        $ques->ques_master_id = $masterQuesId;
+        $ques->question = $request->question;
+        $ques->status =1;
+        $ques->save();
+        $questionId = $ques->id;
+        //Session::flash('success', 'Category created successfully'); 
+        return redirect('user/faq');
     }
 
     public function shipmentNew(){
@@ -679,7 +804,7 @@ class UserController extends FrontController
         // check shipping id belongs to logged in user
         $sq = $shipping_quote->first();
         if(!ShippingDetail::isShippingIdBelongsToLoggedInUser($sq->shipping_id, Auth::User()->id))
-          return redirect('user/home');
+          return redirect('/');
           
           // reject other quotes
           $rejectOther = ShippingQuote::where('shipping_id', $sq->shipping_id)->update(['quote_status'=>2]);

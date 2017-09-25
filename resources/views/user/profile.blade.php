@@ -64,9 +64,9 @@
                 <div class="form-group col-md-12">
                     <div class="col-md-4"><label for="">Street</label></div>
                     <div class="col-md-8">
-                        <div class="_me_dis" id="street_spn">{{ $user_detail->street }}</div>
+                        <div class="_me_dis" id="street_spn">{{ @$user_detail->street }}</div>
                         <div class="_me_input">
-                            {!! Form::text('street', $user_detail->street, array('class'=>'form-control', 'id'=>'street')) !!}
+                            {!! Form::text('street', @$user_detail->street, array('class'=>'form-control', 'id'=>'street')) !!}
                         </div>
                     </div>
                 </div>
@@ -74,9 +74,9 @@
                 <div class="form-group col-md-12">
                     <div class="col-md-4"><label for="">City</label></div>
                     <div class="col-md-8"> 
-                        <div class="_me_dis" id="city_spn">{{ $user_detail->city }}</div>
+                        <div class="_me_dis" id="city_spn">{{ @$user_detail->city }}</div>
                         <div class="_me_input">
-                            {!! Form::text('city', $user_detail->city, array('class'=>'form-control', 'id'=>'city')) !!}
+                            {!! Form::text('city', @$user_detail->city, array('class'=>'form-control', 'id'=>'city')) !!}
                         </div>
                     </div>
                 </div>
@@ -84,9 +84,9 @@
                 <div class="form-group col-md-12">
                     <div class="col-md-4"><label for="">Enter a Location</label></div>
                     <div class="col-md-8">
-                        <div class="_me_dis" id="location_spn">{{ $user_detail->location }}</div>
+                        <div class="_me_dis" id="location_spn">{{ @$user_detail->location }}</div>
                         <div class="_me_input">
-                            {!! Form::text('location', $user_detail->location, array('class'=>'form-control', 'id'=>'location')) !!}
+                            {!! Form::text('location', @$user_detail->location, array('class'=>'form-control', 'id'=>'location')) !!}
                         </div>
                     </div>
                 </div>
@@ -94,9 +94,9 @@
                 <div class="form-group col-md-12">
                     <div class="col-md-4"><label for="">Pin Code</label></div>
                     <div class="col-md-8">
-                        <div class="_me_dis" id="pincode_spn">{{ $user_detail->pincode }}</div>
+                        <div class="_me_dis" id="pincode_spn">{{ @$user_detail->pincode }}</div>
                         <div class="_me_input">
-                            {!! Form::text('pincode', $user_detail->pincode, array('class'=>'form-control', 'id'=>'pincode')) !!}
+                            {!! Form::text('pincode', @$user_detail->pincode, array('class'=>'form-control', 'id'=>'pincode')) !!}
                         </div>
                     </div>
                 </div>
@@ -104,9 +104,9 @@
                 <div class="form-group col-md-12">
                     <div class="col-md-4"><label for="">Country</label></div>
                     <div class="col-md-8">
-                        <div class="_me_dis" id="country_spn">{{ $user_detail->country }}</div>
+                        <div class="_me_dis" id="country_spn">{{ @$user_detail->country }}</div>
                         <div class="_me_input">
-                            {!! Form::text('country', $user_detail->country, array('class'=>'form-control', 'id'=>'country')) !!}
+                            {!! Form::text('country', @$user_detail->country, array('class'=>'form-control', 'id'=>'country')) !!}
                         </div>
                     </div>
                 </div>
@@ -116,8 +116,15 @@
                  <div class="form-group col-md-12 _me_input">
                  {!! Form::submit('Submit', array('class'=>'btn btn-color', 'id'=>'prf_submit')) !!}
                  </div>
+                
+                
             {!!Form::close()!!}
             </div>
+                <div class="form-group col-md-12 ">
+                <a href="{{url('parner/profile/kyc')}}"> {!! Form::button('Kyc', array('class'=>'btn btn-color', 'id'=>'')) !!}</a>
+                
+                 {!! Form::button('Trans', array('class'=>'btn btn-color', 'id'=>'')) !!}
+                 </div>
         </div>
       </div>
 </div>

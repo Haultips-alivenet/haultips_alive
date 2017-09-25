@@ -194,6 +194,10 @@ class FindDeliveriesController extends FrontController
                          $data1['weight'] = $shippingDetail->weight;
                          $data1['remarks'] = $shippingDetail->remarks;
                      }
+
+                     // count if bid is submitted by this partner on the shipping
+                     $msg['count_bid'] = ShippingQuote::where('shipping_id', $shippingId)
+                                                        ->where('carrier_id', Auth::user()->id)->count();
                         
                         $msg['details'] = $data;  
                         $msg['detailsItem'] = $data1; 
@@ -209,32 +213,78 @@ class FindDeliveriesController extends FrontController
             }
     }
 
-    public function bidoffer($shipingid){
-        
-       $msg["miid"] = ShippingQuote::where('shipping_id',$shipingid)->select((DB::raw('min(quote_price) as minimumBid')))->first();
+    public function bidoffer(Request $request, $shipingid){
+       $msg["miid"] = ShippingQuote::where('shipping_id', $shipingid)->select((DB::raw('min(quote_price) as minimumBid')))->first();
+       if($request->quote_id>0){
+            $msg['quote_id'] = $request->quote_id;
+       }
+       else{
+            $quote = ShippingQuote::where('shipping_id', $shipingid)
+                                    ->where('carrier_id', Auth::user()->id)->first();
+            $msg['quote_id'] = $quote->id;
+       }
        $msg["shiping_id"] = $shipingid;  
-       return view('user.bidDetails',$msg);
+       return view('user.bidDetails', $msg);
     }
+
     public function bidoffersave(Request $request){
-        
         $shippingDetail = DB::table("shipping_details as s")
                 ->join('users as u','s.user_id','=','u.id')
-                ->where('s.id',$request->shipingid)->select('u.mobile_number')->first();
+                ->where('s.id',$request->shipingid)->select('u.mobile_number','u.first_name','u.last_name')->first();
         $customer_mobile=$shippingDetail->mobile_number;
         
         $tempArr = Session::get('currentUser');
-        $quote = new ShippingQuote;
-        $quote->shipping_id = $request->shipingid;
-        $quote->carrier_id = $tempArr["id"];
-        $quote->quote_price = $request->bidvalue;
-        $quote->lowest_quote_price = $request->minbid;
-        $quote->quote_status = 0;
-        $msg="A new Quotation has arrived on your post from Haulitps.";
-        $smsObj = new Smsapi();
-        $smsObj->sendsms_api('+91'.$customer_mobile,$msg);  
+        if($request->quote_id>0){
+            $quote_id = $request->quote_id;
+       }
+       else{
+            $quote = ShippingQuote::where('shipping_id', $request->shipingid)
+                                    ->where('carrier_id', Auth::user()->id)->first();
+            $quote_id = $quote->id;
+       }
+        if($quote_id > 0){
+            $quote = DB::table('shipping_quotes')->where('id', $request->quote_id)
+                                    ->where('shipping_id', $request->shipingid)
+                                    ->where('carrier_id', Auth::user()->id);
+            
+            $quote->update([
+                    'quote_price' => $request->bidvalue,
+                    'lowest_quote_price' => $request->minbid,
+                    'quote_status' => 0,
+                ]);
+            $quotationId= $request->quote_id;
+        }
+        else{
+            $quote = new ShippingQuote;
+            $quote->shipping_id = $request->shipingid;
+            $quote->carrier_id = $tempArr["id"];
+            $quote->quote_price = $request->bidvalue;
+            $quote->lowest_quote_price = $request->minbid;
+            $quote->quote_status = 0;
+            $msg="A new Quotation has arrived on your post from Haultips.";
+            $smsObj = new Smsapi();
+            $smsObj->sendsms_api('+91'.$customer_mobile,$msg);  
+            $quote->save();
+            $quotationId= $quote->id;
+        }
+
+        // Users who bid more and having status pending
+        $users_bid_more = User::select('users.mobile_number')
+                                ->join('shipping_quotes as sq', 'users.id', '=', 'sq.carrier_id')
+                                ->where('users.id', '<>', Auth::user()->id)
+                                ->where('sq.shipping_id', $request->shipingid)
+                                ->where('sq.quote_price', '>', $request->bidvalue)
+                                ->where('sq.quote_status', 0)
+                                ->groupBy('users.id')->get();
+
         
-        $quote->save();
-        $quotationId= $quote->id;
+        $notify_msg = 'Minimum bid is arrived on ' . $shippingDetail->first_name . ' '. $shippingDetail->last_name . "'s post.";
+        foreach($users_bid_more as $user_bid_more){
+            // Send message functionality
+            $smsObj = new Smsapi();
+            $smsObj->sendsms_api('+91'.$user_bid_more->mobile_number, $notify_msg);
+        }
+
         Session::flash('success', 'Bids Submitted Sucessfully!');
         return redirect(url('user/find/deliveries'));
     }

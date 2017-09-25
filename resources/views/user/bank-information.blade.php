@@ -8,7 +8,7 @@
     <div class="_dash_rft _bnkac">
         <div class="row">
             <div class="col-md-12">
-                <h3>Bank Information</h3>
+                <h3>Account Information</h3>
 
                 @if(Session::has('alert_msg'))
                     <div class="alert alert-{{ Session::get('alert_type') }}">

@@ -88,7 +88,8 @@ Route::get('user/verifyotp/{id}', 'Front\LoginController@verifyotp');
 Route::get('user/resend/opt/{id}', 'Front\LoginController@resendotp');
 Route::post('user/checkotp', 'Front\LoginController@checkotp');
 Route::get('bid/offer/{id}', 'Front\FindDeliveriesController@bidoffer');
-Route::post('bid/offer/save', 'Front\FindDeliveriesController@bidoffersave');
+Route::post('bid/offer/{id}', 'Front\FindDeliveriesController@bidoffer');
+Route::post('bid/offer/save/{id}', 'Front\FindDeliveriesController@bidoffersave');
 Route::post('partner/question/save', 'Front\FindDeliveriesController@partner_question_save');
 //sds
 

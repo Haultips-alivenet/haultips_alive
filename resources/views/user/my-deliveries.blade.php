@@ -29,11 +29,13 @@
                  <td>{{ $shipping->postDate }}</td>
              </tr>
           @endforeach
+          
         @else
           <tr><td colspan="5">No Record Found</td></tr>
         @endif
         </tbody>
     </table>
+    {!! $shippings->render() !!}
   </div>
 </div>
 @endsection

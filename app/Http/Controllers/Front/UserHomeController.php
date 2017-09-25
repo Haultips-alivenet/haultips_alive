@@ -45,7 +45,8 @@ class UserHomeController extends FrontController
     }
     
     public function getquesAns(Request $request){
-         $quesDetail = TblQuesMaster::select('tq.question','tq.created_at as quesTime','u.first_name as cfname','u.last_name as clname','ta.answer','ta.created_at as ansTime','uc.first_name as ufname','uc.last_name as ulname')
+        $tempArr = Session::get('currentUser');
+         $quesDetail = TblQuesMaster::select('tbl_ques_masters.id as que_master_id','tq.id as qies_id','tq.question','tq.created_at as quesTime','u.first_name as cfname','u.last_name as clname','ta.answer','ta.created_at as ansTime','uc.first_name as ufname','uc.last_name as ulname')
                                     ->leftJoin('tbl_questions as tq','tq.ques_master_id','=','tbl_ques_masters.id')
                                     ->leftJoin('users as u','u.id','=','tbl_ques_masters.carrier_id')
                                     ->leftJoin('tbl_answers as ta','ta.ques_id','=','tq.id')
@@ -60,6 +61,24 @@ class UserHomeController extends FrontController
                 $a.='<h5><b>'.$i.'. '.$detail['question'].'</b></h5>';
                  $a.='Ans '.$detail['answer'];
                  $a.='<br>';
+                 $ids="'".$detail["que_master_id"]."_".$detail["qies_id"]."'";
+                 if($detail['answer']=="" && $tempArr["user_type_id"]!=2){
+                     $a.='<div class="quest_txt">';
+                     $a.='<h4> <span class="pull-right" onclick="getreply('.$i.');"><i class="fa fa-plus-circle"></i></span></h4>';
+                     $a.='<div class="clearfix"></div>';
+                     $a.='<div class="_question_tb_0'.$i.'" style="display: none">';
+                     $a.='<div class="input-group">';
+                     $a.='<input type="text" name="answerof'.$detail["qies_id"].'" id="answerof'.$detail["qies_id"].'"  class="form-control input-sm" maxlength="64" placeholder="Please enter your Answer" />';
+                     $a.='<span class="input-group-addon btn-primary" onclick="reply_ans('.$ids.');">
+                        Submit <i class="fa fa-question" aria-hidden="true"></i>
+                      </span>';
+                     $a.='</div>';
+                     $a.='</div>';
+                     $a.='</div>';
+                     
+                 }
+                 
+                 
                  $i++;
             }
         echo $a;

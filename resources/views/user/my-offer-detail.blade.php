@@ -54,7 +54,7 @@
          </div>
 
 
-         <div class="_dash_m_inner">
+         <div class="_dash_m_inner" style="margin-bottom: 20px;">
              <h3>Freight Information</h3>
 
             <div class="_dash_full">
@@ -87,9 +87,12 @@
             </div>
 
          </div>
-         
-     </div>   
+        <a href="{{ url('user/my-offers') }}" class="btn btn-color pull-right">Go Back</a>
+
+     </div>
+    
 </div>
+
 @endsection
 
 @section('script')

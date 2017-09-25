@@ -112,9 +112,7 @@
             <button class="btn btn-color" onclick="window.location.href='{{ url("user/relist-shipment/" . $shippingDetail->id) }}';">Relist Shipment</button>
         @endif
         
-        @if($quotation_count > 0)
             <button class="btn btn-color"  onclick="window.location.href='{{ url("user/all-quotation/" . $shippingDetail->id) }}';">All Quotations</button>
-        @endif
 
         @if($quotation_count <= 0 && $sts <> 2)
             <button class="btn btn-color" onclick="window.location.href='{{ url("user/my-delivery-delete/" . $shippingDetail->id) }}';">Delete</button>

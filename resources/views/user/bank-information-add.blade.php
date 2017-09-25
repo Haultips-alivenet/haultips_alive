@@ -8,8 +8,8 @@
     <div class="_dash_rft _bnkac">
         <div class="row">
             <div class="col-md-9">
-                <h3>Bank Information</h3>
-
+                <h3>Add New Account</h3>
+                <br>
                 @if($errors->any())
                     <div class="alert alert-danger">
                         <ul>

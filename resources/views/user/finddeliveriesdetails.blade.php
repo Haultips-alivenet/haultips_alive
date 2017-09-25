@@ -247,7 +247,7 @@ which helps you book more loads.
     </div>
 </section>
 
-
+@if(!$count_bid)
 <section class="_make_btn">
     <div class="container">
         <div class="row">
@@ -255,7 +255,10 @@ which helps you book more loads.
         </div>
     </div>
 </section>
+@endif
+
 @endsection
+
 @section('script')
 
 

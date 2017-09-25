@@ -14,22 +14,31 @@
                 <div class="snup_bx _min_in wow zoomIn">
                     <h2 class="text-center">Min Bid Price</h2>
                    <div class="clearfix"></div>
+                   @if(Session::has('alert_msg'))
+                        <div class="alert alert-{{ Session::get('alert_type') }}">
+                            <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+                            {{ Session::get('alert_msg') }}
+                        </div>
+                    @endif
                     <div class="_cus_bx _cus_login">
                         <div class="_price_m">
                           <i class="fa fa-inr" aria-hidden="true"></i>
- <span> {{($miid->minimumBid == '') ? '0' : $miid->minimumBid}}</span>
+                        <span> {{($miid->minimumBid == '') ? '0' : $miid->minimumBid}}</span>
                         </div>    
 
                        <p>Enter a lower amount to automatically underbid other
 Service providers .Learn More</p>
-                       {!! Form::open(array('url'=>'bid/offer/save','id'=>'bid_form','method'=>'post')) !!}
+                       {!! Form::open(array('url'=>'bid/offer/save/'.$shiping_id, 'id'=>'bid_form','method'=>'post', 'onsubmit'=>'validamount();')) !!}
                         
                         <div class="form-group">
                         <div class="input-group">
                         <div class="input-group-addon" style="background: transparent; border: none;"><i class="fa fa-inr" aria-hidden="true" style="font-size: 30px;"></i></div>
-                            <input type="text" name="bidvalue" class="form-control" placeholder="Enter your quotation">
+                            <input type="hidden" name="oldbidvalue" id="oldbidvalue" value="{{($miid->minimumBid == '') ? '0' : $miid->minimumBid}}">
+                            <input type="text" name="bidvalue" id="bidvalue" class="form-control" placeholder="Enter your quotation">
+                            <label id="bidvalue-error" class="error" for="bidvalue"></label>
                             <input type="hidden" name="minbid" value="{{($miid->minimumBid == '') ? '0' : $miid->minimumBid}}">
                             <input type="hidden" name="shipingid" value="{{$shiping_id}}">
+                            <input type="hidden" name="quote_id" value="{{ $quote_id }}">
                         </div>
                         </div>
                         
@@ -40,7 +49,7 @@ Service providers .Learn More</p>
                         <div class="checkbox checkbox-circle">
                         <input type="checkbox" class="filled-in" id="checkbox2">
                         <!--<label for="checkbox2">Subtract haultips fee to calculate the total bid as seen by 
-the customer</label>--->
+the customer</label>-->
                         </div>
                             </div>
                             
@@ -88,6 +97,8 @@ the customer</label>--->
            
 
         });
+
+
 </script>    
 @endsection
 

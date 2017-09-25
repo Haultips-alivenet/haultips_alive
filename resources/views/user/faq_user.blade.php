@@ -6,9 +6,16 @@
 @section('body')
 <?php //print_r($quesdetails); ?>
             <div class="col-md-8">
+                 
            <div class="_dash_rft">
     <div class="tab-content panels-faq">
       <div class="tab-pane active" id="tab1">
+                           @if(Session::has('success'))
+                            <div class="alert alert-success">
+                                <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+                                {{Session::get('success')}}
+                            </div>
+                        @endif   
         <div class="panel-group" id="help-accordion-1">
             <?php $i=1; ?>
          @foreach($quesdetails as $detail)   
@@ -23,20 +30,7 @@
               
               </div>
                 
-                <div class="quest_txt">
-                  <h4> <span class="pull-right" onclick="$('._question_tb_0{{$i}}').toggle();"><i class="fa fa-plus-circle"></i></span></h4>
-                  <div class="clearfix"></div>
-                    <div class="_question_tb_0{{$i}}" style="display: none">
-                    <div class="input-group">
-                      <input type="text" name="question" id="question_faq{{$detail->shippingId}}" class="form-control input-sm" maxlength="64" placeholder="Please enter your Question" />
-                      <span class="input-group-addon btn-primary"  onclick="askquestion({{$detail->shippingId}},{{$detail->user_id}});">
-                        Submit <i class="fa fa-question" aria-hidden="true"></i>
-                      </span>
-                    </div>
-                   
-                    </div>
-               </div>
-                
+               
                 
             </div>
               
@@ -45,10 +39,10 @@
          @endforeach
         </div>
       </div>
-         {!! Form::open(array('url'=>'partner/faq/question','class'=>'form-horizontal','id'=>'partnerfaq_form')) !!}
-          <input type="hidden" name="shiping_id" id="shiping_id">
-          <input type="hidden" name="user_id" id="user_id">
-          <input type="hidden" name="question" id="question">
+          {!! Form::open(array('url'=>'user/faq/answer','class'=>'form-horizontal','id'=>'userfaq_form')) !!}
+          <input type="hidden" name="question_master_id" id="question_master_id">
+          <input type="hidden" name="question_id" id="question_id">
+          <input type="hidden" name="answer" id="answer">
           
           {!! Form::close() !!}
       <div class="tab-pane" id="tab2">
@@ -91,23 +85,30 @@
       //alert(data);
          //$("."+ id).toggle();
          $('#allquesans'+id).html(data);
+       
        //$("#opret-produkt"+id).toggle();
         }
 
    });
     }
-    function askquestion(shiping_id,user_id){
-       
-        var question = $('#question_faq'+shiping_id).val();
+    function getreply(id){
         
-        if(question) {
-         $('#shiping_id').val(shiping_id);
-         $('#question').val(question);
-         $('#user_id').val(user_id);
-          document.getElementById("partnerfaq_form").submit();
-        } else {
-            alert("Please Enter Question?");
-            return false;
-        }
+        $('._question_tb_0'+id).toggle();
+    }
+    
+    function reply_ans(id){
+       var ids=id.split("_");
+       var question_master_id = ids[0];
+       var question_id = ids[1];
+       var ans = $('#answerof'+question_id).val();
+       if(ans) {
+      $('#question_master_id').val(question_master_id);
+      $('#question_id').val(question_id);
+      $('#answer').val(ans);
+      document.getElementById("userfaq_form").submit();
+      } else {
+          alert("Please Enter Answer!");
+          return false;
+      }
     }
     </script>
