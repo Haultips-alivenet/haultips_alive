@@ -70,7 +70,7 @@
                     <li class="pro_im">
                         <a href="{{ ($tempArr['id'] > 0) ? session('home_page_link'): url('/') }}"><span><img src="{{ $profile_pic }}" alt=""></span><span class="usrnm">{{$tempArr["first_name"]." ".$tempArr["last_name"]}}</span></a>
                     </li>
-                    
+
                     <li>
                         <a href="{{ url('auth/logout') }}" id="menu-toggle1" class="toggle" ><i class="fa fa-power-off" style="font-size:30px;"></i></a>
                     </li>
@@ -95,12 +95,13 @@
                     <form id="profile_pic_form" action="{{ url('user/profile-pic/save') }}" method="post" enctype="multipart/form-data">
                     {{ csrf_field() }}
                         <div class="image-upload">
-                            <label for="file-input">
+                            <label for="profile_pic">
                                 <i class="fa fa-edit edicon"></i>
                             </label>
 
-                            <input name="profile_pic" id="file-input" type="file" onchange="this.form.submit();" />
+                            <input name="profile_pic" id="profile_pic" type="file" onchange="editProfilePic();" />
                         </div>
+                        <label class="error text-danger" id="profile_pic_error" style="display: none;"></label>
                     </form>
                 </div>
                 <h4 class="text-center"><a href="#" class="usrnm">{{$tempArr["first_name"]." ".$tempArr["last_name"]}}</a></h4>
@@ -269,6 +270,31 @@ India - 201007</address>
 
     @yield('script')
     <script>
+    function editProfilePic(){
+        $('#profile_pic_error').hide();
+        $('#profile_pic_error').html('');
+        var allowedExtension = ['jpeg', 'jpg', 'png'];
+        var fileExtension = document.getElementById('profile_pic').value.split('.').pop().toLowerCase();
+        var isValidFile = false;
+
+        for(var index in allowedExtension) {
+            if(fileExtension === allowedExtension[index]) {
+                isValidFile = true; 
+                break;
+            }
+        }
+
+        if(!isValidFile) {
+            $('#profile_pic_error').show();
+            $('#profile_pic_error').html('Allowed Extensions are : *.' + allowedExtension.join(', *.'));
+        }
+        else{
+            $('#profile_pic_form').submit();
+        }
+
+    }
+
+
        $('.carousel').carousel();
        $('#menu-toggle').click(function(){
            $('#sidebar-wrapper').toggle();
