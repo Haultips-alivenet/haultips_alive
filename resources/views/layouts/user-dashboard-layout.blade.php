@@ -60,7 +60,7 @@
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                <a class="navbar-brand topnav" href="{{ ($tempArr['id'] > 0) ? session('home_page_link'): url('/')}}" title="HAULTIPS"><img src="{{asset('public/user/img/logo.png')}}" alt="HAULTIPS"></a>
+                <a class="navbar-brand topnav" href="{{ url('/') }}" title="HAULTIPS"><img src="{{asset('public/user/img/logo.png')}}" alt="HAULTIPS"></a>
             </div>
             <!-- Collect the nav links, forms, and other content for toggling -->
             <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
@@ -68,8 +68,9 @@
                 <ul class="nav navbar-nav navbar-right">
                     
                     <li class="pro_im">
-                        <a href="#"><span><img src="{{ $profile_pic }}" alt=""></span><span class="usrnm">{{$tempArr["first_name"]." ".$tempArr["last_name"]}}</span></a>
+                        <a href="{{ ($tempArr['id'] > 0) ? session('home_page_link'): url('/') }}"><span><img src="{{ $profile_pic }}" alt=""></span><span class="usrnm">{{$tempArr["first_name"]." ".$tempArr["last_name"]}}</span></a>
                     </li>
+                    
                     <li>
                         <a href="{{ url('auth/logout') }}" id="menu-toggle1" class="toggle" ><i class="fa fa-power-off" style="font-size:30px;"></i></a>
                     </li>

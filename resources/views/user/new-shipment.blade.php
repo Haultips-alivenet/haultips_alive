@@ -21,6 +21,10 @@
                     @endif
                     @if(Auth::user()->user_type_id == 2)
                         <a href="javascript:void(0);" onclick="findDeliv('{{ $cat->id }}')">Find Delivery <img src="{{ asset('img/readmore.png') }}" alt=""></a>
+                        <input type="hidden" name="category[]" value="{{ $cat->id }}">
+                        <br>
+                        <a href="javascript:allDeliv();" class="btn btn-color"></a>
+
                     @endif
                     </div>
                 </div>
@@ -44,6 +48,19 @@
 function findDeliv(cat_id){
     $('#categoryIdAll').val(cat_id);
     $('#find_deliv_form').submit();
+}
+
+function allDeliv(){
+    var cbc = document.getElementsByName('category[]');
+    var result = '';
+    for(var i=0; i<cbc.length; i++) 
+    {
+        if(cbc[i].checked ) result += (result.length > 0 ? "," : "") + cbc[i].value;
+    }
+    if(result) {
+        $('#categoryIdAll').val(result);
+        $('#find_deliv_form').submit();
+    }
 }
 </script>
 @endsection

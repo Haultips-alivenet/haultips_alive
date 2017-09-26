@@ -71,7 +71,7 @@
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                <a class="navbar-brand topnav" href="{{ ($tempArr['id'] > 0) ? session('home_page_link'): url('/')}}" title="HAULTIPS"><img src="{{asset('public/user/img/logo.png')}}" alt="HAULTIPS"></a>
+                <a class="navbar-brand topnav" href="{{ url('/') }}" title="HAULTIPS"><img src="{{asset('public/user/img/logo.png')}}" alt="HAULTIPS"></a>
             </div>
             <!-- Collect the nav links, forms, and other content for toggling -->
             <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
@@ -90,7 +90,7 @@
                  if($tempArr["first_name"]!="") {
                  ?>
                      <li>
-                       <a href="#"> <span><img src="{{asset('public/user/img/sign-up-icon.png')}}" alt=""></span>{{$tempArr["first_name"]." ".$tempArr["last_name"]}}</a>
+                       <a href="{{ ($tempArr['id'] > 0) ? session('home_page_link'): url('/') }}"> <span><img src="{{asset('public/user/img/sign-up-icon.png')}}" alt=""></span>{{$tempArr["first_name"]." ".$tempArr["last_name"]}}</a>
                     </li>
                     <li>
                         <a href="{{url('auth/logout')}}"><span><img src="{{asset('public/user/img/log-out-icon.png')}}" alt=""></span>Log out</a>
