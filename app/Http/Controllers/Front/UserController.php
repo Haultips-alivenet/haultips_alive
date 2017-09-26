@@ -547,18 +547,32 @@ class UserController extends FrontController
           $user->first_name = $request->get('first_name');
           $user->last_name = $request->get('last_name');
 
-          $user_detail_updt = UserDetail::where('user_id', Auth::User()->id)
-                              ->update([
-                                    'street' => $request->get('street'),
-                                    'location' => $request->get('location'),
-                                    'city' => $request->get('city'),
-                                    'pincode' => $request->get('pincode'),
-                                    'country' => $request->get('country'),
-                                  ]);
-          
-          if($user->save() && $user_detail_updt){
-            /*$request->session()->flash('alert_type', 'success');
-            $request->session()->flash('alert_msg', 'Profile is updated successfully!');*/
+          $user_detail_updt = UserDetail::where('user_id', Auth::User()->id);
+          $update_success = 0;
+          if($user_detail_updt->count()){
+            if($user_detail_updt->update([
+                      'street' => $request->get('street'),
+                      'location' => $request->get('location'),
+                      'city' => $request->get('city'),
+                      'pincode' => $request->get('pincode'),
+                      'country' => $request->get('country'),
+                    ])){
+              $update_success = 1;
+            }
+          }
+          else{
+            $usrdet = new UserDetail;
+            $usrdet->user_id = Auth::User()->id;
+            $usrdet->street = $request->get('street');
+            $usrdet->location = $request->get('location');
+            $usrdet->city = $request->get('city');
+            $usrdet->pincode = $request->get('pincode');
+            $usrdet->country = $request->get('country');
+            if($usrdet->save())
+              $update_success = 1;
+          }
+                              
+          if($user->save() && $update_success){
             $user->street = $request->get('street');
             $user->location = $request->get('location');
             $user->city = $request->get('city');
@@ -766,7 +780,7 @@ class UserController extends FrontController
     }
 
     public function setDefaultImage($path = '', $file = '', $type = 'n'){
-        $filename = public_path($path . $file);
+        $filename = base_path($path . $file);
         // n=>Normal no image, u=>User icon image
         $type_arr = array('n' => 'not-available.jpg', 'u' => 'customer_img.png');
         if (file_exists($filename) && !empty($file))
@@ -969,6 +983,51 @@ class UserController extends FrontController
          Session::flash('success', 'Transporter Updated Sucessfully!'); 
           return redirect(url('parner/profile/transporter'));  
        
+    }
+
+    public function profileImageEdit(Request $request){
+      $rules = array (
+        'profile_pic' => 'required|image|mimes:jpeg,png,jpg|max:2048',
+      );
+      $validator = Validator::make ( Input::all (), $rules );
+      if ($validator->fails ()){
+        Session::flash('alert_type', 'danger');
+        Session::flash('alert_msg', 'Error: ' . $validator->errors()->first());
+      }
+      else{
+        $destinationPath=public_path()."/uploads/userimages/"; 
+         $user_id=Auth::User()->id;
+         $profile_pic = $request->file('profile_pic');
+         $user_detail = UserDetail::where('user_id', $user_id);
+          
+          $filename=$profile_pic->getClientOriginalName();
+          $t=time();
+          $photofilename="prpic_".$user_id.'_'.$t.'_'.$filename; 
+          $upload = $request->file('profile_pic')->move($destinationPath, $photofilename);
+          
+          $success = 0;
+          if(count($user_detail)){
+              if($user_detail->update(['image' => $photofilename]))
+                $success = 1;
+          }
+          else{
+              $user_det = new UserDetail;
+              $user_det->user_id =$user_id;
+              $user_det->image = $photofilename;
+              if($user_det->save())
+                $success = 1;
+          }
+          
+          if($success == 1 && $upload){
+              Session::flash('alert_type', 'success');
+              Session::flash('alert_msg', 'Profile pic updated successfully!');             
+          }
+          else{
+             Session::flash('alert_type', 'danger');
+             Session::flash('alert_msg', 'Error: Profile pic update failed!'); 
+          }
+      }
+      return redirect(url('user/profile'));
     }
 
 }
