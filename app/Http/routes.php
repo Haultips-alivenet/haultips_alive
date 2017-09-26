@@ -30,7 +30,9 @@ Route::get('user/delivery-detail/{shipping_id}', 'Front\UserController@deliveryD
 Route::get('user/my-delivery-delete/{shipping_id}', 'Front\UserController@deliveryDelete');
 Route::get('user/all-quotation/{shipping_id}', 'Front\UserController@allQuotation');
 Route::get('user/quotation-offer/{quote_id}', 'Front\UserController@quotationDetail');
-Route::post('user/quotation-offer/{quote_id}', 'Front\UserController@quotationStatusChange');
+Route::get('user/quotation-offer/accept/{quote_id}', 'Front\UserController@quotationOfferAccept');
+Route::post('user/quotation-offer/accept/cod', 'Front\UserController@quotationOfferAcceptCod');
+Route::get('user/quotation-offer/reject/{quote_id}', 'Front\UserController@quotationOfferReject');
 Route::get('user/relist-shipment/{shipping_id}', 'Front\UserController@relistShipment');
 Route::post('user/relist-shipment/{shipping_id}', 'Front\UserController@relistShipment');
 Route::get('user/bank-infomation', 'Front\UserController@bankInformation');
@@ -39,8 +41,7 @@ Route::get('user/bank-infomation/add', 'Front\UserController@bankInformationAdd'
 Route::post('user/bank-infomation/add', 'Front\UserController@bankInformationAdd');
 Route::get('user/transactionhistory', 'Front\UserController@getTransactionHistory');
 Route::get('user/new-shipment', 'Front\UserController@shipmentNew');
-Route::get('user/new-shipment', 'Front\UserController@shipmentNew');
-
+Route::get('user/find-delivery', 'Front\UserController@shipmentNew');
 //partner kyc
 Route::get('parner/profile/kyc', 'Front\UserController@partner_profile_kyc');
 Route::post('user/kyc/rc', 'Front\UserController@partner_profile_kyc_upload');
@@ -51,7 +52,9 @@ Route::post('user/kyc/business', 'Front\UserController@partner_profile_kyc_uploa
 Route::get('parner/profile/transporter', 'Front\UserController@partner_profile_transporter');
 Route::get('parner/profile/getcapacity', 'Front\UserController@gettruckcapacity');
 Route::post('profile/transporter/update', 'Front\UserController@partner_transporter_update');
-
+Route::post('user/payment', 'Front\UserController@payment');
+Route::post('user/payment/success', 'Front\UserController@success');
+Route::post('user/payment/failure', 'Front\UserController@failure');
 // User login panel end
 
 // Partner login panel
@@ -104,7 +107,8 @@ Route::get('user/verifyotp/{id}', 'Front\LoginController@verifyotp');
 Route::get('user/resend/opt/{id}', 'Front\LoginController@resendotp');
 Route::post('user/checkotp', 'Front\LoginController@checkotp');
 Route::get('bid/offer/{id}', 'Front\FindDeliveriesController@bidoffer');
-Route::post('bid/offer/save', 'Front\FindDeliveriesController@bidoffersave');
+Route::post('bid/offer/{id}', 'Front\FindDeliveriesController@bidoffer');
+Route::post('bid/offer/save/{id}', 'Front\FindDeliveriesController@bidoffersave');
 Route::post('partner/question/save', 'Front\FindDeliveriesController@partner_question_save');
 //sds
 
@@ -270,4 +274,7 @@ Route::post('webservices/kycUpdate', 'AndroidController@kycUpdate');
 Route::post('webservices/viewKYC', 'AndroidController@viewKYC');
 Route::post('webservices/partnerProfileView', 'AndroidController@partnerProfileView');
 Route::post('webservices/deleteBankInfo', 'AndroidController@deleteBankInfo');
+Route::post('webservices/paymentSucess', 'AndroidController@paymentSucess');
+Route::post('webservices/paymentFailure', 'AndroidController@paymentFailure');
+Route::post('webservices/paymentByCod', 'AndroidController@paymentByCod');
 Route::post('webservices/test', 'AndroidController@test');
