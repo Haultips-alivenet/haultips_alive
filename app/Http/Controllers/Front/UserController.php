@@ -586,7 +586,7 @@ class UserController extends FrontController
       if(Auth::user()->user_type_id <> 2  || !Auth::check()) return redirect('/');
 
       $offerData = ShippingQuote::select('shipping_quotes.id','shipping_quotes.shipping_id','shipping_quotes.quote_status','shipping_quotes.quote_price','sd.table_name','sd.subcategory_id','sd.category_id')
-                            ->leftJoin('shipping_details as sd','sd.id','=','shipping_quotes.shipping_id')
+                            ->join('shipping_details as sd','sd.id','=','shipping_quotes.shipping_id')
                             ->where('shipping_quotes.carrier_id', Auth::User()->id)->paginate(10);
                 
       if(count($offerData) > 0){
@@ -663,7 +663,7 @@ class UserController extends FrontController
     {
         $tempArr = Session::get('currentUser');
          if($tempArr["user_type_id"]==2) {
-         $data["quesdetails"] = TblQuesMaster::select('tq.question','u.id as user_id','u.first_name','u.last_name','ud.image','sd.table_name','sd.id as shippingId','tq.id as quesId','tbl_ques_masters.carrier_id')                            
+         return $data["quesdetails"] = TblQuesMaster::select('tq.question','u.id as user_id','u.first_name','u.last_name','ud.image','sd.table_name','sd.id as shippingId','tq.id as quesId','tbl_ques_masters.carrier_id')                            
                                     ->leftJoin('tbl_questions as tq','tq.ques_master_id','=','tbl_ques_masters.id')
                                     ->leftJoin('users as u','u.id','=','tbl_ques_masters.user_id')
                                     ->leftJoin('user_details as ud','ud.user_id','=','tbl_ques_masters.carrier_id')

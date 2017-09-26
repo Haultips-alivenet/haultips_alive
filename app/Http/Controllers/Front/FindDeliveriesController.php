@@ -221,14 +221,14 @@ class FindDeliveriesController extends FrontController
        else{
             $quote = ShippingQuote::where('shipping_id', $shipingid)
                                     ->where('carrier_id', Auth::user()->id)->first();
-            $msg['quote_id'] = $quote->id;
+            $msg['quote_id'] = ($quote)?$quote->id:'';
        }
        $msg["shiping_id"] = $shipingid;  
        return view('user.bidDetails', $msg);
     }
 
     public function bidoffersave(Request $request){
-        $shippingDetail = DB::table("shipping_details as s")
+        return $shippingDetail = DB::table("shipping_details as s")
                 ->join('users as u','s.user_id','=','u.id')
                 ->where('s.id',$request->shipingid)->select('u.mobile_number','u.first_name','u.last_name')->first();
         $customer_mobile=$shippingDetail->mobile_number;
@@ -240,7 +240,7 @@ class FindDeliveriesController extends FrontController
        else{
             $quote = ShippingQuote::where('shipping_id', $request->shipingid)
                                     ->where('carrier_id', Auth::user()->id)->first();
-            $quote_id = $quote->id;
+            $quote_id = ($quote)?$quote->id:0;
        }
         if($quote_id > 0){
             $quote = DB::table('shipping_quotes')->where('id', $request->quote_id)

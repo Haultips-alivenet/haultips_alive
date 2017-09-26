@@ -14,6 +14,8 @@ Route::get('/', 'Front\UserHomeController@index');
 Route::resource('user/dashboard', 'Front\UserHomeController@index');
 Route::resource('user/home', 'Front\UserHomeController@userdashboard');
 Route::resource('user/faq', 'Front\UserController@faq');
+Route::post('user/faq/answer', 'Front\UserController@user_ans_save');
+Route::post('partner/faq/question', 'Front\UserController@partner_question_save');
 Route::get('getquesAns', 'Front\UserHomeController@getquesAns');
 
 // User login panel 
@@ -48,6 +50,11 @@ Route::get('user/my-offers', 'Front\UserController@myOffer');
 Route::get('user/my-offer/{quote_id}', 'Front\UserController@myOfferDetail');
 // 
 
+//partner kyc
+Route::get('parner/profile/kyc', 'Front\UserController@partner_profile_kyc');
+Route::post('user/kyc/rc', 'Front\UserController@partner_profile_kyc_upload');
+Route::post('user/kyc/pan', 'Front\UserController@partner_profile_kyc_upload');
+Route::post('user/kyc/business', 'Front\UserController@partner_profile_kyc_upload');
 #User
 
 Route::resource('user/login', 'Front\LoginController');

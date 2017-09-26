@@ -15,7 +15,7 @@
           <div class="panel panel-default panel-help">
             <a href="#opret-produkt{{$i}}" data-toggle="collapse" data-parent="#help-accordion-1" onclick="getquestionAns({{$i}},{{$detail->shippingId}},{{$detail->carrier_id}});">
               <div class="panel-heading">
-                <h2>{{App\ShippingDetail::getDeliveryName($detail->table_name,$detail->shippingId).' - '.$detail['first_name'].' '.$detail['last_name']}}</h2>
+                <h2>{{ App\ShippingDetail::getDeliveryName($detail->table_name, ($detail->shippingId) ? $detail->shippingId : 0).' - '.$detail['first_name'].' '.$detail['last_name'] }}</h2>
               </div>
             </a>
             <div id="opret-produkt{{$i}}" class="collapse">
