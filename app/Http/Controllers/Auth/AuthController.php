@@ -35,16 +35,23 @@ class AuthController extends Controller
             $user_detail = UserDetail::select('image')->where('user_id', $user->id)->first();
 
             if($user_detail) {
-            $request->session()->put('userimage', $user_detail->image);
+                $request->session()->put('userimage', $user_detail->image);
             } else {
                 $request->session()->put('userimage', "");
+            }
+
+            if($user->user_type_id=='2'){
+                $request->session()->put('home_page_link', url('user/find-delivery'));
+            }
+            elseif($user->user_type_id=='3'){
+                $request->session()->put('home_page_link', url('user/new-shipment'));
             }
 
             $getoffer=$request->session()->get('check_getofferpage');
             $finddelivery=$request->session()->get('check_findDelivery');
 
             if($getoffer!="") {
-                if($user->user_type_id=='1') {
+                if($user->user_type_id=='3') {
                     return redirect(url('user/getoffer'));  
                 } else {
                    Session::flash('success', 'You are Registered as a partner,so You can not Post Shipment!'); 
@@ -56,12 +63,10 @@ class AuthController extends Controller
                 if($user->user_type_id=='1'){            
                     return redirect('admin/dashboard') ;
                 }elseif($user->user_type_id=='2'){
-                    $request->session()->put('home_page_link', url('user/my-offers'));
-                    return redirect(url('user/my-offers'));
+                    return redirect(url('user/find-delivery'));
                 }elseif($user->user_type_id=='3'){
                     //return redirect()->route('user/dashboard') ;
-                    $request->session()->put('home_page_link', url('user/my-deliveries/all-status'));
-                     return redirect(url('user/my-deliveries/all-status'));
+                     return redirect(url('user/new-shipment'));
                 }
             } 
         }else{
