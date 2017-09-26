@@ -26,6 +26,7 @@
         <!-- Custom CSS -->
         {!! Html::style('public/user/css/animate.css') !!}
         {!! Html::style('public/user/css/style.css') !!}
+        {!! Html::style('public/user/css/custom-style.css') !!}
         {!! Html::style('public/user/css/select2.css') !!}
         {!! HTML::script('public/admin/js/jquery-1.10.2.min.js')!!}   
 
@@ -48,7 +49,7 @@
             <li><a href="#contact">Blog</a></li>
         </ul>
     </nav> 
-
+<?php $tempArr = Session::get('currentUser');?>
 <nav class="navbar navbar-default navbar-fixed-top topnav nav-theme" role="navigation">
         <div class="container-fluid topnav">
             <!-- Brand and toggle get grouped for better mobile display -->
@@ -59,13 +60,13 @@
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                <a class="navbar-brand topnav" href="{{url('user/my-offers')}}" title="HAULTIPS"><img src="{{asset('public/user/img/logo.png')}}" alt="HAULTIPS"></a>
+                <a class="navbar-brand topnav" href="{{ ($tempArr['id'] > 0) ? session('home_page_link'): url('/')}}" title="HAULTIPS"><img src="{{asset('public/user/img/logo.png')}}" alt="HAULTIPS"></a>
             </div>
             <!-- Collect the nav links, forms, and other content for toggling -->
             <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
                 
                 <ul class="nav navbar-nav navbar-right">
-                    <?php $tempArr = Session::get('currentUser');?>
+                    
                     <li class="pro_im">
                         <a href="#"><span><img src="{{ $profile_pic }}" alt=""></span><span class="usrnm">{{$tempArr["first_name"]." ".$tempArr["last_name"]}}</span></a>
                     </li>
@@ -90,6 +91,16 @@
             <div class="_dash_lft _dash_m">
                 <div class="_d_mg">
                     <img src="{{ $profile_pic }}" alt="">
+                    <form id="profile_pic_form" action="{{ url('user/profile-pic/save') }}" method="post" enctype="multipart/form-data">
+                    {{ csrf_field() }}
+                        <div class="image-upload">
+                            <label for="file-input">
+                                <i class="fa fa-edit edicon"></i>
+                            </label>
+
+                            <input name="profile_pic" id="file-input" type="file" onchange="this.form.submit();" />
+                        </div>
+                    </form>
                 </div>
                 <h4 class="text-center"><a href="#" class="usrnm">{{$tempArr["first_name"]." ".$tempArr["last_name"]}}</a></h4>
                 <div class="clearfix"></div>

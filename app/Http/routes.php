@@ -55,14 +55,13 @@ Route::post('profile/transporter/update', 'Front\UserController@partner_transpor
 Route::post('user/payment', 'Front\UserController@payment');
 Route::post('user/payment/success', 'Front\UserController@success');
 Route::post('user/payment/failure', 'Front\UserController@failure');
+Route::post('user/profile-pic/save', 'Front\UserController@profileImageEdit');
 // User login panel end
 
 // Partner login panel
 Route::get('user/my-offers', 'Front\UserController@myOffer');
 Route::get('user/my-offer/{quote_id}', 'Front\UserController@myOfferDetail');
 // 
-
-
 
 
 #User

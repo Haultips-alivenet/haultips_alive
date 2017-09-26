@@ -60,7 +60,7 @@
            <!-- <li><a href="#contact">Blog</a></li>-->
         </ul>
     </nav> 
-
+<?php  $tempArr = Session::get('currentUser');?>
 <nav class="navbar navbar-default navbar-fixed-top topnav nav-theme" role="navigation">
         <div class="container-fluid topnav">
             <!-- Brand and toggle get grouped for better mobile display -->
@@ -71,7 +71,7 @@
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                <a class="navbar-brand topnav" href="{{url('/')}}" title="HAULTIPS"><img src="{{asset('public/user/img/logo.png')}}" alt="HAULTIPS"></a>
+                <a class="navbar-brand topnav" href="{{ ($tempArr['id'] > 0) ? session('home_page_link'): url('/')}}" title="HAULTIPS"><img src="{{asset('public/user/img/logo.png')}}" alt="HAULTIPS"></a>
             </div>
             <!-- Collect the nav links, forms, and other content for toggling -->
             <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
@@ -86,7 +86,7 @@
                 </ul>
                
             <ul class="nav navbar-nav navbar-right">
-                 <?php  $tempArr = Session::get('currentUser');
+                 <?php
                  if($tempArr["first_name"]!="") {
                  ?>
                      <li>
