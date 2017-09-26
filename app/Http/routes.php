@@ -62,11 +62,9 @@ Route::get('user/my-offers', 'Front\UserController@myOffer');
 Route::get('user/my-offer/{quote_id}', 'Front\UserController@myOfferDetail');
 // 
 
-//partner kyc
-Route::get('parner/profile/kyc', 'Front\UserController@partner_profile_kyc');
-Route::post('user/kyc/rc', 'Front\UserController@partner_profile_kyc_upload');
-Route::post('user/kyc/pan', 'Front\UserController@partner_profile_kyc_upload');
-Route::post('user/kyc/business', 'Front\UserController@partner_profile_kyc_upload');
+
+
+
 #User
 
 Route::resource('user/login', 'Front\LoginController');
@@ -277,4 +275,4 @@ Route::post('webservices/deleteBankInfo', 'AndroidController@deleteBankInfo');
 Route::post('webservices/paymentSucess', 'AndroidController@paymentSucess');
 Route::post('webservices/paymentFailure', 'AndroidController@paymentFailure');
 Route::post('webservices/paymentByCod', 'AndroidController@paymentByCod');
-Route::post('webservices/test', 'AndroidController@test');
+Route::post('webservices/conjob', 'AndroidController@conjob');
