@@ -96,9 +96,9 @@ class AndroidController extends AppController
                     $string_shuffled = str_shuffle($string);
                     $otp = substr($string_shuffled, 1, 5);
 
-                    $mobileData=User::where('mobile_number',$mobileNumber)->select('id')->get();
+                    $mobileData=User::where('mobile_number',$mobileNumber)->select('id','is_deleted')->get();
                     $mobileExists = $mobileData->toArray();
-
+            if($mobileExists[0]['is_deleted'] == 0){
                     $user = new User;
                     $user->mobile_number = $mobileNumber;
 
@@ -124,6 +124,11 @@ class AndroidController extends AppController
                     $msg['responseMessage'] = "Otp is fetched successfully";
                     $msg['userId'] = $userId;
                     $msg['otp'] = $otp;  
+                    
+                }else{
+                    $msg['responseCode'] = "0";
+                    $msg['responseMessage'] = "Failed.Account Deactivated.";
+                }
                 }else{
                     $msg['responseCode'] = "0";
                     $msg['responseMessage'] = "Failed.Please enter mobile number with country code";
@@ -3457,6 +3462,8 @@ class AndroidController extends AppController
                 $deleteData = DB::table($detail->table_name)->where('shipping_id',$detail->id)->delete();
                 $pickData = DB::table('shipping_pickup_details')->where('shipping_id',$detail->id)->delete();
                 $deliverData = DB::table('shipping_delivery_details')->where('shipping_id',$detail->id)->delete();
+                $shippingQuotes = DB::table('shipping_quotes')->where('shipping_id',$detail->id)->delete();
+                
             }
             $shipmentDetail = ShippingDetail::select('table_name','id')->where('status', 0)->delete();
         }

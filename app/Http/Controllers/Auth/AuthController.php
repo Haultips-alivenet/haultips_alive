@@ -31,14 +31,19 @@ class AuthController extends Controller
     protected $redirectAfterLogout = 'admin/login';
     
     public function authenticated($request , $user){
+    
+        if($user->status=='1' && $user->is_deleted=='0'){    
         $user_detail = UserDetail::select('image')->where('user_id', $user->id)->first();
+
         if($user_detail) {
         $request->session()->put('userimage', $user_detail->image);
         } else {
             $request->session()->put('userimage', "");
         }
+
         $getoffer=$request->session()->get('check_getofferpage');
         $finddelivery=$request->session()->get('check_findDelivery');
+
         if($getoffer!="") {
             if($user->user_type_id=='1') {
             return redirect(url('user/getoffer'));  
@@ -58,6 +63,15 @@ class AuthController extends Controller
                  return redirect(url('user/my-deliveries/all-status'));
             }
         } 
+        }else{
+            $errorMsg = ($user->is_deleted=='1')? 'Account Deactivated' : 'Verify your mobile number to login';
+            $this->getLogout();
+            return redirect($this->loginPath($request->user))
+            ->withInput($request->only($this->loginUsername(), 'remember'))
+            ->withErrors([
+                $this->loginUsername() => $errorMsg,
+            ]);
+    }
     }
     
     

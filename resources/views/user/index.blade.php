@@ -64,7 +64,7 @@
                                     <div class="bx_img "><img src="{{asset('public/user/img/'.$category->category_image)}}" alt="" class="wow  bounce"></div>
                                     <div class="discription">
                                         <h4>{{$category->category_name}}</h4>
-                                        <div class="readmore">Read More <img src="{{ asset('public/user/img/readmore.png')}}" alt=""></div>
+<!--                                        <div class="readmore">Read More <img src="{{ asset('public/user/img/readmore.png')}}" alt=""></div>-->
                                     </div>
                                 </a>
                             </li>

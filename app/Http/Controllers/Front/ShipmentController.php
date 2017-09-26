@@ -297,12 +297,9 @@ class ShipmentController extends FrontController
     
     public function getoffer(Request $request){
         $shiping_id=$request->session()->get('shiping_id');
-       //echo $shiping_id;die;
         if($shiping_id!="") {
-           // echo "fdfdf";die;
         return view('user/shipment/getoffer');
         } else {
-           //  echo "456";die;
             return redirect(url('/')); 
         }
     }

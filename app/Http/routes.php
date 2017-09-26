@@ -143,6 +143,7 @@ Route::resource('admin/materials', 'MaterialsController');
 Route::post('admin/materials-Save', 'MaterialsController@store');
 Route::get('admin/materials/{id}/update', 'MaterialsController@create');
 Route::get('admin/materials/{id}/delete', 'MaterialsController@destroy');
+Route::get('admin/partner/changesttus/{id}', 'PartnerRegistrationController@changesttus');
 Route::get('admin/materials/status/{id}', 'MaterialsController@changesttus');
 
 # Admin Sub Category
@@ -159,7 +160,7 @@ Route::get('gettransporterData', 'PartnerRegistrationController@gettransporterDa
 Route::get('admin/partner/{id}/delete', 'PartnerRegistrationController@destroy');
 Route::get('admin/partner/{id}/approve', 'PartnerRegistrationController@approve');
 Route::post('admin/partnerDocumentsUpload', 'PartnerRegistrationController@DocumentsUpload');
-Route::get('admin/partner/changesttus/{id}', 'PartnerRegistrationController@changesttus');
+
 
 # Truck Length
 Route::resource('admin/trucklength', 'TruckLengthController');

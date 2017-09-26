@@ -27,12 +27,12 @@
                         
 
 
-                        <div class="_es_time">
+<!--                        <div class="_es_time">
                                 <i class="fa fa-inr" aria-hidden="true"></i>
  500.00
                             
                         </div>
-                        <span>Estimation price</span>
+                        <span>Estimation price</span>-->
 
 
                         <div class="form-group text-center">
