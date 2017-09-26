@@ -979,7 +979,7 @@ class ShipmentController extends FrontController
         $response = curl_exec($ch);
         curl_close($ch);
         $response_a = json_decode($response);
-        if($response_a->results){
+        if($response_a){
         $lat = $response_a->results[0]->geometry->location->lat;
         $long = $response_a->results[0]->geometry->location->lng;
         } else {

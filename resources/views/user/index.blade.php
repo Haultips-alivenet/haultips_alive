@@ -113,7 +113,7 @@
                      
                 </div>
 
-                    <div class="_bx_footer">More</div>
+                    <a href="{{url('user/find/deliveries')}}">  <div class="_bx_footer">More</div></a>
                 </div>
 
              </div>
