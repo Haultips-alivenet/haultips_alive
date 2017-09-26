@@ -120,10 +120,14 @@
                 
             {!!Form::close()!!}
             </div>
+            
                 <div class="form-group col-md-12 ">
                 <a href="{{url('parner/profile/kyc')}}"> {!! Form::button('Kyc', array('class'=>'btn btn-color', 'id'=>'')) !!}</a>
+                <?php if($user->carrier_type_id!=1) {  ?>
+               <a href="{{url('parner/profile/transporter')}}">  {!! Form::button('Transporter', array('class'=>'btn btn-color', 'id'=>'')) !!}</a>
+                <?php } ?>
                 
-                 {!! Form::button('Trans', array('class'=>'btn btn-color', 'id'=>'')) !!}
+                 
                  </div>
         </div>
       </div>

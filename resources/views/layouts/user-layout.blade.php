@@ -49,15 +49,15 @@
     <a  href="#" class="btn btn-dark btn-lg"><i class="fa fa-bars"></i></a>
     <nav id="sidebar-wrapper">
         <ul class="sidebar-nav">
-            <a id="menu-close" href="#" class="btn btn-light btn-lg pull-right toggle"><i class="fa fa-times"></i></a>
+          <!--  <a id="menu-close" href="#" class="btn btn-light btn-lg pull-right toggle"><i class="fa fa-times"></i></a>-->
             
-            <li class="sidebar-brand"><a href="#top">Home1</a></li>
-            <li><a href="#about">About</a></li>
-            <li><a href="#services">Support</a></li>
+            <li class="sidebar-brand"><a href="{{url('/')}}">Home</a></li>
+            <li><a href="{{url('about-us')}}">About</a></li>
+           <!-- <li><a href="#services">Support</a></li>-->
             <li><a href="{{url('user/find/deliveries')}}">Deliveries</a></li>
-            <li><a href="#contact">New Shipment</a></li>
-            <li><a href="#contact">How it Works</a></li>
-            <li><a href="#contact">Blog</a></li>
+           <!-- <li><a href="#contact">New Shipment</a></li>-->
+            <li><a href="{{url('how-it-works')}}">How it Works</a></li>
+           <!-- <li><a href="#contact">Blog</a></li>-->
         </ul>
     </nav> 
 
@@ -77,7 +77,7 @@
             <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
                 <ul class="nav navbar-nav navbar-left">
                     <li>
-                        <a href="#about">How to works</a>
+                        <a href="{{url('how-it-works')}}">How to works</a>
                     </li>
                     <li>
                         <a href="{{url('user/find/deliveries')}}">Deliveries</a>

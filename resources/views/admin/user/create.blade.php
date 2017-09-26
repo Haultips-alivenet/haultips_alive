@@ -84,7 +84,7 @@
                 async: false,
                 //dataType:"html",
                 success: function(msg)
-                { alert(msg);
+                { 
                     //If username exists, set response to true
                     //response = (msg === 'true') ? true : false;
                     isSuccess = msg === "false" ?  false : true;

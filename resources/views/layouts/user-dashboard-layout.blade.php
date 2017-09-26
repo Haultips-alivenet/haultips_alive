@@ -26,6 +26,7 @@
         <!-- Custom CSS -->
         {!! Html::style('public/user/css/animate.css') !!}
         {!! Html::style('public/user/css/style.css') !!}
+        {!! Html::style('public/user/css/select2.css') !!}
         {!! HTML::script('public/admin/js/jquery-1.10.2.min.js')!!}   
 
    
@@ -58,7 +59,7 @@
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                <a class="navbar-brand topnav" href="{{url('/')}}" title="HAULTIPS"><img src="{{asset('public/user/img/logo.png')}}" alt="HAULTIPS"></a>
+                <a class="navbar-brand topnav" href="{{url('user/my-offers')}}" title="HAULTIPS"><img src="{{asset('public/user/img/logo.png')}}" alt="HAULTIPS"></a>
             </div>
             <!-- Collect the nav links, forms, and other content for toggling -->
             <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
@@ -250,6 +251,7 @@ India - 201007</address>
      {!! Html::script('public/admin/js/jquery.nicescroll.js') !!}
      {!! Html::script('public/user/js/moment.js') !!}
      {!! Html::script('public/user/js/bootstrap-datetimepicker.js') !!}
+     {!! Html::script('public/user/js/select2.js') !!}
      {!! Html::script('https://maps.googleapis.com/maps/api/js?key=AIzaSyDr-iGaiLmD2zCzCvl11pPRKgeFHxY8b7I&libraries=places') !!}
      <!-- {!! Html::script('public/admin/js/bootstrap-select.min.js') !!} -->
 

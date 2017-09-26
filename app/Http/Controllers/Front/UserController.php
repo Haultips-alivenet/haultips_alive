@@ -10,20 +10,21 @@ use Auth;
 use Session;
 use App\VehicleCategory;
 use App\User;
+use App\UserVehicleDetail;
+use App\TblAnswer;
 use App\UserDetail;
 use App\TruckLengths;
 use App\AdminBedroom;
 use App\AdminBox;
 use App\TblQuesMaster;
+use App\TblQuestion;
+use App\PartnerKyc;
 use App\ShippingDetail;
 use App\ShippingQuote;
 use App\ShippingPickupDetail;
 use App\PaymentDetail;
 use App\ShippingDeliveryDetail;
 use App\PayInfo;
-use App\TblQuestion;
-use App\TblAnswer;
-use App\PartnerKyc;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Input;
 use App\library\Smsapi;
@@ -45,15 +46,15 @@ class UserController extends FrontController
       $data['profile_pic'] = $this->setDefaultImage('public/uploads/userimages/', ($user_detail) ? $user_detail->image : '', 'u');
       return view('user.profile', $data);
     }
-
+    
     public function partner_profile_kyc(){
-      if((Auth::user()->user_type_id <> 3 && Auth::user()->user_type_id <> 2)  || !Auth::check()) return redirect('/');
+       if((Auth::user()->user_type_id <> 3 && Auth::user()->user_type_id <> 2)  || !Auth::check()) return redirect('/');
       $data["kycdata"] = DB::table('partner_kycs')->where('user_id', Auth::User()->id)->first();
       $data['user'] = Auth::User();
       $user_detail = UserDetail::where('user_id', Auth::User()->id)->first();
       $data['user_detail'] = $user_detail;
       $data['profile_pic'] = $this->setDefaultImage('public/uploads/userimages/', ($user_detail) ? $user_detail->image : '', 'u');
-      return view('user.profile_kyc',$data);
+        return view('user.profile_kyc',$data);
     }
 
     public function partner_profile_kyc_upload(Request $request){
@@ -663,7 +664,7 @@ class UserController extends FrontController
     {
         $tempArr = Session::get('currentUser');
          if($tempArr["user_type_id"]==2) {
-         return $data["quesdetails"] = TblQuesMaster::select('tq.question','u.id as user_id','u.first_name','u.last_name','ud.image','sd.table_name','sd.id as shippingId','tq.id as quesId','tbl_ques_masters.carrier_id')                            
+          $data["quesdetails"] = TblQuesMaster::select('tq.question','u.id as user_id','u.first_name','u.last_name','ud.image','sd.table_name','sd.id as shippingId','tq.id as quesId','tbl_ques_masters.carrier_id')                            
                                     ->leftJoin('tbl_questions as tq','tq.ques_master_id','=','tbl_ques_masters.id')
                                     ->leftJoin('users as u','u.id','=','tbl_ques_masters.user_id')
                                     ->leftJoin('user_details as ud','ud.user_id','=','tbl_ques_masters.carrier_id')
@@ -872,11 +873,104 @@ class UserController extends FrontController
       // For Otherthan Default Gateway
       //$response = Indipay::gateway('payumoney')->response($request);
 
-      //dd($response);
-      $user_detail = UserDetail::where('user_id', Auth::User()->id)->first();
-      $response['profile_pic'] = $this->setDefaultImage('public/uploads/userimages/', ($user_detail) ? $user_detail->image : '', 'u');
-      return view('user/payment-failure', $response);
+      dd($response);
+    }
+    
+    public function partner_profile_transporter(){
+      
+        //if((Auth::user()->user_type_id <> 3 && Auth::user()->user_type_id <> 2)  || !Auth::check()) return redirect('/');
+        $data['user'] = Auth::User();
+        $user_detail = UserDetail::where('user_id', Auth::User()->id)->first();
+        $data['user_detail'] = $user_detail;
+        $data['profile_pic'] = $this->setDefaultImage('public/uploads/userimages/', ($user_detail) ? $user_detail->image : '', 'u');
+        
+        $arr = \App\VehicleCategory::where("category_name","=","open")->lists('id')->all(); 
+            $arr1 = \App\VehicleCategory::where("category_name","=","Trailer")->lists('id')->all(); 
+            $arr2 = \App\VehicleCategory::where("category_name","=","Container")->lists('id')->all(); 
+            $arr3 = \App\VehicleCategory::where("category_name","=","Truck Booking")->lists('id')->all(); 
+            $data["openlength"]= DB::table('truck_lengths')
+                            ->whereIn('truck_type_id',$arr)
+                            ->select('id','truck_length')
+                            ->get();
+           
+            $data["openlength_capacity"]  = DB::table('truck_capacities')
+                    ->whereIn('truck_length_id',\App\TruckLength::where("truck_type_id","=",$arr)->lists('id')->all())
+                    ->select('truck_capacity','id')
+                    ->get();
+           
+            $data["Trailerlength"]= DB::table('truck_lengths')
+                            ->whereIn('truck_type_id',$arr1)
+                            ->select('id','truck_length')
+                            ->get();
+             $data["Trailerlength_capacity"]  = DB::table('truck_capacities')
+                    ->whereIn('truck_length_id',\App\TruckLength::where("truck_type_id","=",$arr1)->lists('id')->all())
+                    ->select('truck_capacity','id')
+                    ->get();
+             
+             $data["Containerlength"]= DB::table('truck_lengths')
+                            ->whereIn('truck_type_id',$arr2)
+                            ->select('id','truck_length')
+                            ->get();
+              $data["Containerlength_capacity"]  = DB::table('truck_capacities')
+                    ->whereIn('truck_length_id',\App\TruckLength::where("truck_type_id","=",$arr2)->lists('id')->all())
+                    ->select('truck_capacity','id')
+                    ->get();
+             $data["trucktype"]= DB::table('vehicle_categories')
+                            ->where('parent_id',$arr3)
+                            ->select('id','category_name','category_image')
+                            ->get();
+        
+        
+        
+        $data["vechileData"] = UserVehicleDetail::select('vehicle_category_id','vehicle_subcategory_id','vehicle_length_id','vehicle_capacity_id')
+                                        ->where('user_id',Auth::User()->id)->get(); 
+        return view('user/partner_profile_transporter',$data);
+    }
+    
+     public function gettruckcapacity(Request $request){
+        $ids = $request->id;
+        $ids=explode(",",$request->id);
+       
+       $data["truck_capacity"]  = DB::table('truck_capacities')
+                    ->whereIn('truck_length_id',$ids)
+                    ->select('truck_capacity','id')
+                    ->get();
+      echo json_encode($data);
+    }
+    
+    public function partner_transporter_update(Request $request){
+       // print_r($_POST);die;
+        $subcategory_type = $request->subcategory_type;
+        if($subcategory_type) {
+            $vehicleDetails = UserVehicleDetail::where('user_id',Auth::User()->id)->delete();
+        for($i=0;$i<count($subcategory_type);$i++) {
+            
+            $length="length".$subcategory_type[$i];
+            $len=$request->$length;
+           
+            for($j=0;$j<count($len);$j++) { 
+                
+                $userVehicleDetail = new UserVehicleDetail;
+                $userVehicleDetail->user_id  = Auth::User()->id;
+                $userVehicleDetail->vehicle_category_id = 1;
+                $userVehicleDetail->vehicle_subcategory_id = $subcategory_type[$i];
+                $userVehicleDetail->vehicle_length_id = $len[$j];
+                $userVehicleDetail->save(); 
+            }
+        }
+         User::where('id',Auth::User()->id)
+                    ->update([            
+                        'total_vehicle'=>$request->total_vehicles,
+                        'attached_vehicle'=>$request->attched_vehicles
+                        ]);
+        
+        
+        }
+         Session::flash('success', 'Transporter Updated Sucessfully!'); 
+          return redirect(url('parner/profile/transporter'));  
+       
     }
 
 }
+
 

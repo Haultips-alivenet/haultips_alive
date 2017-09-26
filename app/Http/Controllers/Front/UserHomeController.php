@@ -160,5 +160,11 @@ class UserHomeController extends FrontController
         }
        
     }
+    public function about_us(){ 
+        return view('user/about_us');
+    }
+    public function how_it_work(){ 
+        return view('user/how_it_work');
+    }
 }
 

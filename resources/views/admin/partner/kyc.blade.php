@@ -32,7 +32,7 @@
                              <div class="form-group" style="display:none">
                                      {!! Form :: text('userType','3',['class'=>'form-control1', 'id'=>'userType'])  !!}                                                              
                             </div>
-                            <div class="form-group">
+                          <!--  <div class="form-group">
                                 <label for="name" class="col-sm-2 control-label">Status</label>
                                 <div class="col-sm-8">
                                     <select name="status" id="status" class="form-control select2">
@@ -41,14 +41,15 @@
                                          <option value="0"  >UnApprove</option>  
                                         
                                     </select>
-                                    <input type="hidden" name="user_id" value="<?php echo $user_id; ?>">
+                                   
                                 </div> 
-                            </div>
+                            </div>-->
                             <div class="form-group">
                                 <label for="name" class="col-sm-2 control-label">RC Photo</label>
                                 <div class="col-sm-8">
                                      {!! Form :: file('rc_photo','',['class'=>'form-control1', 'id'=>'rc_photo'])  !!}
-                                </div>                                
+                                </div>      
+                                 <input type="hidden" name="user_id" value="<?php echo $user_id; ?>">
                             </div>
                             <div class="form-group">
                                 <label for="name" class="col-sm-2 control-label">Company PanCard</label>
@@ -86,7 +87,7 @@
                                         <td><img src="{{asset('public/admin/kyc/'.$kycdata->rc_photo)}}" alt='foo' width='300' height='200'/></td>
                                         <td><img src="{{asset('public/admin/kyc/'.$kycdata->pancart)}}" alt='foo' width='300' height='200'/></td>
                                         <td><img src="{{asset('public/admin/kyc/'.$kycdata->business_card)}}" alt='foo' width='300' height='200'/></td>
-                                        <td>{{($kycdata->documents_status=='1')?'Approved' : 'UnApproved'}}</td>
+                                        <td><a onclick="return confirm('Do you Want to Change status?');return false;" href="{{URL :: asset('admin/partner/changesttus/'.$user_id.'_'.$kycdata->documents_status)}}">{{($kycdata->documents_status=='1')?'Approved' : 'UnApproved'}}</a></td>
                                     </tr>
                                      
                                 </tbody>
