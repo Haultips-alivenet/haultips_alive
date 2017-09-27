@@ -41,6 +41,7 @@
                      </div>
                 </div>
                 @endforeach
+                {!! $bank_infos->render() !!}
             @else
                 <div class="bnk_list">No Bank Information Found!</div>
             @endif

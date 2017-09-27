@@ -467,7 +467,7 @@ class UserController extends FrontController
       if((Auth::user()->user_type_id <> 3 && Auth::user()->user_type_id <> 2)  || !Auth::check()) return redirect('/');
 
       $data['bank_infos'] = PayInfo::where('user_id', Auth::User()->id)
-                                      ->orderBy('id', 'desc')->get();
+                                      ->orderBy('id', 'desc')->paginate(3);
 
       $user_detail = UserDetail::where('user_id', Auth::User()->id)->first();
       $data['profile_pic'] = $this->setDefaultImage('public/uploads/userimages/', ($user_detail) ? $user_detail->image : '', 'u');
