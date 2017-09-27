@@ -98,18 +98,19 @@ class AndroidController extends AppController
 
                     $mobileData=User::where('mobile_number',$mobileNumber)->select('id','is_deleted')->get();
                     $mobileExists = $mobileData->toArray();
-            if($mobileExists[0]['is_deleted'] == 0){
+           
                     $user = new User;
                     $user->mobile_number = $mobileNumber;
-
+                    $alreadyExists = '';
                     if(empty($mobileExists)){               
                         $user->save();
                         $userId= $user->id;
                     }else{
                         $userId = $mobileExists[0]['id'];
+                        $alreadyExists = ($mobileExists[0]['is_deleted'] == 0)?'exists' : 'deleted';
                     }
                    // $token = JWTAuth::fromUser($user); 
-
+                if($alreadyExists == 'exists' || empty($alreadyExists) || $alreadyExists == ''){
                     $userVerification =new UserVerification;
                     $userVerification->user_id = $userId;
                     $userVerification->otp = $otp;
@@ -131,7 +132,7 @@ class AndroidController extends AppController
                 }
                 }else{
                     $msg['responseCode'] = "0";
-                    $msg['responseMessage'] = "Failed.Please enter mobile number with country code";
+                    $msg['responseMessage'] = "Failed.Please enter mobile number";
                 } 
 //         }else{
 //                    $msg['responseCode'] = "0";
@@ -2055,7 +2056,7 @@ class AndroidController extends AppController
                     }else{
                         $msg['responseCode'] = "200";
                         $msg['responseMessage'] = "Information get successfully";  
-                        $msg['details'] = 'No Data found';
+                        $msg['diliveries'] = 'No Data found';
                     }                     
                 }
         }catch(\Exception $e) {
@@ -3486,7 +3487,7 @@ class AndroidController extends AppController
             $shipping_quote->update(['quote_status' => 1]);
 
             // Update shipping details
-            ShippingDetail::where('id', $sq->shipping_id)->update(['payment_method_id' => 2, 'shipping_price' => $response['amount'],'payments_status' => 1]);
+            ShippingDetail::where('id', $sq->shipping_id)->update(['payment_method_id' => 2, 'shipping_price' => $response['amount'],'payments_status' => 1, 'quote_status'=>1]);
 
             // insert payment details
             $pay_det = new PaymentDetail;
@@ -3602,7 +3603,7 @@ class AndroidController extends AppController
         $sts_updt = $shipping_quote->update(['quote_status' => 1]);
 
         # Update shipping details
-        ShippingDetail::where('id', $sq->shipping_id)->update(['payment_method_id' => 1, 'shipping_price' => $sq->quote_price, 'payments_status' => 0]);
+        ShippingDetail::where('id', $sq->shipping_id)->update(['payment_method_id' => 1, 'shipping_price' => $sq->quote_price, 'payments_status' => 0, 'quote_status'=>1]);
 
         #Accept offer Notification
             $carrierData = ShippingQuote::select('u.id','u.device_token','u.mobile_number','u.first_name','u.last_name')
