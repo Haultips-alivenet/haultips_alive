@@ -88,7 +88,7 @@
                     </div>
 
                     <div class="_add_btn_btm">
-                        <button class="btn btn-border">Back</button>
+                        <a href="{{ url('/') }}" class="btn btn-border">Back</a>
                          <button type="button" class="btn btn-color" onclick="validate_part('next')">Continue</button>
                     </div>
 

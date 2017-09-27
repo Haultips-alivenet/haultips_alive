@@ -58,6 +58,9 @@ class FindDeliveriesController extends FrontController
             }elseif($orderBy == 'destination_desc'){
                 $shippingData = $shippingData->orderBy('sdd.delivery_address', 'DESC');
             }
+            else{
+                $shippingData = $shippingData->orderBy('shipping_details.id', 'DESC');
+            }
             
             if($pickupaddress) {
                 $shippingData = $shippingData->where('spd.pickup_address', 'like', "%$pickupaddress%");

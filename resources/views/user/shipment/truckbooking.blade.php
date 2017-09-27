@@ -146,7 +146,7 @@
                         </div>
                     </div>
                          <div class="_add_btn_btm">
-                        <button onclick="window.history.back()" class="btn btn-border">Back</button>
+                        <a href="{{ url('/') }}" class="btn btn-border">Back</a>
                          {!! Form :: submit("Submit",["class"=>"btn btn-color",'id'=>'']) !!}
                     </div>
                       </div>

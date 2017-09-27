@@ -83,7 +83,7 @@
                     </div>
 
                     <div class="_add_btn_btm">
-                        <button class="btn btn-border">Back</button>
+                        <a href="{{ url('subCategory/3') }}" class="btn btn-border">Back</a>
                        
                         <button type="button" class="btn btn-color" onclick="validate_office('next')">Continue</button>
                         <div class="inputbox-mandat-loading-1" style="display:none"><img src="{{ asset('public/admin/images/ajax-loader.gif')}}" alt=""></div>    

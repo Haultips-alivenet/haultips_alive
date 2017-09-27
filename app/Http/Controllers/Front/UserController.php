@@ -372,7 +372,7 @@ class UserController extends FrontController
         $sts_updt = $shipping_quote->update(['quote_status' => 1]);
 
         // Update shipping details
-        ShippingDetail::where('id', $sq->shipping_id)->update(['payment_method_id' => 1, 'shipping_price' => $sq->quote_price, 'payments_status' => 0]);
+        ShippingDetail::where('id', $sq->shipping_id)->update(['payment_method_id' => 1, 'shipping_price' => $sq->quote_price, 'payments_status' => 0, 'quote_status' => 1]);
 
         #Accept offer Notification
         $carrierData = ShippingQuote::select('u.device_token','u.first_name','u.last_name','u.mobile_number')
@@ -828,7 +828,7 @@ class UserController extends FrontController
           $shipping_quote->update(['quote_status' => 1]);
 
           // Update shipping details
-          ShippingDetail::where('id', $sq->shipping_id)->update(['payment_method_id' => 2, 'shipping_price' => $response['amount'],'payments_status' => 1]);
+          ShippingDetail::where('id', $sq->shipping_id)->update(['payment_method_id' => 2, 'shipping_price' => $response['amount'], 'payments_status' => 1, 'quote_status' => 1]);
 
           // insert payment details
           $pay_det = new PaymentDetail;
