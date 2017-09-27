@@ -30,6 +30,8 @@ class AuthController extends Controller
     protected $loginPath = 'admin/login';
     protected $redirectAfterLogout = 'admin/login';
     
+    
+    
     public function authenticated($request , $user){
         if($user->status=='1' && $user->is_deleted=='0'){    
             $user_detail = UserDetail::select('image')->where('user_id', $user->id)->first();

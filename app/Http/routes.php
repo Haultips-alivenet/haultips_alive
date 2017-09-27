@@ -132,6 +132,12 @@ Route::get('admin/userList', 'RegistrationController@index');
 Route::get('admin/users/{id}/delete', 'RegistrationController@destroy');
 Route::resource('admin/users', 'RegistrationController');
 
+//support
+Route::post('admin/support/store', 'SupportController@store');
+Route::get('admin/supportList', 'SupportController@index');
+Route::get('admin/support/{id}/delete', 'SupportController@destroy');
+Route::resource('admin/support', 'SupportController');
+
 # Admin Category
 Route::resource('admin/category', 'CategoryController');
 Route::post('admin/Category-Save', 'CategoryController@store');

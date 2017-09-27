@@ -106,6 +106,15 @@ License URL: http://creativecommons.org/licenses/by/3.0/
                             <li><a href="{{url('admin/adminshipment/shipList')}}">Equipments List</a></li> 
                          </ul>
                     </li>   
+                    
+                   <li class="menu-list">
+                        <a href="#"><i class="fa fa-user"></i>
+                        <span>Support</span></a>
+                        <ul class="sub-menu-list">
+                            <li><a href="{{ url('admin/support/create') }}">New Support</a> </li>
+                            <li><a href="{{ url('admin/supportList') }}">Support List</a></li>
+                        </ul>
+                    </li>
                 </ul>
                     <!--sidebar nav end-->
             </div>
