@@ -1009,7 +1009,7 @@ class UserController extends FrontController
           $upload = $request->file('profile_pic')->move($destinationPath, $photofilename);
           
           $success = 0;
-          if(count($user_detail)){
+          if($user_detail->count()){
               if($user_detail->update(['image' => $photofilename]))
                 $success = 1;
           }
@@ -1019,7 +1019,9 @@ class UserController extends FrontController
               $user_det->image = $photofilename;
               if($user_det->save())
                 $success = 1;
+              
           }
+
           
           if($success == 1 && $upload){
               Session::flash('alert_type', 'success');

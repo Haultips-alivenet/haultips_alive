@@ -26,6 +26,7 @@
                            <p>we hope you enjoy this
 Haultips gift.</p>
 
+                            <br><a href="{{ url('/') }}" class="btn btn-color">Go On Home Page</a>
 
 
 
