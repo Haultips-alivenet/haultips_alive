@@ -231,7 +231,7 @@ class FindDeliveriesController extends FrontController
     }
 
     public function bidoffersave(Request $request){
-        return $shippingDetail = DB::table("shipping_details as s")
+        $shippingDetail = DB::table("shipping_details as s")
                 ->join('users as u','s.user_id','=','u.id')
                 ->where('s.id',$request->shipingid)->select('u.mobile_number','u.first_name','u.last_name')->first();
         $customer_mobile=$shippingDetail->mobile_number;
