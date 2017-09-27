@@ -887,7 +887,10 @@ class UserController extends FrontController
       // For Otherthan Default Gateway
       //$response = Indipay::gateway('payumoney')->response($request);
 
-      dd($response);
+      //dd($response);
+      $user_detail = UserDetail::where('user_id', Auth::User()->id)->first();
+      $response['profile_pic'] = $this->setDefaultImage('public/uploads/userimages/', ($user_detail) ? $user_detail->image : '', 'u');
+      return view('user/payment-failure', $response);
     }
     
     public function partner_profile_transporter(){
