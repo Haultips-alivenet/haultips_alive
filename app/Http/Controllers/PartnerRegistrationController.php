@@ -464,5 +464,22 @@ class PartnerRegistrationController extends Controller
         }
         return redirect(url('admin/partner/'.$user_id.'/approve'));
     }
-    
+    public function changesttus($ids){
+        
+       $id=explode("_",$ids);
+       if($id[1]==1){
+         $status=0;  
+       } else {
+         $status=1;  
+       }
+       $user = User::find($id[0]); 
+       $user->documents_status = $status;
+       $statusupdate = $user->save(); 
+        if($statusupdate == 1){
+            Session::flash('success', 'Documents Status Updated successfully!');            
+        }else{
+           Session::flash('success', 'Error occur ! Please try again.');
+        }
+        return redirect(url('admin/partner/'.$id[0].'/approve'));
+    }
 }

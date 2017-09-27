@@ -84,7 +84,7 @@ class UserController extends FrontController
             $pancard_filename="Pan_".$user_id.'_'.$t.'_'.$filename; 
             $request->file('pancard')->move($destinationPath,$pancard_filename);
         } else if(@$kycdata->pancart){
-            $pancard_filename=$kycdata->rc_photo;
+            $pancard_filename=$kycdata->pancart;
         }else {
             $pancard_filename='';
         }
