@@ -113,7 +113,28 @@
                  <div class="xs tabls">
                     <div class="panel panel-warning" >
                         
-                               
+                             {!! Form::open(array('url'=>'admin/truckcapacity-search','id'=>'shiplist','method'=>'post')) !!}
+                                    <div class="row">  
+                                        <div class="form-group col-md-4 grid_box1">
+                                         <select name="trucktype_search" id="status" class="form-control select2" onchange="gettrucklength_search(this.value);">
+                                            <option value=""  >Select Truck Type</option>                                                
+                                            <?php foreach($categoryname as $value) { ?>
+                                            <option   value="{{$value->id}}"  {{Input::get('trucktype_search')==$value->id ? 'selected' : ''}}>{{$value->category_name}}</option>
+                                           <?php } ?>
+                                        </select>
+                                        </div>
+                                       
+                                        <div class="form-group col-md-4 grid_box1">
+                                              
+                                            <input type="text" name="trucklength_search" id="trucklength_search" value="{{Input::get('trucklength_search')}}" class="form-control" placeholder="Truck Length">
+                                        </div>
+                                                                     
+                                        <div class="form-group col-sm-4">
+                                            {!! Form::submit('Search',['class'=>"btn btn-success"]) !!}
+                                            <a href="{{ url('admin/truckcapacity/create') }}" class="btn btn-success" title="Refresh"><i class="fa fa-refresh"></i></a>                                            
+                                        </div>                                        
+                                    </div>
+                                    {!! Form::close() !!}   
                         
                         <div class="panel-heading">
                             <h2>Category List</h2>
@@ -223,6 +244,9 @@
 
    });
     }
+    
+    
+    
 $('#newCategory').validate({
 
             rules: {

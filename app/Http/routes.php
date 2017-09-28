@@ -180,6 +180,7 @@ Route::get('checktrucklength ', 'TruckLengthController@checktrucklength');
 Route::resource('admin/truckcapacity', 'TruckCapacityController');
 Route::get('gettrucklength ', 'TruckCapacityController@gettrucklength');
 Route::post('admin/truckcapacity-Save', 'TruckCapacityController@store');
+Route::post('admin/truckcapacity-search', 'TruckCapacityController@create');
 Route::get('admin/truckcapacity/{id}/update', 'TruckCapacityController@create');
 Route::get('admin/truckcapacity/{id}/delete', 'TruckCapacityController@destroy');
 Route::get('gettruckcapacity ', 'TruckCapacityController@gettruckcapacity');

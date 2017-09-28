@@ -38,13 +38,28 @@ class TruckCapacityController extends Controller
                             ->select('category_name','id')
                             ->get();
       
-        
+        if($request->trucktype_search && $request->trucklength_search){
+             $data["truckcapacity"] =DB::table('truck_capacities as c')
+                       ->join('truck_lengths as l','c.truck_length_id', '=', 'l.id')
+                       ->join('vehicle_categories as v','l.truck_type_id', '=', 'v.id')
+                       ->where('v.id',$request->trucktype_search)
+                       ->where('l.truck_length','like',"%$request->trucklength_search%")
+                       ->select('c.*','l.truck_length','v.category_name')->paginate(10);
+               
+        } else if($request->trucktype_search){
+             $data["truckcapacity"] =DB::table('truck_capacities as c')
+                       ->join('truck_lengths as l','c.truck_length_id', '=', 'l.id')
+                       ->join('vehicle_categories as v','l.truck_type_id', '=', 'v.id')
+                      ->where('v.id',$request->trucktype_search)
+                       ->select('c.*','l.truck_length','v.category_name')->paginate(10);
+               
+        } else {
         $data["truckcapacity"] =DB::table('truck_capacities as c')
                        ->join('truck_lengths as l','c.truck_length_id', '=', 'l.id')
                        ->join('vehicle_categories as v','l.truck_type_id', '=', 'v.id')
                        ->select('c.*','l.truck_length','v.category_name')->paginate(10);
                
-        
+        }
         $data["page"] = $data["truckcapacity"]->toArray();
          if($id){
              $data["truckupdate"] = TruckCapacity::find($id);
