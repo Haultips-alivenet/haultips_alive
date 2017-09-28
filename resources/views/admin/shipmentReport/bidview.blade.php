@@ -26,7 +26,8 @@ error_reporting(0);
          <tr style="border:none;">
          <td>{{$value->first_name.' '.$value->last_name}}</td>
          <td>{{$value->quote_price}}</td>
-         <td>{{($value->quote_status == 0) ? "Pending" : ($value->quote_status == 1)  ? "Accepted" : (($value->quote_status == 2) ? "Rejected" : "others")}}</td>
+         
+         <td><?php if($value->quote_status == 0) { echo "Pending"; } else if($value->quote_status == 1) { echo "Accepted"; } else if($value->quote_status == 2) { echo "Rejected"; } else { echo "Others"; }?></td>
          </tr>
      @endforeach
      

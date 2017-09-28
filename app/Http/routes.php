@@ -205,6 +205,8 @@ Route::resource('admin/transaction/history', 'TransactionHistoryController');
 #shipment/report
 Route::get('shipment/detailsReport/{id}', 'ShipmentReportController@details_report');
 Route::get('shipment/BidsReport/{id}', 'ShipmentReportController@bids_report');
+Route::get('shipment/codPayments/{id}', 'ShipmentReportController@cod_payments');
+Route::get('shipment/cod/payment/{id}', 'ShipmentReportController@cod_payments_save');
 Route::resource('shipment/{id}/report', 'ShipmentReportController');
 Route::resource('shipment/reportList/{id}', 'ShipmentReportController@index');
 

@@ -106,7 +106,10 @@
                                                 <td>{{$status}}</td>
                                                 <td>{{$bidstatus}}</td>
                                                 <td>{{$payments_status}}
-                                                <td><a href="{{URL :: asset('shipment/detailsReport/'.$value->id)}}"  class="btn btn-xs btn-link">View</a>/<a href="{{URL :: asset('shipment/BidsReport/'.$value->id)}}"  class="btn btn-xs btn-link">Bids View</a></td>
+                                                <td><a href="{{URL :: asset('shipment/detailsReport/'.$value->id)}}"  class="btn btn-xs btn-link">View</a>/
+                                                    <a href="{{URL :: asset('shipment/BidsReport/'.$value->id)}}"  class="btn btn-xs btn-link">Bids View</a> <?php if($value->method=="Cash on Delivery" && $payments_status=="UnDelivered") { ?>/
+                                                    <a href="{{URL :: asset('shipment/codPayments/'.$value->id.'_'.$id)}}"  class="btn btn-xs btn-link">Make COD Payments</a> <?php } ?>
+                                                </td>
                                               
                                             </tr>
                                         @endforeach
