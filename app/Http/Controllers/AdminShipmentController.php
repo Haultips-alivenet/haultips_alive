@@ -63,11 +63,15 @@ class AdminShipmentController extends Controller
 
     public function shipList(Request $request)
     {
-       if($request->type){
-           $data["tableList"] =DB::table($request->type)->select('*')->paginate(10);
+       if($request->type && $request->eq_name){
+           $data["tableList"] =DB::table($request->type)->where('name','like',"%$request->eq_name%")->select('*')->paginate(10);
            $data["page"] = $data["tableList"]->toArray(); 
            //$data["page"]["next_page_url"]=$data["page"]["next_page_url"].'&type='.$request->type;
-       } else {
+       } else if($request->type) {
+            $data["tableList"] =DB::table($request->type)->select('*')->paginate(10);
+           $data["page"] = $data["tableList"]->toArray();
+           
+       }else {
           
            $data["tableList"]='';
            
