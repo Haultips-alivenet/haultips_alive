@@ -198,7 +198,7 @@ $('#prf_edt_frm').validate({
 
 });
 
-/*$(document).ready(function() {
+$(document).ready(function() {
 
     $.ajaxSetup({
         headers: {
@@ -247,6 +247,6 @@ $('#prf_edt_frm').validate({
             }
         });
     });
-});*/
+});
 </script>
 @endsection
