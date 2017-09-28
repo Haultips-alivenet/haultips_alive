@@ -19,7 +19,7 @@
                         @endif
                     {{--    Error Display ends--}}
                 
-                     
+                     <?php if($id!=4) { ?>
                     <div class="tab-pane active" id="horizontal-form">
                         {!! Form::open(array('url'=>'shipment/reportList/'.$id,'class'=>'form-horizontal','id'=>'newCategory','files' => true)) !!}
                             
@@ -36,6 +36,13 @@
                                     </select>
                                 </div> 
                             </div>
+                            
+                            <div class="form-group">
+                                <label for="name" class="col-sm-2 control-label">Delivery Title</label>
+                                <div class="col-sm-8">
+                                    <input type="text" name="delivery_title" id="delivery_title" value="{{Input::get('delivery_title')}}" class="form-control">
+                                </div> 
+                            </div>
                            
                             <div class="col-sm-8 col-sm-offset-2">
                             {!! Form :: submit("Search",["class"=>"btn-success btn",'id'=>'trucklen']) !!}
@@ -45,7 +52,7 @@
                         {!! Form::close() !!}
 					
                     </div>
-                    
+                    <?php } ?>
                 </div>
             <br><br>
                  <div class="xs tabls">
@@ -68,8 +75,9 @@
                                 <thead>
                                     <tr class="warning">
                                         <th>#</th>
-                                        <th>Category</th>
-                                        <th>Sub Category</th>
+                                        <!--<th>Category</th> -->
+                                    <?php if($id!=4) { ?>    <th>Sub Category</th> <?php } ?>
+                                        <th>Delivery Title</th>
                                         <th>Estimated Price</th>
                                          <th>Payments</th>
                                         <th>Status</th>
@@ -90,8 +98,9 @@
                                                     }?>
                                                 <?php if($value->payments_status==0) { $payments_status="UnDelivered"; } else if($value->payments_status==1) { $payments_status="Delivered";  }?>
                                                 <td><?= $i++ ?></td>
-                                                <td>{{$value->categoty_name}}</td>
-                                                <td>{{$value->subcategory_name}}</td>
+                                               <!-- <td>{{$value->categoty_name}}</td>-->
+                                              <?php if($id!=4) { ?>  <td>{{$value->subcategory_name}}</td> <?php } ?>
+                                                <td>{!! App\ShippingDetail::getDeliveryName($value->table_name,$value->id) !!}</td>
                                                 <td>{{$value->estimated_price}}</td>
                                                 <td>{{$value->method}}</td>
                                                 <td>{{$status}}</td>

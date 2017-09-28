@@ -89,7 +89,7 @@ error_reporting(0);
         if($c_name=="item_image") { 
            //$tables_value->$tables_columns[$i] = "<img src='".asset('public/uploads/userimages/'.$tables_value->$tables_columns[$i])."' alt='foo' width='50' height='30'/>";
         }
-        if($c_name!="created_at" && $c_name!="updated_at" && $c_name!="status") {
+        if($c_name!="created_at" && $c_name!="updated_at" && $c_name!="status" && $c_name!="shipping_id") {
       ?>
      <tr>
          <td style="width: 20%;"><?php echo strtoupper($name); ?></td>

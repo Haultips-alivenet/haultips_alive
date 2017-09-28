@@ -23,6 +23,9 @@
                                     </select>
                                         </div>
                                        
+                                        <div class="form-group col-md-4 grid_box1">
+                                              <input type="text" name="eq_name" id="eq_name" value="{{Input::get('eq_name')}}" class="form-control" placeholder="Name">
+                                        </div>
                                                                      
                                         <div class="form-group col-sm-4">
                                             {!! Form::submit('Search',['class'=>"btn btn-success"]) !!}

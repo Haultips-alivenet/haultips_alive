@@ -30,6 +30,8 @@ class ShipmentReportController extends Controller
                             ->where('parent_id',$id)
                             ->select('category_name','id')
                             ->get();
+        
+        //echo $tbl->table_name;die;
          if($request->category){
         $data["shiping_details"] =   DB::table('shipping_details as s')
                              ->leftjoin('vehicle_categories as v','v.id', '=', 's.category_id')
@@ -38,10 +40,30 @@ class ShipmentReportController extends Controller
                               ->leftjoin('shipping_quotes as q','q.shipping_id', '=', 's.id')
                             ->where('s.subcategory_id',$request->category)
                             ->where('s.status',1)
-                            ->select('s.id','s.estimated_price','s.status','s.payments_status','v.category_name as categoty_name','v1.category_name as subcategory_name','p.method','q.quote_status')
+                            ->select('s.id','s.estimated_price','s.table_name','s.status','s.payments_status','v.category_name as categoty_name','v1.category_name as subcategory_name','p.method','q.quote_status')
                             ->paginate(10);
        
+         } if($request->category && $request->delivery_title) {
+             $tbl =  DB::table('shipping_details')
+                            ->where('status',1)
+                            ->where('subcategory_id',$request->category)
+                            ->select('table_name')
+                            ->first();
+             
+             $data["shiping_details"] =   DB::table('shipping_details as s')
+                             ->leftjoin('vehicle_categories as v','v.id', '=', 's.category_id')
+                             ->leftjoin('vehicle_categories as v1','v1.id', '=', 's.subcategory_id')
+                              ->leftjoin('payment_methods as p','p.id', '=', 's.payment_method_id')
+                              ->leftjoin('shipping_quotes as q','q.shipping_id', '=', 's.id')
+                              ->leftjoin($tbl->table_name.' as tblName','tblName.shipping_id', '=','s.id')
+                            ->where('s.subcategory_id',$request->category)
+                            ->where('tblName.delivery_title','like',"%$request->delivery_title%")
+                            ->where('s.status',1)
+                            ->select('s.id','s.estimated_price','s.table_name','s.status','s.payments_status','v.category_name as categoty_name','v1.category_name as subcategory_name','p.method','q.quote_status')
+                            ->paginate(10);
+             
          } else {
+         
            $data["shiping_details"] =   DB::table('shipping_details as s')
                              ->leftjoin('vehicle_categories as v','v.id', '=', 's.category_id')
                              ->leftjoin('vehicle_categories as v1','v1.id', '=', 's.subcategory_id')
@@ -50,7 +72,7 @@ class ShipmentReportController extends Controller
                             ->where('s.category_id',$id)                            
                             ->where('s.status',1)     
                             // ->where('q.quote_status',0)->orWhere('q.quote_status','1')
-                            ->select('s.id','s.estimated_price','s.status','s.payments_status','v.category_name as categoty_name','v1.category_name as subcategory_name','p.method','q.quote_status')
+                            ->select('s.id','s.estimated_price','s.table_name','s.status','s.payments_status','v.category_name as categoty_name','v1.category_name as subcategory_name','p.method','q.quote_status')
                            ->paginate(10);
         }
         $data["page"] = $data["shiping_details"]->toArray(); 

@@ -73,9 +73,6 @@ class AdminShipmentController extends Controller
            
        }
        
-       //echo $data["page"]["next_page_url"];
-       //print_r($data["page"]);die;
-     //print_r($data["tableList"]->render());die;
       $data["type"] =DB::table('admin_general_shipments_types')->select('*')->get();
         
        return view('admin.shipmentmaster.shiplist',$data);
