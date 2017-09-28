@@ -68,7 +68,7 @@ which helps you book more loads.
        <div class="container">
        
             <div class="row">
-<small class="pull-right"><a onclick="window.history.go(-1);" style="cursor: pointer;">Back to Search Results</a></small>
+<small class="pull-right custom-back-arrow"><i class="fa fa-arrow-left" aria-hidden="true"></i>  <a onclick="window.history.go(-1);" style="cursor: pointer;">Back to Search Results</a></small>
         <div class="goodes_details">
 
             <div class="col-md-3 border-right no-padding">
@@ -103,9 +103,9 @@ which helps you book more loads.
                         <ul class="_g_d_list">
                             <li><strong>Publish Date:</strong></li>
                             <li>{{$details["publishDate"]}}</li>
-                            <li><strong>Bid/Offer Expire Date:</strong></li>
+                            <li><strong>Bid/Offer Pickup Date:</strong></li>
                             <li>{{$details["pickupDate"]}} </li>
-                            <li><strong>Item Expire Date :</strong></li>
+                            <li><strong>Item Expiry Date :</strong></li>
                             <li> {{$details["expireDate"]}} </li>
                         </ul>
                     </div>
@@ -190,13 +190,13 @@ which helps you book more loads.
             <h3><span>{{$detailsItem["deliveryTitle"]}} :</span> </h3>
             <div class="clearfix"></div>
  <?php foreach($detailsItem as $key=>$value) { if($key!="itemImage" && $key!="additionalDetail") { ?>
-            <div class="col-md-12">
+            <div class="col-md-6">
                
               <ul class="go_info_list">
-                  <div class="col-md-8">
+                  <div class="col-md-6">
                 <li><strong>{{strtoupper($key)}} </strong></li>
                 </div>
-                <div class="col-md-4">
+                <div class="col-md-6">
                 <li>{{$value}}</li>
                 </div>
                 

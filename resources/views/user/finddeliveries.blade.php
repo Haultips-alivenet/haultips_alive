@@ -126,7 +126,7 @@
 
                         </form>
 
-                    </div>--->
+                    </div>-->
 
                 </div>
 
@@ -150,7 +150,7 @@
                             <div class="clearfix"></div>
 
                         </div>
-                        <div class="_fr_bm_fn">
+                        <!-- <div class="_fr_bm_fn">
                             <h3>Show shipments that:</h3>
                             <hr>
                             <h4>In Map Area</h4>
@@ -206,8 +206,8 @@
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                        <div class="_fr_bm_frm_srch">
+                        </div> -->
+                        <!-- <div class="_fr_bm_frm_srch">
                             <div class="col-md-3">
                                 <div class="text-right _tt"> Zoom to area:</div>
                             </div>
@@ -220,7 +220,7 @@
                                 </div>
                                 e.g. India,New Delhi,Mumbai,Kolkata
                             </div>
-                        </div>
+                        </div> -->
 
                     </div>
                 </div>
@@ -237,7 +237,7 @@
                         </ul>-->
 
                         <div class="input-group _pr">
-                            <span class="pull-left">Sort by</span>
+                            <span class="pull-left _pr_selecter">Sort by</span>
                             <select class="selectpicker" name="orderby" id="orderby" onchange="getorderbydata(this.value);">
                                 <option value="">-Select Sort-</option>
                                 

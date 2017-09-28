@@ -30,6 +30,8 @@
       
     </div>
     {!! $quoteDetails->render() !!}
+    <br><br>
+    <a href="{{ url('user/delivery-detail/' . $shipping_id) }}" class="btn btn-color pull-right">Go Back</a>
   </div>
 </div>
 @endsection

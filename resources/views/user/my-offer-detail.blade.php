@@ -8,6 +8,7 @@
      <div class="_dash_lft _dash_m">
          <h3>My Offer Details</h3>
 
+        @if($offer->quote_status != 2)
          <div class="_dash_m_inner">
             <h3>Shipping Customent Details</h3>
 
@@ -31,9 +32,9 @@
                 <div class="_dash_full_lrt">: Haultips</div>
             </div>
 
-
-
          </div>
+        @endif
+
          <div class="_dash_m_inner">
              <h3>Other information</h3>
             <div class="_dash_full">
@@ -70,11 +71,13 @@
                 <div class="_dash_full_lft">Order No</div>
                 <div class="_dash_full_lrt">: {{ $offer->orderNo }}</div>
             </div>
-
+            
+            @if($offer->quote_status != 2)
             <div class="_dash_full">
                 <div class="_dash_full_lft">Title</div>
                 <div class="_dash_full_lrt">: {{ $offer->title }}</div>
             </div>
+            @endif
 
             <div class="_dash_full">
                 <div class="_dash_full_lft">Take Away</div>

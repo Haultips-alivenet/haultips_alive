@@ -215,9 +215,10 @@ India - 201007</address>
   <form name="ne_form" id="ne_form" method="post">
     {{ csrf_field() }}
     <div class="input-group foot-grp">
-      <input type="text" name="ne_email" id="ne_email" class="form-control" placeholder="Enter your email...">
+      <input type="text" name="newsletter_email" id="newsletter_email" class="form-control" placeholder="Enter your email...">
+      <label id="newsletter_email-error" class="error" for="newsletter_email" style="display: none;"></label>
       <span class="input-group-btn">
-        <button class="btn" type="button"><i class="fa fa-send-o"></i></button>
+        <button type="submit" class="btn" type="button"><i class="fa fa-send-o"></i></button>
       </span>
     </div>
   </form>
@@ -303,6 +304,73 @@ India - 201007</address>
            $('#sidebar-wrapper').toggle();
         });
         new WOW().init();
-    </script>
+    </script><script type="text/javascript">
+$('#ne_form').validate({
+    rules: {
+        newsletter_email:{
+            required : true,
+            email: true
+        },
+        
+       
+    },
+    messages: {
+        newsletter_email:{
+            required : "Enter your email."
+        },
+        
+    }
+
+});
+
+$(document).ready(function() {
+
+    $.ajaxSetup({
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        }
+    })
+
+    $(document).on('submit', '#ne_form', function(e) {
+        e.preventDefault();
+        $('#newsletter_email-error').hide();
+        $('#newsletter_email-error').html('');
+        $("#newsletter_email-error").css("color", "red");
+        var ajax_url = "{{ url('newsletter/subscribe') }}";
+        $.ajax ({
+            type: "POST",
+            url: ajax_url,
+            cache: false,
+            data: $("#ne_form").serialize(),
+            dataType: "json",
+            success: function(msg) {
+                var alertmsg = '';
+                if(msg == 0){
+                  alertmsg += 'Error: Newsletters subsription failed.';
+                }
+                else if(msg == 1){
+                  alertmsg += 'Newsletter is subscribed successfully!';
+                  $("#newsletter_email-error").css("color", "green");
+                }
+                else if(msg == 2){
+                  alertmsg += 'Newsletters have been subsribed already!';
+                }
+                else{
+                    var obj = JSON.parse(JSON.stringify(msg));
+                    $.each(obj, function(key, value) {
+                        alertmsg += value + '<br>';
+                    }); 
+                }
+                $('#newsletter_email-error').show();
+                $('#newsletter_email-error').html(alertmsg);
+            },
+            error : function(msg, status) {
+                alert(msg+status);
+            }
+        });
+    });
+});  
+</script>
+
   </body>
 </html>

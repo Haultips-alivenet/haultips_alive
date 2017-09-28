@@ -174,6 +174,7 @@ class UserController extends FrontController
       $shiipings = ShippingDetail::where('user_id', $userId)->orderBy('id', 'desc');
       if($status == 'delivered') $shiipings->where('payments_status', 1);
       if (array_key_exists($status, $sts_arr)) $shiipings->where('status', $sts_arr[$status]);
+      if($status == 'active') $shiipings->where('quote_status', 0);
       $shiipings = $shiipings->paginate(10);
       if(count($shiipings) > 0){
          foreach($shiipings as $key=>$shipping){
@@ -261,7 +262,7 @@ class UserController extends FrontController
         }
       }
       $data['quoteDetails'] = $quoteDetails;
-
+      $data['shipping_id'] = $id;
       $user_detail = UserDetail::where('user_id', Auth::User()->id)->first();
       $data['profile_pic'] = $this->setDefaultImage('public/uploads/userimages/', ($user_detail) ? $user_detail->image : '', 'u');
 
@@ -417,23 +418,27 @@ class UserController extends FrontController
         $this->validate($request, [
             'pickup_address' => 'required',
             'delivery_address' => 'required',
-            'pickup_date' => 'required|date|after:yesterday',
-            'delivery_date' => 'required|date|after:pickup_date',
+            'pickup_date' => 'date_format:m-d-Y|required|after:today',
+            'delivery_date' => 'date_format:m-d-Y|required|after:pickup_date',
         ]);
         $picklatlong = $this->getLatLong($request->get('pickup_address'));
         $delivlatlong = $this->getLatLong($request->get('delivery_address'));
         try{
           DB::beginTransaction();
+          $pickup_date1 = explode('-', $request->get('pickup_date'));
+          $pickup_date = $pickup_date1[2].'-'.$pickup_date1[0].'-'.$pickup_date1[1];
           $pick_updt = ShippingPickupDetail::where('shipping_id', $shipping_id)->update([
                           'pickup_address' => $request->get('pickup_address'),
-                          'pickup_date' => $request->get('pickup_date'),
+                          'pickup_date' => $pickup_date,
                           'latitude' => $picklatlong['lat'],
                           'longitutde' => $picklatlong['lng'],
                         ]);
           
+          $delivery_date1 = explode('-', $request->get('delivery_date'));
+          $delivery_date = $delivery_date1[2].'-'.$delivery_date1[0].'-'.$delivery_date1[1];
           $ship_updt =  ShippingDeliveryDetail::where('shipping_id', $shipping_id)->update([
                           'delivery_address' => $request->get('delivery_address'),
-                          'delivery_date' => $request->get('delivery_date'),
+                          'delivery_date' => $delivery_date,
                           'latitude' => $picklatlong['lat'],
                           'longitutde' => $picklatlong['lng'],
                         ]);
@@ -602,7 +607,8 @@ class UserController extends FrontController
 
       $offerData = ShippingQuote::select('shipping_quotes.id','shipping_quotes.shipping_id','shipping_quotes.quote_status','shipping_quotes.quote_price','sd.table_name','sd.subcategory_id','sd.category_id')
                             ->join('shipping_details as sd','sd.id','=','shipping_quotes.shipping_id')
-                            ->where('shipping_quotes.carrier_id', Auth::User()->id)->paginate(10);
+                            ->where('shipping_quotes.carrier_id', Auth::User()->id)
+                            ->orderBy('shipping_quotes.updated_at', 'desc')->paginate(10);
                 
       if(count($offerData) > 0){
         foreach($offerData as $key=>$offer){ 
@@ -638,6 +644,8 @@ class UserController extends FrontController
     }
 
     public function myOfferDetail($quote_id){
+      if(Auth::user()->user_type_id <> 2  || !Auth::check()) return redirect('/');
+
       $offerData = ShippingQuote::select('shipping_quotes.shipping_id','shipping_quotes.quote_status','sd.order_id','sd.category_id','sd.subcategory_id','sd.order_id','sd.table_name','sd.created_at','u.first_name','u.last_name','u.email','u.mobile_number','spd.pickup_date','spd.pickup_address','sdd.delivery_address')
                             ->leftJoin('shipping_details as sd','sd.id','=','shipping_quotes.shipping_id')
                             ->leftJoin('users as u','u.id','=','sd.user_id')
@@ -774,7 +782,7 @@ class UserController extends FrontController
                       'lng' => $response_a->results[0]->geometry->location->lng);
         }
         else{
-          return array( 'lat' => '', 'lng' => '');
+          return array( 'lat' => 0, 'lng' => 0);
         }
         
     }
