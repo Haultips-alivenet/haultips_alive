@@ -7,6 +7,7 @@
     <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
     <meta name="description" content="">
     <meta name="author" content="">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     
 
     <title>@yield('title')</title>
@@ -185,13 +186,17 @@ India - 201007</address>
 
 <div class="clearfix"></div>
 <div class="foot-link">
-<h3>Subscribe Now</h3>
+  <h3>Subscribe Now</h3>
+  <form name="ne_form" id="ne_form" method="post">
+    {{ csrf_field() }}
     <div class="input-group foot-grp">
-      <input type="text" class="form-control" placeholder="Search for...">
+      <input type="text" name="newsletter_email" id="newsletter_email" class="form-control" placeholder="Enter your email...">
+      <label id="newsletter_email-error" class="error" for="newsletter_email" style="display: none;"></label>
       <span class="input-group-btn">
-        <button class="btn" type="button"><i class="fa fa-send-o"></i></button>
+        <button type="submit" class="btn" type="button"><i class="fa fa-send-o"></i></button>
       </span>
     </div>
+  </form>
 </div>
 
 <h3>Follow Us </h3>
@@ -295,7 +300,75 @@ India - 201007</address>
             google.maps.event.addDomListener(window, 'load', init);
       
 </script>
-  </body>
+
+<script type="text/javascript">
+$('#ne_form').validate({
+    rules: {
+        newsletter_email:{
+            required : true,
+            email: true
+        },
+        
+       
+    },
+    messages: {
+        newsletter_email:{
+            required : "Enter your email."
+        },
+        
+    }
+
+});
+
+$(document).ready(function() {
+
+    $.ajaxSetup({
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        }
+    })
+
+    $(document).on('submit', '#ne_form', function(e) {
+        e.preventDefault();
+        $('#newsletter_email-error').hide();
+        $('#newsletter_email-error').html('');
+        $("#newsletter_email-error").css("color", "red");
+        var ajax_url = "{{ url('newsletter/subscribe') }}";
+        $.ajax ({
+            type: "POST",
+            url: ajax_url,
+            cache: false,
+            data: $("#ne_form").serialize(),
+            dataType: "json",
+            success: function(msg) {
+                var alertmsg = '';
+                if(msg == 0){
+                  alertmsg += 'Error: Newsletters subsription failed.';
+                }
+                else if(msg == 1){
+                  alertmsg += 'Newsletter is subscribed successfully!';
+                  $("#newsletter_email-error").css("color", "green");
+                }
+                else if(msg == 2){
+                  alertmsg += 'Newsletters have been subsribed already!';
+                }
+                else{
+                    var obj = JSON.parse(JSON.stringify(msg));
+                    $.each(obj, function(key, value) {
+                        alertmsg += value + '<br>';
+                    }); 
+                }
+                $('#newsletter_email-error').show();
+                $('#newsletter_email-error').html(alertmsg);
+            },
+            error : function(msg, status) {
+                alert(msg+status);
+            }
+        });
+    });
+});  
+</script>
+</body>
 </html>
 
 

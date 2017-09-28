@@ -28,7 +28,7 @@ class LoginController extends FrontController
      */
     public function index()
     {
-       
+       if(Auth::check()) return redirect(session()->get('home_page_link'));
       //  return view('welcome');
         return view('user.login.login');
        

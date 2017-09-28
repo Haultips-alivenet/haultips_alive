@@ -19,6 +19,7 @@ Route::post('partner/faq/question', 'Front\UserController@partner_question_save'
 Route::get('getquesAns', 'Front\UserHomeController@getquesAns');
 Route::get('about-us', 'Front\UserHomeController@about_us');
 Route::get('how-it-works', 'Front\UserHomeController@how_it_work');
+Route::post('newsletter/subscribe', 'Front\NewsletterController@index');
 
 // User login panel 
 Route::get('user/profile', 'Front\UserController@profile');

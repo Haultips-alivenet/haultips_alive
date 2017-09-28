@@ -212,12 +212,15 @@ India - 201007</address>
 <div class="clearfix"></div>
 <div class="foot-link">
 <h3>Subscribe Now</h3>
+  <form name="ne_form" id="ne_form" method="post">
+    {{ csrf_field() }}
     <div class="input-group foot-grp">
-      <input type="text" class="form-control" placeholder="Search for...">
+      <input type="text" name="ne_email" id="ne_email" class="form-control" placeholder="Enter your email...">
       <span class="input-group-btn">
         <button class="btn" type="button"><i class="fa fa-send-o"></i></button>
       </span>
     </div>
+  </form>
 </div>
 
 <h3>Follow Us </h3>
