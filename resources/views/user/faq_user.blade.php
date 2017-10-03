@@ -8,6 +8,7 @@
             <div class="col-md-8">
                  
            <div class="_dash_rft">
+           <h3>FAQ</h3>
     <div class="tab-content panels-faq">
       <div class="tab-pane active" id="tab1">
                            @if(Session::has('success'))

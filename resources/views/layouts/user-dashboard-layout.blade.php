@@ -271,6 +271,11 @@ India - 201007</address>
      {!! Html::script('public/user/js/select2.js') !!}
      {!! Html::script('https://maps.googleapis.com/maps/api/js?key=AIzaSyDr-iGaiLmD2zCzCvl11pPRKgeFHxY8b7I&libraries=places') !!}
      <!-- {!! Html::script('public/admin/js/bootstrap-select.min.js') !!} -->
+     <script type="text/javascript">
+        jQuery.validator.addMethod("noEmptyValue", function(value, element) {
+            return this.optional(element) || ($.trim(value) != '');
+        }, "Empty value not allowed");
+     </script>
 
     @yield('script')
     <script>

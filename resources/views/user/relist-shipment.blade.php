@@ -41,16 +41,16 @@
     <div class="form-group row">
       <div class="col-md-6">
         <label for="">Pickup Date</label>
-        <div class="input-group date datetimepicker8">
-          {!! Form::text('pickup_date', date('m-d-Y', strtotime($shipPickDetail->pickup_date)), array('class'=>'form-control datetimepicker8', 'id'=>'pickup_date')) !!}
+        <div class="input-group date" id="datetimepicker8">
+          {!! Form::text('pickup_date', date('m-d-Y', strtotime($shipPickDetail->pickup_date)), array('class'=>'form-control', 'id'=>'pickup_date')) !!}
           <span class="input-group-addon" style="background: transparent; border-radius: 0;"> <img src="{!! url('public/user/img/date-time-icon.png') !!}" alt=""></span>
         </div>
       </div>
 
       <div class="col-md-6">
         <label for="">Delivery Date</label>
-        <div class="input-group date datetimepicker9">
-          {!! Form::text('delivery_date', date('m-d-Y', strtotime($shipDelivDetail->delivery_date)), array('class'=>'form-control datetimepicker9', 'id'=>'delivery_date')) !!}
+        <div class="input-group date" id="datetimepicker9">
+          {!! Form::text('delivery_date', date('m-d-Y', strtotime($shipDelivDetail->delivery_date)), array('class'=>'form-control', 'id'=>'delivery_date')) !!}
           <span class="input-group-addon" style="background: transparent; border-radius: 0;"> <img src="{!! url('public/user/img/date-time-icon.png') !!}" alt=""></span>
         </div>
       </div>
@@ -71,20 +71,22 @@
 <script>
 $(function () {
 
-    $('.datetimepicker8').datetimepicker({
-         format: 'MM-DD-YYYY'
+    $('#datetimepicker8').datetimepicker({
+         format: 'MM-DD-YYYY',
+         minDate: new Date,
     });
 
-    $('.datetimepicker9').datetimepicker({
-         format: 'MM-DD-YYYY'
+    $('#datetimepicker9').datetimepicker({
+         format: 'MM-DD-YYYY',
+         useCurrent: false, //Important! See issue #1075
     });
     
-    /*$(".datetimepicker8").on("dp.change", function (e) {
-        $('.datetimepicker9').data("DateTimePicker").minDate(e.date);
+    $("#datetimepicker8").on("dp.change", function (e) {
+        $('#datetimepicker9').data("DateTimePicker").minDate(e.date);
     });
-    $(".datetimepicker9").on("dp.change", function (e) {
-        $('.datetimepicker8').data("DateTimePicker").maxDate(e.date);
-    });*/
+    $("#datetimepicker9").on("dp.change", function (e) {
+        $('#datetimepicker8').data("DateTimePicker").maxDate(e.date);
+    });
 });
 
 $('#relist_ship_form').validate({

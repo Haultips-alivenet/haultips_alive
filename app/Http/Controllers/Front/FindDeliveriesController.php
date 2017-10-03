@@ -96,9 +96,9 @@ class FindDeliveriesController extends FrontController
                             $data[$i]['minimumBid'] = ($miid) ? $miid->minimumBid : '0'; 
                             $data[$i]['partnerQuote'] = ($shippingQuote) ? $shippingQuote->quote_price : '';
                             $data[$i]['distance'] = ShippingDetail::distance($detail['pickupLat'],$detail['pickupLong'],$detail['deliveryLat'],$detail['deliveryLong'], "K"). ' km'; 
-                            $data[$i]['postingDate'] = date('d-m-Y', strtotime($detail['created_at'])); 
-                            $data[$i]['pickupDate'] = date('d-m-Y', strtotime($detail['pickup_date']));
-                            $data[$i]['deliveryDate'] = date('d-m-Y', strtotime($detail['delivery_date']));
+                            $data[$i]['postingDate'] = date('m-d-Y', strtotime($detail['created_at'])); 
+                            $data[$i]['pickupDate'] = date('m-d-Y', strtotime($detail['pickup_date']));
+                            $data[$i]['deliveryDate'] = $detail['delivery_date'];
                             $i++;
                         }
                         

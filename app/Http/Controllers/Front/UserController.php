@@ -38,7 +38,8 @@ class UserController extends FrontController
 {
 
     public function profile(){
-      if((Auth::user()->user_type_id <> 3 && Auth::user()->user_type_id <> 2)  || !Auth::check()) return redirect('/');
+      if(!Auth::check()) return redirect('user/login');
+      if((Auth::user()->user_type_id <> 3 && Auth::user()->user_type_id <> 2)) return redirect('/');
 
       $data['user'] = Auth::User();
       $user_detail = UserDetail::where('user_id', Auth::User()->id)->first();
@@ -48,7 +49,9 @@ class UserController extends FrontController
     }
     
     public function partner_profile_kyc(){
-       if((Auth::user()->user_type_id <> 3 && Auth::user()->user_type_id <> 2)  || !Auth::check()) return redirect('/');
+      if(!Auth::check()) return redirect('user/login');
+      if((Auth::user()->user_type_id <> 3 && Auth::user()->user_type_id <> 2)) return redirect('/');
+
       $data["kycdata"] = DB::table('partner_kycs')->where('user_id', Auth::User()->id)->first();
       $data['user'] = Auth::User();
       $user_detail = UserDetail::where('user_id', Auth::User()->id)->first();
@@ -133,7 +136,8 @@ class UserController extends FrontController
     }
 
     public function changepassword(Request $request){
-      if((Auth::user()->user_type_id <> 3 && Auth::user()->user_type_id <> 2)  || !Auth::check()) return redirect('/');
+      if(!Auth::check()) return redirect('user/login');
+      if((Auth::user()->user_type_id <> 3 && Auth::user()->user_type_id <> 2)) return redirect('/');
 
       if($request->isMethod('post')){
         $this->validate($request, [
@@ -165,7 +169,8 @@ class UserController extends FrontController
     }
 
     public function myDeliveries($status){
-      if(Auth::user()->user_type_id <> 3 || !Auth::check()) return redirect('/');
+      if(!Auth::check()) return redirect('user/login');
+      if(Auth::user()->user_type_id <> 3) return redirect('/');
 
       $sts_arr = array("active" => "1", "deleted" => "2");
       $sts_label_arr = array("all-status" => "All Status", "active" => "Active", "deleted" => "Deleted", "delivered" => "Delivered");
@@ -200,7 +205,8 @@ class UserController extends FrontController
     }
     
     public function deliveryDetail($id){
-      if(Auth::user()->user_type_id <> 3 || !Auth::check()) return redirect('/');
+      if(!Auth::check()) return redirect('user/login');
+      if(Auth::user()->user_type_id <> 3) return redirect('/');
 
       $shipmentDetail = ShippingDetail::select('shipping_details.id', 'shipping_details.payments_status', 'shipping_details.status', 'shipping_details.table_name', 'shipping_price as price','shipping_details.created_at as published', 'spd.pickup_address', 'spd.pickup_date','sdd.delivery_address', 'sdd.delivery_date', 'pm.method as paymnentType', 'vcat.category_name', 'vscat.category_name as subcat_name')
                   ->leftJoin('shipping_pickup_details as spd','spd.shipping_id','=','shipping_details.id')
@@ -231,7 +237,8 @@ class UserController extends FrontController
     }
 
     public function deliveryDelete($id){
-      if(Auth::user()->user_type_id <> 3 || !Auth::check()) return redirect('/');
+      if(!Auth::check()) return redirect('user/login');
+      if(Auth::user()->user_type_id <> 3) return redirect('/');
 
       $shipping_detail = ShippingDetail::where('id', $id)
                                   ->where('user_id', Auth::User()->id);
@@ -240,7 +247,8 @@ class UserController extends FrontController
     }
 
     public function allQuotation($id){
-      if(Auth::user()->user_type_id <> 3 || !Auth::check()) return redirect('/');
+      if(!Auth::check()) return redirect('user/login');
+      if(Auth::user()->user_type_id <> 3) return redirect('/');
 
       $data = array();
       // check shipping id belongs to logged in user
@@ -270,7 +278,8 @@ class UserController extends FrontController
     }
 
     public function quotationDetail($quoteId){
-      if(Auth::user()->user_type_id <> 3 || !Auth::check()) return redirect('/');
+      if(!Auth::check()) return redirect('user/login');
+      if(Auth::user()->user_type_id <> 3) return redirect('/');
 
       $data = array();
       $offerData = ShippingQuote::select('shipping_quotes.quote_status','sd.created_at','sd.id as shippingId','spd.pickup_date','shipping_quotes.quote_price')
@@ -299,7 +308,8 @@ class UserController extends FrontController
     }
 
     public function quotationOfferAccept($quoteId){
-      if(Auth::user()->user_type_id <> 3 || !Auth::check()) return redirect('/');
+      if(!Auth::check()) return redirect('user/login');
+      if(Auth::user()->user_type_id <> 3) return redirect('/');
 
       $data = array();
       $offerData = ShippingQuote::select('shipping_quotes.quote_status','sd.created_at','sd.id as shippingId','spd.pickup_date','shipping_quotes.quote_price')
@@ -328,7 +338,8 @@ class UserController extends FrontController
     }
 
     public function quotationOfferReject(Request $request, $quot_id){
-      if(Auth::user()->user_type_id <> 3 || !Auth::check()) return redirect('/');
+      if(!Auth::check()) return redirect('user/login');
+      if(Auth::user()->user_type_id <> 3) return redirect('/');
 
       $shipping_quote = ShippingQuote::where('id', $quot_id);
       
@@ -359,7 +370,8 @@ class UserController extends FrontController
     }
 
     public function quotationOfferAcceptCod(Request $request){
-      if(Auth::user()->user_type_id <> 3 || !Auth::check()) return redirect('/');
+      if(!Auth::check()) return redirect('user/login');
+      if(Auth::user()->user_type_id <> 3) return redirect('/');
       $quot_id = $request->quot_id;
       $shipping_quote = ShippingQuote::where('id', $quot_id);
       
@@ -408,7 +420,8 @@ class UserController extends FrontController
     }
 
     public function relistShipment(Request $request, $shipping_id){
-      if(Auth::user()->user_type_id <> 3 || !Auth::check()) return redirect('/');
+      if(!Auth::check()) return redirect('user/login');
+      if(Auth::user()->user_type_id <> 3) return redirect('/');
 
       // check shipping id belongs to logged in user
       if(!ShippingDetail::isShippingIdBelongsToLoggedInUser($shipping_id, Auth::User()->id))
@@ -419,7 +432,7 @@ class UserController extends FrontController
             'pickup_address' => 'required',
             'delivery_address' => 'required',
             'pickup_date' => 'date_format:m-d-Y|required|after:today',
-            'delivery_date' => 'date_format:m-d-Y|required|after:pickup_date',
+            'delivery_date' => 'date_format:m-d-Y|required',
         ]);
         $picklatlong = $this->getLatLong($request->get('pickup_address'));
         $delivlatlong = $this->getLatLong($request->get('delivery_address'));
@@ -469,7 +482,8 @@ class UserController extends FrontController
 
     // Get Bank Info
     public function bankInformation(){
-      if((Auth::user()->user_type_id <> 3 && Auth::user()->user_type_id <> 2)  || !Auth::check()) return redirect('/');
+      if(!Auth::check()) return redirect('user/login');
+      if((Auth::user()->user_type_id <> 3 && Auth::user()->user_type_id <> 2)) return redirect('/');
 
       $data['bank_infos'] = PayInfo::where('user_id', Auth::User()->id)
                                       ->orderBy('id', 'desc')->paginate(3);
@@ -482,7 +496,8 @@ class UserController extends FrontController
 
     // Delete bank info with 
     public function bankInformationDelete(Request $request, $bank_info_id){
-      if((Auth::user()->user_type_id <> 3 && Auth::user()->user_type_id <> 2)  || !Auth::check()) return redirect('/');
+      if(!Auth::check()) return redirect('user/login');
+      if((Auth::user()->user_type_id <> 3 && Auth::user()->user_type_id <> 2)) return redirect('/');
 
       $bank_info = PayInfo::where('user_id', Auth::User()->id)
                             ->where('id', $bank_info_id);
@@ -498,7 +513,8 @@ class UserController extends FrontController
     }
 
     public function bankInformationAdd(Request $request){
-      if((Auth::user()->user_type_id <> 3 && Auth::user()->user_type_id <> 2)  || !Auth::check()) return redirect('/');
+      if(!Auth::check()) return redirect('user/login');
+      if((Auth::user()->user_type_id <> 3 && Auth::user()->user_type_id <> 2)) return redirect('/');
 
       if($request->isMethod('post')){
         $this->validate($request, [
@@ -533,7 +549,8 @@ class UserController extends FrontController
 
     // Profile edit
     public function profileEdit(Request $request){
-      if((Auth::user()->user_type_id <> 3 && Auth::user()->user_type_id <> 2)  || !Auth::check()) return redirect('/');
+      if(!Auth::check()) return redirect('user/login');
+      if((Auth::user()->user_type_id <> 3 && Auth::user()->user_type_id <> 2)) return redirect('/');
 
       $rules = array (
         'first_name' => 'required|max:200',
@@ -590,7 +607,8 @@ class UserController extends FrontController
     }
 
     public function getTransactionHistory(){
-      if((Auth::user()->user_type_id <> 3 && Auth::user()->user_type_id <> 2)  || !Auth::check()) return redirect('/');
+      if(!Auth::check()) return redirect('user/login');
+      if((Auth::user()->user_type_id <> 3 && Auth::user()->user_type_id <> 2)) return redirect('/');
 
       $data['transaction_history'] = ShippingDetail::select('shipping_details.id', 'shipping_details.order_id', 'shipping_details.table_name','pd.created_at','pd.amount','pd.status')                            
                                     ->Join('payment_details as pd','pd.shipping_id','=','shipping_details.id')
@@ -603,7 +621,8 @@ class UserController extends FrontController
     }
 
     public function myOffer(){
-      if(Auth::user()->user_type_id <> 2  || !Auth::check()) return redirect('/');
+      if(!Auth::check()) return redirect('user/login');
+      if(Auth::user()->user_type_id <> 2) return redirect('/');
 
       $offerData = ShippingQuote::select('shipping_quotes.id','shipping_quotes.shipping_id','shipping_quotes.quote_status','shipping_quotes.quote_price','sd.table_name','sd.subcategory_id','sd.category_id')
                             ->join('shipping_details as sd','sd.id','=','shipping_quotes.shipping_id')
@@ -644,7 +663,8 @@ class UserController extends FrontController
     }
 
     public function myOfferDetail($quote_id){
-      if(Auth::user()->user_type_id <> 2  || !Auth::check()) return redirect('/');
+      if(!Auth::check()) return redirect('user/login');
+      if(Auth::user()->user_type_id <> 2) return redirect('/');
 
       $offerData = ShippingQuote::select('shipping_quotes.shipping_id','shipping_quotes.quote_status','sd.order_id','sd.category_id','sd.subcategory_id','sd.order_id','sd.table_name','sd.created_at','u.first_name','u.last_name','u.email','u.mobile_number','spd.pickup_date','spd.pickup_address','sdd.delivery_address')
                             ->leftJoin('shipping_details as sd','sd.id','=','shipping_quotes.shipping_id')
@@ -748,7 +768,8 @@ class UserController extends FrontController
     }
 
     public function shipmentNew(){
-      if((Auth::user()->user_type_id <> 2 && Auth::user()->user_type_id <> 3) || !Auth::check()) return redirect('/');
+      if(!Auth::check()) return redirect('user/login');
+      if((Auth::user()->user_type_id <> 2 && Auth::user()->user_type_id <> 3)) return redirect('/');
 
       $vehicle_cat = VehicleCategory::where('parent_id', 0);
 
@@ -798,7 +819,8 @@ class UserController extends FrontController
     }
 
     public function payment(Request $request){
-      if(Auth::user()->user_type_id <> 3 || !Auth::check()) return redirect('/');
+      if(!Auth::check()) return redirect('user/login');
+      if(Auth::user()->user_type_id <> 3) return redirect('/');
 
       $parameters = [
         'amount' => $request->amount, 
@@ -816,7 +838,8 @@ class UserController extends FrontController
     }
 
     public function success(Request $request){
-      if(Auth::user()->user_type_id <> 3 || !Auth::check()) return redirect('/');
+      if(!Auth::check()) return redirect('user/login');
+      if(Auth::user()->user_type_id <> 3) return redirect('/');
 
       // For default Gateway
       $response = Indipay::response($request);
@@ -888,6 +911,7 @@ class UserController extends FrontController
     }
 
     public function failure(Request $request){
+      if(!Auth::check()) return redirect('user/login');
       // For default Gateway
       $response = Indipay::response($request);
       
@@ -997,6 +1021,9 @@ class UserController extends FrontController
     }
 
     public function profileImageEdit(Request $request){
+      if(!Auth::check()) return redirect('user/login');
+      if((Auth::user()->user_type_id <> 3 && Auth::user()->user_type_id <> 2)) return redirect('/');
+
       $rules = array (
         'profile_pic' => 'required|image|mimes:jpeg,png,jpg|max:2048',
       );

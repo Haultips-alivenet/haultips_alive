@@ -20,6 +20,7 @@ Route::get('getquesAns', 'Front\UserHomeController@getquesAns');
 Route::get('about-us', 'Front\UserHomeController@about_us');
 Route::get('how-it-works', 'Front\UserHomeController@how_it_work');
 Route::post('newsletter/subscribe', 'Front\NewsletterController@index');
+Route::get('geo-location/city/{state_id}', 'Front\GeoLocationController@getCityByStateId');
 
 // User login panel 
 Route::get('user/profile', 'Front\UserController@profile');

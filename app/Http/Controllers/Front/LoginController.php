@@ -17,6 +17,7 @@ use App\UserVerification;
 use App\TruckLengths;
 use App\AdminBedroom;
 use App\AdminBox;
+use App\GeoLocation;
 use DB;
 
 class LoginController extends FrontController
@@ -53,6 +54,7 @@ class LoginController extends FrontController
                             ->where('parent_id',1)
                             ->select('category_name','id')
                             ->get();
+        $data['states'] = GeoLocation::getState();
         $data["carrier_types"] =   DB::table('carrier_types')->select('*')->get();
         return view('user.login.partner',$data);
        

@@ -246,6 +246,13 @@ India - 201007</address>
      {!! Html::script('public/admin/js/jquery.nicescroll.js') !!}
      {!! Html::script('public/user/js/moment.js') !!}
      {!! Html::script('public/user/js/bootstrap-datetimepicker.js') !!}
+
+     <script type="text/javascript">
+        jQuery.validator.addMethod("noEmptyValue", function(value, element) {
+            return this.optional(element) || ($.trim(value) != '');
+        }, "Empty value not allowed");
+
+     </script>
      
     @yield('script')
     <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
@@ -366,7 +373,30 @@ $(document).ready(function() {
             }
         });
     });
-});  
+
+    
+});
+
+function getCityByStateId(state_id, elm){
+  var ajax_url = "{{ url('geo-location/city') }}/" + state_id;
+  $.ajax({
+      url: ajax_url,
+      dataType: "json",
+      success: function(msg) {
+        var dt = '<option value="">Select a city</option>';
+        var obj = JSON.parse(JSON.stringify(msg));
+        $.each(obj, function(key, value) {
+          dt += '<option value="' + value.id + '">' + value.name + '</option>';
+        }); 
+    
+        $('#' + elm).html(dt);
+      },
+      error : function(msg, status) {
+          alert(msg+status);
+      }
+  });
+}
+
 </script>
 </body>
 </html>

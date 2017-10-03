@@ -230,7 +230,7 @@ which helps you book more loads.
             
  
             <div class="col-md-12">
-                 <textarea name="question" placeholder="Write Question" class="form-control"></textarea>
+                 <textarea name="question" id="question" placeholder="Write Question" class="form-control"></textarea>
                  <input type="hidden" name="ship_id" value="{{$shiping_id}}">
             </div><div class="col-md-12"><br></div>
             <div class="col-md-12">
@@ -260,6 +260,23 @@ which helps you book more loads.
 @endsection
 
 @section('script')
+<script type="text/javascript">
+$('#bid_form').validate({
+    rules: {
+        question:{
+            required : true,
+            noEmptyValue : true
+        }
+    },
+    messages: {
+        question:{
+            required : "Enter the question."
+        }
+    }
+
+});
+</script>
+@endsection
 
 
 

@@ -7,6 +7,7 @@
 <?php //print_r($quesdetails); ?>
             <div class="col-md-8">
            <div class="_dash_rft">
+            <h3>FAQ</h3>
     <div class="tab-content panels-faq">
       <div class="tab-pane active" id="tab1">
         <div class="panel-group" id="help-accordion-1">
@@ -33,6 +34,7 @@
                         Submit <i class="fa fa-question" aria-hidden="true"></i>
                       </span>
                     </div>
+                    
                    
                     </div>
                </div>
@@ -96,15 +98,15 @@
 
    });
     }
-    function askquestion(shiping_id,user_id){
+    function askquestion(shiping_id, user_id){
        
         var question = $('#question_faq'+shiping_id).val();
         
-        if(question) {
-         $('#shiping_id').val(shiping_id);
-         $('#question').val(question);
-         $('#user_id').val(user_id);
-          document.getElementById("partnerfaq_form").submit();
+        if(question.trim()){
+           $('#shiping_id').val(shiping_id);
+           $('#question').val(question);
+           $('#user_id').val(user_id);
+           document.getElementById("partnerfaq_form").submit();
         } else {
             alert("Please Enter Question?");
             return false;
