@@ -69,7 +69,7 @@
                                                 <td><a href="{{URL :: asset('admin/partner/'.$user->id)}}"  class="btn btn-xs btn-link">{{$user->first_name." ".$user->last_name}}</a></td>
                                                 <td>{{$user->email}}</td>
                                                 <td>{{$user->mobile_number}}</td>
-                                                <td>{{($user->status=='1')?'Active' : 'Inactive'}}</td>
+                                                <td><a onclick="return confirm('Do you Want to Change Status?');return false;" href="{{URL :: asset('admin/partner/status/'.$user->id.'_'.$user->status)}}">{{($user->status=='1')?'Active' : 'Inactive'}}</a></td>
                                                  <td><a href="{{URL :: asset('admin/partner/'.$user->id)}}/approve"  class="btn btn-xs btn-link">{{($user->documents_status=='1')?'Approved' : 'Unapproved'}}</a></td>
                                                 <td><a <?php if($user->carrier_type_id!='1') { ?>style="cursor: pointer" onclick="gettransporterData({{$user->id}});" <?php } ?>>{{($user->carrier_type_id=='1')?'Packer & Mover' : 'Transporter'}}</a></td>
                                                 <td>{{date('F d, Y', strtotime($user->created_at))}}</td>

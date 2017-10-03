@@ -482,4 +482,21 @@ class PartnerRegistrationController extends Controller
         }
         return redirect(url('admin/partner/'.$id[0].'/approve'));
     }
+     public function partner_active_Inactive($ids){
+        $id=explode("_",$ids);
+        if($id[1]==1) {
+            $status='0';
+        } else {
+            $status='1';
+        }
+        $user = User::find($id[0]); 
+        $user->status = $status;
+        $Sucess = $user->save();  
+        if($Sucess == 1){
+            Session::flash('success', 'Patner Status Updated successfully');            
+        }else{
+           Session::flash('success', 'Error occur ! Please try again.');
+        } 
+        return redirect(url('admin/partnerList'));
+    }
 }

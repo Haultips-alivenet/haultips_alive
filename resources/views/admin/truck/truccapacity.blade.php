@@ -179,7 +179,8 @@
                                     @endif
                                 </tbody>
                             </table>
-                            <?php  echo $truckcapacity->render();  ?>                                        
+                            {!! $truckcapacity->appends(Request::except('page'))->render() !!}
+                                                              
                         </div>
                     </div>						
                 </div>
