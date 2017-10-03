@@ -9,6 +9,8 @@ use App\Http\Controllers\Controller;
 use Illuminate\Foundation\Auth\ThrottlesLogins;
 use Illuminate\Foundation\Auth\AuthenticatesAndRegistersUsers;
 use Session;
+use Illuminate\Http\Request;
+use Auth;
 
 
 class AuthController extends Controller
@@ -30,10 +32,28 @@ class AuthController extends Controller
     protected $loginPath = 'admin/login';
     protected $redirectAfterLogout = 'admin/login';
     
-    
-    
-    public function authenticated($request , $user){
-        if($user->status=='1' && $user->is_deleted=='0'){    
+    public function postLogin(Request $request){   
+        // Validate the form data
+        $this->validate($request, [
+            'email' => 'required',
+            'password' => 'required|min:6',
+        ]);
+
+        // Attempt to log the user in 
+        if(Auth::attempt(['email' => $request->email, 'password' => $request->password, 'status' => 1, 'is_deleted' => 0], $request->remember) ||
+            Auth::attempt(['mobile_number' => $request->email, 'password' => $request->password, 'status' => 1, 'is_deleted' => 0], $request->remember)){
+            $user = Auth::user();
+
+            if($user->is_deleted=='1'){
+                $errorMsg = ($user->is_deleted=='1')? 'Account Deactivated' : 'Verify your mobile number to login';
+                $this->getLogout();
+                return redirect($this->loginPath($request->user))
+                ->withInput($request->only($this->loginUsername(), 'remember'))
+                ->withErrors([
+                    $this->loginUsername() => $errorMsg,
+                ]);
+            }
+
             $user_detail = UserDetail::select('image')->where('user_id', $user->id)->first();
 
             if($user_detail) {
@@ -70,17 +90,14 @@ class AuthController extends Controller
                     //return redirect()->route('user/dashboard') ;
                      return redirect(url('user/new-shipment'));
                 }
-            } 
-        }else{
-            $errorMsg = ($user->is_deleted=='1')? 'Account Deactivated' : 'Verify your mobile number to login';
-            $this->getLogout();
-            return redirect($this->loginPath($request->user))
-            ->withInput($request->only($this->loginUsername(), 'remember'))
-            ->withErrors([
-                $this->loginUsername() => $errorMsg,
-            ]);
+            }
         }
+        return redirect($this->loginPath($request->user))
+            ->withInput($request->only($this->loginUsername(), 'remember'))
+            ->withErrors('These credentials do not match our records.');
+        
     }
+    
     
     
     /**

@@ -61,7 +61,6 @@ License URL: http://creativecommons.org/licenses/by/3.0/
                         </div>
                     @endif
                         {!! Form::open(array('url'=>'/auth/login','id'=>'login-form')) !!}
-                            {!! csrf_field() !!}
                             <div class="log-input">
                                 <div class="log-input-left">
                                     {!! Form :: text('email','',['placeholder'=>'Yourname','class'=>'user','id'=>'user']) !!}
@@ -78,7 +77,7 @@ License URL: http://creativecommons.org/licenses/by/3.0/
                             
                         <div class="checkbox icheck">
                             <label style="padding: 0;">
-                                <input type="checkbox"> <span>Remember Me</span>
+                                <input name="remember" value="1" type="checkbox"> <span>Remember Me</span>
                             </label>
                         </div>
                         {!! Form::submit('Login') !!}

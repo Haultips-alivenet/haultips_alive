@@ -263,7 +263,7 @@
 
                         <tbody style="display: table-row-group;">
                             <?php foreach($diliveries as $value) { ?>
-                            <tr style="@if($value["deliveryDate"] < date('Y-m-d')) {{ 'background-color:#ffd4d4;' }} @endif">
+                            <tr>
                                 <td> <span class="_quote"><a href="{{URL :: asset('user/find/deliveries/details/'.$value["shippingId"])}}">{{$value["title"]}}</a></span></td>
                                 <td><span class="_quote"> INR {{$value["minimumBid"]}}</span> </td>
                                 <td><span>{{$value["pickupAddress"]}}</span></td>

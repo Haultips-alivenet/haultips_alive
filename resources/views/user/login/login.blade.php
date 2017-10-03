@@ -31,7 +31,6 @@
                     <div class="_cus_bx _cus_login">
                         <p>Don't have an account? <a href="{{url('user/signup')}}">Haultips Sign Up</a></p>
                            {!! Form::open(array('url'=>'/auth/login','id'=>'login-form')) !!}
-                            {!! csrf_field() !!}
                             <div class="form-group ">
                                
                                   {!! Form :: text('email','',['placeholder'=>'Enter your username or email address','class'=>'user form-control','id'=>'user']) !!}
@@ -46,7 +45,7 @@
                                 <div class="col-md-6">
                                 
                             <div class="checkbox checkbox-circle">
-                            <input type="checkbox" class="filled-in" id="checkbox2">
+                            <input name="remember" value="1" type="checkbox" class="filled-in" id="checkbox2">
                             <label for="checkbox2">Remember me</label>
                             </div>
 
