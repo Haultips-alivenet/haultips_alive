@@ -42,6 +42,11 @@ class Handler extends ExceptionHandler
      */
     public function render($request, Exception $e)
     {
+        if ($e instanceof \ReflectionException OR $e instanceof \Symfony\Component\HttpKernel\Exception\NotFoundHttpException) //Si la ruta no existe, mostar view 404.
+            return response(view('errors.404'), 404);
+        return parent::render($request, $e);
+
+    /*
         if ($e instanceof ModelNotFoundException) {
             $e = new NotFoundHttpException($e->getMessage(), $e);
         }
@@ -50,6 +55,6 @@ class Handler extends ExceptionHandler
 //          return response()->json(array('responseCode'=>'0','responseMessage'=>'Token Mismatch','token'=>$_POST['_token'],'servertoken'=>$request->session()->token()));
 //        }
 
-        return parent::render($request, $e);
+        return parent::render($request, $e);*/
     }
 }

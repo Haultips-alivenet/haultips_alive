@@ -26,7 +26,7 @@ class NewsletterController extends FrontController
       if ($validator->fails ())
           return Response::json ($validator->messages());
       else{
-          $ne = NewsletterSubscriber::where('newsletter_email', $request->newsletter_email);
+          $ne = NewsletterSubscriber::where('newsletter_email', $request->get('newsletter_email'));
           $success = 0;
           if($ne->count()){
             $success = 2;

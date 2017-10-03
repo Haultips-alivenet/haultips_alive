@@ -210,7 +210,7 @@ Route::get('shipment/BidsReport/{id}', 'ShipmentReportController@bids_report');
 Route::get('shipment/codPayments/{id}', 'ShipmentReportController@cod_payments');
 Route::get('shipment/cod/payment/{id}', 'ShipmentReportController@cod_payments_save');
 Route::resource('shipment/{id}/report', 'ShipmentReportController');
-Route::resource('shipment/reportList/{id}', 'ShipmentReportController@index');
+Route::get('shipment/reportList/{id}', 'ShipmentReportController@index');
 
 
 
