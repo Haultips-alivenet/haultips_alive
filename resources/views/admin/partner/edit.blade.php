@@ -45,7 +45,7 @@
                         @endif
                     {{--    Error Display ends--}}
                     <div class="tab-pane active" id="horizontal-form">
-                        {!! Form::model($user,['route'=>['admin.partner.update',$user->id], 'method'=>'patch','class'=>'form-horizontal'])  !!}
+                        {!! Form::model($user,['route'=>['admin.partner.update',$user->id], 'method'=>'patch','class'=>'form-horizontal','id'=>'newUser'])  !!}
                        
                             
                             <div id="msgStatus"></div>
@@ -188,7 +188,14 @@ $('#newUser').validate({
                     required : true,
                     minlength:1,
                     number:true
-                }
+                },
+                 carrer_type1: {
+                    require_from_group: [1, ".carrer_group"]
+                  },
+                  carrer_type2: {
+                    require_from_group: [1, ".carrer_group"]
+                  }
+               
             },
 
             messages: {

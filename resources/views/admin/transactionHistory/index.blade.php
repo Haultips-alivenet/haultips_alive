@@ -19,10 +19,16 @@
                                         <div class="form-group col-md-2 grid_box1">
                                             {!! Form::text('Order_Category',Input::get('Order_Category'),['class'=>"form-control",'placeholder'=>'Order Category']) !!}
                                         </div>
+                                        <div class="form-group col-md-2 grid_box1">
+                                            {!! Form::text('mobile',Input::get('mobile'),['class'=>"form-control",'placeholder'=>'Mobile']) !!}
+                                        </div>
+                                        <div class="form-group col-md-2 grid_box1">
+                                            {!! Form::text('transaction_id',Input::get('transaction_id'),['class'=>"form-control",'placeholder'=>'Transaction Id']) !!}
+                                        </div>
                                          <div class="form-group col-md-2 grid_box1">
                                             {!! Form::text('Payment_Status',Input::get('Payment_Status'),['class'=>"form-control",'placeholder'=>'Payment Status']) !!}
                                         </div>                                      
-                                        <div class="form-group col-sm-3">
+                                        <div class="form-group col-sm-2">
                                             {!! Form::submit('Search',['class'=>"btn btn-success"]) !!}
                                             <a href="{{ url('admin/transaction/history') }}" class="btn btn-success" title="Refresh"><i class="fa fa-refresh"></i></a>                                            
                                         </div>                                        

@@ -31,7 +31,10 @@ class TransactionHistoryController extends Controller
                             ->leftjoin('payment_methods as pm','pm.id','=','s.payment_method_id')
                             ->where('u.first_name', 'like', "%$request->name%")
                             ->where('v.category_name', 'like', "%$request->Order_Category%")
+                            ->where('u.mobile_number','like' ,"%$request->mobile%")
+                            ->where('p.transaction_id','like' ,"%$request->transaction_id%")
                             ->where('p.status', 'like', "%$request->Payment_Status%")
+                            ->orderBy('p.created_at',"desc")
                             ->select('s.id as shipmentId','s.table_name','p.id','p.amount','p.transaction_id','p.status','p.created_at','u.first_name','u.last_name','u.mobile_number','v.category_name','pm.method')
                             ->paginate(10);
         $user =$categoryname;
