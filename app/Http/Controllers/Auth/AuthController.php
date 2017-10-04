@@ -89,6 +89,9 @@ class AuthController extends Controller
                 }elseif($user->user_type_id=='3'){
                     //return redirect()->route('user/dashboard') ;
                      return redirect(url('user/new-shipment'));
+                } elseif($user->user_type_id=='4'){
+                    
+                   return redirect('support/dashboard') ;
                 }
             }
         }
