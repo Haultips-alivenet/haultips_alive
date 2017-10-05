@@ -38,6 +38,28 @@ License URL: http://creativecommons.org/licenses/by/3.0/
 </head> 
 <body class="sticky-header" >
     <section>
+    <?php  $tempArr = Session::get('currentUser');
+       if($tempArr["user_type_id"]==4) { ?>
+        <div class="left-side sticky-left-side">
+             <div class="logo">
+                <h1><a href="{{ url('support/dashboard') }}">Haultips<span>Support</span></a></h1>
+            </div>
+            <div class="logo-icon text-center">
+                    <a href="{{ url('support/dashboard') }}"><i class="lnr lnr-home"></i> </a>
+            </div>
+            <div class="left-side-inner">
+                <ul class="nav nav-pills nav-stacked custom-nav">
+                    <li class="active">
+                        <a href="{{ url('support/dashboard') }}"><i class="fa fa-dashboard"></i><span>Dashboard</span></a>
+                    </li>
+                    <li class="active">
+                        <a href="{{ url('support/inbox') }}"><i class="fa fa-inbox"></i><span>Inbox</span></a>
+                    </li>
+                </ul>
+                
+            </div>
+         </div>   
+    <?php } else { ?>
     <!-- left side start-->
         <div class="left-side sticky-left-side">
 
@@ -119,6 +141,7 @@ License URL: http://creativecommons.org/licenses/by/3.0/
                     <!--sidebar nav end-->
             </div>
         </div>
+         <?php } ?>
         <!-- left side end-->
         <!-- main content start-->
         <div class="main-content">
@@ -148,8 +171,8 @@ License URL: http://creativecommons.org/licenses/by/3.0/
                                         </div>	
                                         </a>
                                         <ul class="dropdown-menu drp-mnu">
-                                            <li> <a href="#"><i class="fa fa-cog"></i> Settings</a> </li> 
-                                            <li> <a href="#"><i class="fa fa-user"></i>Profile</a> </li> 
+<!--                                            <li> <a href="#"><i class="fa fa-cog"></i> Settings</a> </li> 
+                                            <li> <a href="#"><i class="fa fa-user"></i>Profile</a> </li> -->
                                             <li> <a href="{{ url('auth/logout') }}"><i class="fa fa-sign-out"></i> Logout</a> </li>
                                         </ul>
                                     </li>

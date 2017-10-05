@@ -111,6 +111,9 @@ Route::post('bid/offer/save/{id}', 'Front\FindDeliveriesController@bidoffersave'
 Route::post('partner/question/save', 'Front\FindDeliveriesController@partner_question_save');
 //sds
 
+//support
+Route::get('support/dashboard', 'SupportDashboardController@index');
+Route::get('support/inbox', 'SupportDashboardController@inbox');
 
 #Admin
 Route::get('/admin/login', function () {
