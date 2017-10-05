@@ -431,9 +431,23 @@ class UserController extends FrontController
         $this->validate($request, [
             'pickup_address' => 'required',
             'delivery_address' => 'required',
-            'pickup_date' => 'date_format:m-d-Y|required|after:today',
+            'pickup_date' => 'date_format:m-d-Y|required',
             'delivery_date' => 'date_format:m-d-Y|required',
         ]);
+        $p_date = date_create_from_format('m-d-Y', $request->pickup_date); ;
+        $d_date = date_create_from_format('m-d-Y', $request->delivery_date);
+        if(date_format($d_date, 'Y-m-d') < date_format($p_date, 'Y-m-d')){
+          return redirect()->to('user/relist-shipment/' . $shipping_id)
+                    ->withInput($request->input())
+                    ->withErrors('Delivery date must be greater than or equal to pickup date.');
+        }
+
+        if(date_format($p_date, 'Y-m-d') <= date('Y-m-d')){
+          return redirect()->to('user/relist-shipment/' . $shipping_id)
+                    ->withInput($request->input())
+                    ->withErrors('Pickup date must be greater than current date.');
+        }
+
         $picklatlong = $this->getLatLong($request->get('pickup_address'));
         $delivlatlong = $this->getLatLong($request->get('delivery_address'));
         try{
@@ -673,7 +687,9 @@ class UserController extends FrontController
                             ->leftJoin('shipping_delivery_details as sdd','sdd.shipping_id','=','shipping_quotes.shipping_id')
                             ->where('shipping_quotes.id', $quote_id)
                             ->where('shipping_quotes.carrier_id', Auth::User()->id)->first();
-               
+      
+      if($offerData->quote_status <> 1) return redirect('/');
+      
       if(count($offerData)){
            $shippingId = $offerData->shipping_id;
            $shippingData = DB::table($offerData->table_name)->select('delivery_title')->where('shipping_id',$shippingId)->first();

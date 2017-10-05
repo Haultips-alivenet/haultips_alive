@@ -12,9 +12,9 @@
          @foreach($offers as $key=>$offer)
          <ul class="event-list">
              <li>
-                 <img src="{{ $offer->image }}" alt="" height="119" onclick="location.href='{{ url('user/my-offer/' . $offer->id) }}'" style="cursor: pointer;">
+                 <img src="{{ $offer->image }}" alt="" height="119" @if($offer->quote_status == 1) onclick="location.href='{{ url('user/my-offer/' . $offer->id) }}'" @endif style="cursor: pointer;">
                  <div class="info">
-                     <h2 onclick="location.href='{{ url('user/my-offer/' . $offer->id) }}'" style="cursor: pointer;">{{ $offer->title }}</h2>
+                     <h2 @if($offer->quote_status == 1) onclick="location.href='{{ url('user/my-offer/' . $offer->id) }}'" @endif style="cursor: pointer;">{{ $offer->title }}</h2>
                      <p><strong>Category :</strong> {{ $offer->category }}</p>
                      <p><strong>Bid Amount :</strong> INR {{ $offer->quotePrice }}</p>
                  </div>

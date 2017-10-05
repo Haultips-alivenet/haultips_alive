@@ -74,6 +74,7 @@ $(function () {
     $('#datetimepicker8').datetimepicker({
          format: 'MM-DD-YYYY',
          minDate: new Date,
+         useCurrent: false,
     });
 
     $('#datetimepicker9').datetimepicker({
