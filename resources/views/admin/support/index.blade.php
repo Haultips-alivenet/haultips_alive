@@ -67,7 +67,7 @@
                                                 <td><a href="{{url('admin/users/'.$user->id)}}"  class="btn btn-xs btn-link">{{$user->first_name." ".$user->last_name}}</a></td>
                                                 <td>{{$user->email}}</td>
                                                 <td>{{$user->mobile_number}}</td>
-                                                <td>{{($user->status=='1')?'Active' : 'Inactive'}}</td>
+                                                <td><a onclick="return confirm('Do you Want to Change Status?');return false;" href="{{URL :: asset('admin/support/status/'.$user->id.'_'.$user->status)}}">{{($user->status=='1')?'Active' : 'Inactive'}}</a></td>
                                                 <td>{{date('F d, Y', strtotime($user->created_at))}}</td>
                                                 <td>
                                                     <a href="{{URL :: asset('admin/support/'.$user->id)}}/edit" class="btn btn-success" title='edit'><i class="fa fa-edit"></i></a>

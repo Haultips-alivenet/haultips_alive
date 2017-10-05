@@ -209,5 +209,21 @@ class SupportController extends Controller
         }
        
     }
-            
+    public function user_active_Inactive($ids){
+        $id=explode("_",$ids);
+        if($id[1]==1) {
+            $status='0';
+        } else {
+            $status='1';
+        }
+        $user = User::find($id[0]); 
+        $user->status = $status;
+        $Sucess = $user->save();  
+        if($Sucess == 1){
+            Session::flash('success', 'Support Status Updated successfully');            
+        }else{
+           Session::flash('success', 'Error occur ! Please try again.');
+        } 
+        return redirect(url('admin/supportList'));
+    }        
 }

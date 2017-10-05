@@ -111,9 +111,6 @@ Route::post('bid/offer/save/{id}', 'Front\FindDeliveriesController@bidoffersave'
 Route::post('partner/question/save', 'Front\FindDeliveriesController@partner_question_save');
 //sds
 
-//support
-Route::get('support/dashboard', 'SupportDashboardController@index');
-Route::get('support/inbox', 'SupportDashboardController@inbox');
 
 #Admin
 Route::get('/admin/login', function () {
@@ -135,14 +132,13 @@ Route::get('admin/mobileCheck', 'RegistrationController@mobileCheck');
 Route::get('admin/userList', 'RegistrationController@index');
 Route::get('admin/users/{id}/delete', 'RegistrationController@destroy');
 Route::get('admin/user/status/{id}', 'RegistrationController@user_active_Inactive');
-//Route::get('email/user/emailverify/{id}', 'RegistrationController@emailverify');
-Route::get('user/emailverify/{id}', 'Front\LoginController@emailverify');
 Route::resource('admin/users', 'RegistrationController');
 
 //support
 Route::post('admin/support/store', 'SupportController@store');
 Route::get('admin/supportList', 'SupportController@index');
 Route::get('admin/support/{id}/delete', 'SupportController@destroy');
+Route::get('admin/support/status/{id}', 'SupportController@user_active_Inactive');
 Route::resource('admin/support', 'SupportController');
 
 # Admin Category
@@ -174,8 +170,7 @@ Route::get('admin/partner/{id}/delete', 'PartnerRegistrationController@destroy')
 Route::get('admin/partner/{id}/approve', 'PartnerRegistrationController@approve');
 Route::post('admin/partnerDocumentsUpload', 'PartnerRegistrationController@DocumentsUpload');
 Route::get('admin/partner/status/{id}', 'PartnerRegistrationController@partner_active_Inactive');
-Route::get('admin/partner/emailverify/{id}', 'PartnerRegistrationController@emailverify');
-
+Route::get('user/emailverify/{id}', 'Front\LoginController@emailverify');
 # Truck Length
 Route::resource('admin/trucklength', 'TruckLengthController');
 Route::post('admin/trucklength-Save', 'TruckLengthController@store');
@@ -292,4 +287,5 @@ Route::post('webservices/deleteBankInfo', 'AndroidController@deleteBankInfo');
 Route::post('webservices/paymentSucess', 'AndroidController@paymentSucess');
 Route::post('webservices/paymentFailure', 'AndroidController@paymentFailure');
 Route::post('webservices/paymentByCod', 'AndroidController@paymentByCod');
+Route::post('webservices/createHashForPay', 'AndroidController@createHashForPay');
 Route::post('webservices/conjob', 'AndroidController@conjob');
