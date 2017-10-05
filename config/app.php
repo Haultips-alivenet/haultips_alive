@@ -150,6 +150,7 @@ return [
         
         //JWT auth Provider
         Tymon\JWTAuth\Providers\JWTAuthServiceProvider::class,
+        Vinkla\Pusher\PusherServiceProvider::class,
     ],
 
     /*

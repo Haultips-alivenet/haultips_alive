@@ -37,6 +37,10 @@ class ComposerStaticInit9df7efa49b843b908d9b392fd6df8211
         array (
             'Webmozart\\Assert\\' => 17,
         ),
+        'V' => 
+        array (
+            'Vinkla\\Pusher\\' => 14,
+        ),
         'T' => 
         array (
             'Tymon\\JWTAuth\\' => 14,
@@ -92,6 +96,7 @@ class ComposerStaticInit9df7efa49b843b908d9b392fd6df8211
             'GuzzleHttp\\Psr7\\' => 16,
             'GuzzleHttp\\Promise\\' => 19,
             'GuzzleHttp\\' => 11,
+            'GrahamCampbell\\Manager\\' => 23,
         ),
         'F' => 
         array (
@@ -132,6 +137,10 @@ class ComposerStaticInit9df7efa49b843b908d9b392fd6df8211
         'Webmozart\\Assert\\' => 
         array (
             0 => __DIR__ . '/..' . '/webmozart/assert/src',
+        ),
+        'Vinkla\\Pusher\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/vinkla/pusher/src',
         ),
         'Tymon\\JWTAuth\\' => 
         array (
@@ -261,6 +270,10 @@ class ComposerStaticInit9df7efa49b843b908d9b392fd6df8211
         array (
             0 => __DIR__ . '/..' . '/guzzlehttp/guzzle/src',
         ),
+        'GrahamCampbell\\Manager\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/graham-campbell/manager/src',
+        ),
         'Faker\\' => 
         array (
             0 => __DIR__ . '/..' . '/fzaninotto/faker/src/Faker',
@@ -372,6 +385,7 @@ class ComposerStaticInit9df7efa49b843b908d9b392fd6df8211
         'App\\CostEstimation' => __DIR__ . '/../..' . '/app/CostEstimation.php',
         'App\\Events\\Event' => __DIR__ . '/../..' . '/app/Events/Event.php',
         'App\\Exceptions\\Handler' => __DIR__ . '/../..' . '/app/Exceptions/Handler.php',
+        'App\\GeoLocation' => __DIR__ . '/../..' . '/app/GeoLocation.php',
         'App\\Helpers\\DateHelper' => __DIR__ . '/../..' . '/app/Helpers/DateHelper.php',
         'App\\Helpers\\Helper' => __DIR__ . '/../..' . '/app/Helpers/Helper.php',
         'App\\Http\\Controllers\\AdminShipmentController' => __DIR__ . '/../..' . '/app/Http/Controllers/AdminShipmentController.php',
@@ -385,7 +399,9 @@ class ComposerStaticInit9df7efa49b843b908d9b392fd6df8211
         'App\\Http\\Controllers\\DashboardController' => __DIR__ . '/../..' . '/app/Http/Controllers/DashboardController.php',
         'App\\Http\\Controllers\\FrontController' => __DIR__ . '/../..' . '/app/Http/Controllers/FrontController.php',
         'App\\Http\\Controllers\\Front\\FindDeliveriesController' => __DIR__ . '/../..' . '/app/Http/Controllers/Front/FindDeliveriesController.php',
+        'App\\Http\\Controllers\\Front\\GeoLocationController' => __DIR__ . '/../..' . '/app/Http/Controllers/Front/GeoLocationController.php',
         'App\\Http\\Controllers\\Front\\LoginController' => __DIR__ . '/../..' . '/app/Http/Controllers/Front/LoginController.php',
+        'App\\Http\\Controllers\\Front\\NewsletterController' => __DIR__ . '/../..' . '/app/Http/Controllers/Front/NewsletterController.php',
         'App\\Http\\Controllers\\Front\\ShipmentController' => __DIR__ . '/../..' . '/app/Http/Controllers/Front/ShipmentController.php',
         'App\\Http\\Controllers\\Front\\UserController' => __DIR__ . '/../..' . '/app/Http/Controllers/Front/UserController.php',
         'App\\Http\\Controllers\\Front\\UserHomeController' => __DIR__ . '/../..' . '/app/Http/Controllers/Front/UserHomeController.php',
@@ -394,6 +410,8 @@ class ComposerStaticInit9df7efa49b843b908d9b392fd6df8211
         'App\\Http\\Controllers\\RegistrationController' => __DIR__ . '/../..' . '/app/Http/Controllers/RegistrationController.php',
         'App\\Http\\Controllers\\ShipmentReportController' => __DIR__ . '/../..' . '/app/Http/Controllers/ShipmentReportController.php',
         'App\\Http\\Controllers\\SubCategoryController' => __DIR__ . '/../..' . '/app/Http/Controllers/SubCategoryController.php',
+        'App\\Http\\Controllers\\SupportController' => __DIR__ . '/../..' . '/app/Http/Controllers/SupportController.php',
+        'App\\Http\\Controllers\\SupportDashboardController' => __DIR__ . '/../..' . '/app/Http/Controllers/SupportDashboardController.php',
         'App\\Http\\Controllers\\TransactionHistoryController' => __DIR__ . '/../..' . '/app/Http/Controllers/TransactionHistoryController.php',
         'App\\Http\\Controllers\\TruckCapacityController' => __DIR__ . '/../..' . '/app/Http/Controllers/TruckCapacityController.php',
         'App\\Http\\Controllers\\TruckLengthController' => __DIR__ . '/../..' . '/app/Http/Controllers/TruckLengthController.php',
@@ -406,9 +424,11 @@ class ComposerStaticInit9df7efa49b843b908d9b392fd6df8211
         'App\\Http\\Requests\\Request' => __DIR__ . '/../..' . '/app/Http/Requests/Request.php',
         'App\\Jobs\\Job' => __DIR__ . '/../..' . '/app/Jobs/Job.php',
         'App\\Material' => __DIR__ . '/../..' . '/app/Material.php',
+        'App\\NewsletterSubscriber' => __DIR__ . '/../..' . '/app/NewsletterSubscriber.php',
         'App\\Notification' => __DIR__ . '/../..' . '/app/Notification.php',
         'App\\PartnerKyc' => __DIR__ . '/../..' . '/app/PartnerKyc.php',
         'App\\PayInfo' => __DIR__ . '/../..' . '/app/PayInfo.php',
+        'App\\PaymentDetail' => __DIR__ . '/../..' . '/app/PaymentDetail.php',
         'App\\Providers\\AppServiceProvider' => __DIR__ . '/../..' . '/app/Providers/AppServiceProvider.php',
         'App\\Providers\\AuthServiceProvider' => __DIR__ . '/../..' . '/app/Providers/AuthServiceProvider.php',
         'App\\Providers\\EventServiceProvider' => __DIR__ . '/../..' . '/app/Providers/EventServiceProvider.php',
@@ -886,6 +906,9 @@ class ComposerStaticInit9df7efa49b843b908d9b392fd6df8211
         'File_Iterator' => __DIR__ . '/..' . '/phpunit/php-file-iterator/src/Iterator.php',
         'File_Iterator_Facade' => __DIR__ . '/..' . '/phpunit/php-file-iterator/src/Facade.php',
         'File_Iterator_Factory' => __DIR__ . '/..' . '/phpunit/php-file-iterator/src/Factory.php',
+        'GrahamCampbell\\Manager\\AbstractManager' => __DIR__ . '/..' . '/graham-campbell/manager/src/AbstractManager.php',
+        'GrahamCampbell\\Manager\\ConnectorInterface' => __DIR__ . '/..' . '/graham-campbell/manager/src/ConnectorInterface.php',
+        'GrahamCampbell\\Manager\\ManagerInterface' => __DIR__ . '/..' . '/graham-campbell/manager/src/ManagerInterface.php',
         'GuzzleHttp\\Client' => __DIR__ . '/..' . '/guzzlehttp/guzzle/src/Client.php',
         'GuzzleHttp\\ClientInterface' => __DIR__ . '/..' . '/guzzlehttp/guzzle/src/ClientInterface.php',
         'GuzzleHttp\\Cookie\\CookieJar' => __DIR__ . '/..' . '/guzzlehttp/guzzle/src/Cookie/CookieJar.php',
@@ -2820,6 +2843,9 @@ class ComposerStaticInit9df7efa49b843b908d9b392fd6df8211
         'Psy\\VarDumper\\Dumper' => __DIR__ . '/..' . '/psy/psysh/src/Psy/VarDumper/Dumper.php',
         'Psy\\VarDumper\\Presenter' => __DIR__ . '/..' . '/psy/psysh/src/Psy/VarDumper/Presenter.php',
         'Psy\\VarDumper\\PresenterAware' => __DIR__ . '/..' . '/psy/psysh/src/Psy/VarDumper/PresenterAware.php',
+        'Pusher' => __DIR__ . '/..' . '/pusher/pusher-php-server/lib/Pusher.php',
+        'PusherException' => __DIR__ . '/..' . '/pusher/pusher-php-server/lib/Pusher.php',
+        'PusherInstance' => __DIR__ . '/..' . '/pusher/pusher-php-server/lib/Pusher.php',
         'SebastianBergmann\\Comparator\\ArrayComparator' => __DIR__ . '/..' . '/sebastian/comparator/src/ArrayComparator.php',
         'SebastianBergmann\\Comparator\\Comparator' => __DIR__ . '/..' . '/sebastian/comparator/src/Comparator.php',
         'SebastianBergmann\\Comparator\\ComparisonFailure' => __DIR__ . '/..' . '/sebastian/comparator/src/ComparisonFailure.php',
@@ -3459,6 +3485,10 @@ class ComposerStaticInit9df7efa49b843b908d9b392fd6df8211
         'Tymon\\JWTAuth\\Validators\\PayloadValidator' => __DIR__ . '/..' . '/tymon/jwt-auth/src/Validators/PayloadValidator.php',
         'Tymon\\JWTAuth\\Validators\\TokenValidator' => __DIR__ . '/..' . '/tymon/jwt-auth/src/Validators/TokenValidator.php',
         'Tymon\\JWTAuth\\Validators\\ValidatorInterface' => __DIR__ . '/..' . '/tymon/jwt-auth/src/Validators/ValidatorInterface.php',
+        'Vinkla\\Pusher\\Facades\\Pusher' => __DIR__ . '/..' . '/vinkla/pusher/src/Facades/Pusher.php',
+        'Vinkla\\Pusher\\PusherFactory' => __DIR__ . '/..' . '/vinkla/pusher/src/PusherFactory.php',
+        'Vinkla\\Pusher\\PusherManager' => __DIR__ . '/..' . '/vinkla/pusher/src/PusherManager.php',
+        'Vinkla\\Pusher\\PusherServiceProvider' => __DIR__ . '/..' . '/vinkla/pusher/src/PusherServiceProvider.php',
         'Webmozart\\Assert\\Assert' => __DIR__ . '/..' . '/webmozart/assert/src/Assert.php',
         'XdgBaseDir\\Xdg' => __DIR__ . '/..' . '/dnoegel/php-xdg-base-dir/src/Xdg.php',
         'phpDocumentor\\Reflection\\DocBlock' => __DIR__ . '/..' . '/phpdocumentor/reflection-docblock/src/DocBlock.php',

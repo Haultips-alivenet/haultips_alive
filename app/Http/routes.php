@@ -21,6 +21,10 @@ Route::get('about-us', 'Front\UserHomeController@about_us');
 Route::get('how-it-works', 'Front\UserHomeController@how_it_work');
 Route::post('newsletter/subscribe', 'Front\NewsletterController@index');
 Route::get('geo-location/city/{state_id}', 'Front\GeoLocationController@getCityByStateId');
+Route::post('send-message-s', 'ChatController@sendMessageS');
+Route::post('send-message-u', 'ChatController@sendMessageU');
+Route::get('chatboxs', 'ChatController@chatBoxS');
+Route::get('chatboxu', 'ChatController@chatBoxU');
 
 // User login panel 
 Route::get('user/profile', 'Front\UserController@profile');
