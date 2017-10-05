@@ -19,40 +19,51 @@
                         @endif
                     {{--    Error Display ends--}}
                 
-                     <?php if($id!=4) { ?>
-                    <div class="tab-pane active" id="horizontal-form">
+                      <?php if($id!=4) { ?>
+                <div class="tab-content">
+                    {{--    Error Display--}}
+                        @if($errors->any())
+                        <ul class="alert">
+                            @foreach($errors->all() as $error)
+                            <li style="color:red;"><b>{{ $error }}</b></li>
+                            @endforeach
+                        </ul>
+                        @endif
+                    {{--    Error Display ends--}}
+                
+                    
+                   <div class="grid_3 fulldiv pd10 m0" id="horizontal-form">
                         {!! Form::open(array('url'=>'shipment/reportList/'.$id,'class'=>'form-horizontal','id'=>'newCategory','files' => true)) !!}
                             
                             <div id="msgStatus"></div>
                             
-                            <div class="form-group">
+                            <div>
                                 <label for="name" class="col-sm-2 control-label">Category Type</label>
-                                <div class="col-sm-8">
-                                    <select name="category" id="category" class="form-control select2" >
+                                <div class="col-sm-3">
+                                    <select name="category" id="category" class="form-control1 select2" >
                                         <option value=""  >Select Category</option> 
                                         <?php foreach($categoryname as $value) { ?>
                                         <option value="<?php echo $value->id; ?>" {{Input::get('category')==$value->id ? 'selected' : ''}}><?php echo $value->category_name; ?></option>
                                         <?php } ?>
                                     </select>
                                 </div> 
-                            </div>
-                            
-                            <div class="form-group">
-                                <label for="name" class="col-sm-2 control-label">Delivery Title</label>
-                                <div class="col-sm-8">
-                                    <input type="text" name="delivery_title" id="delivery_title" value="{{Input::get('delivery_title')}}" class="form-control">
+								<div class="col-sm-3">
+                                    <input type="text" name="delivery_title" id="delivery_title" class="form-control" value="{{Input::get('delivery_title')}}" placeholder="Delivery Title">
                                 </div> 
-                            </div>
                            
-                            <div class="col-sm-8 col-sm-offset-2">
-                            {!! Form :: submit("Search",["class"=>"btn-success btn",'id'=>'trucklen']) !!}
-                             <a href="{{ url('shipment/'.$id.'/report') }}" class="btn btn-success" title="Refresh"><i class="fa fa-refresh"></i></a>
+                                <div class="col-sm-4">
+                                {!! Form :: submit("Search",["class"=>"btn-success btn min-btn",'id'=>'trucklen']) !!}
+                                 <a href="{{ url('shipment/'.$id.'/report') }}" class="btn btn-success min-btn" title="Refresh"><i class="fa fa-refresh"></i></a>
+                                </div>
                             </div>
                               
                         {!! Form::close() !!}
 					
                     </div>
-                    <?php } ?>
+                    
+                </div>
+            <br><br>
+				 <?php } ?>
                 </div>
             <br><br>
                  <div class="xs tabls">

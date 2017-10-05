@@ -175,7 +175,8 @@ class PartnerRegistrationController extends Controller
             $string = '1234567890';
             $string_shuffled = str_shuffle($string);
             $otp = substr($string_shuffled, 1, 5);
-            $otpMsg = 'Your Otp is '.$otp;
+           // $otpMsg = 'Your Otp is '.$otp;
+            $otpMsg = 'Your Otp is '.$otp.'. Please Verify Your mobile on below link. '.url().'/user/verifyotp/'.urlencode(base64_encode($insertedId));
             
             $userverify= new UserVerification;
             $userverify->user_id = $insertedId;
@@ -189,11 +190,12 @@ class PartnerRegistrationController extends Controller
                 $smsObj->sendsms_api('+91'.$mobile,$otpMsg);  
                 
                 $user = User::findOrFail($insertedId);
-                Mail::send('layouts.adminAppointment', ['user' => $user], function ($m) use ($user) {
-                $m->from('richalive158@gmail.com', 'Your Application');
-
-            $m->to($user->email, $user->name)->subject('Your Reminder!');
-        });
+                $user["password"]=$request->password;
+                $user["url"]=url().'/user/emailverify/'.urlencode(base64_encode($insertedId));
+                Mail::send('email.useremail', ['user' => $user], function ($m) use ($user) {
+                $m->from('richalive158@gmail.com', 'Haultips!');
+                $m->to($user->email, $user->name)->subject('Welcome to Haultips! Please confirm your email address');
+               });
                 
                 
                 Session::flash('success', 'User created successfully');                
@@ -464,7 +466,7 @@ class PartnerRegistrationController extends Controller
         }
         return redirect(url('admin/partner/'.$user_id.'/approve'));
     }
-    public function changesttus($ids){
+	public function changesttus($ids){
         
        $id=explode("_",$ids);
        if($id[1]==1){
@@ -482,7 +484,7 @@ class PartnerRegistrationController extends Controller
         }
         return redirect(url('admin/partner/'.$id[0].'/approve'));
     }
-     public function partner_active_Inactive($ids){
+    public function partner_active_Inactive($ids){
         $id=explode("_",$ids);
         if($id[1]==1) {
             $status='0';

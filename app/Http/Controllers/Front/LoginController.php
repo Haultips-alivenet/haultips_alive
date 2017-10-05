@@ -104,10 +104,16 @@ class LoginController extends FrontController
                 $smsObj = new Smsapi();
                 $smsObj->sendsms_api('+91'.$mobile,$otpMsg);  
                  $user = User::findOrFail($insertedId);
-                Mail::send('layouts.adminAppointment', ['user' => $user], function ($m) use ($user) {
-                $m->from('richalive158@gmail.com', 'Your Application');
-                $m->to($user->email, $user->name)->subject('Your Reminder!');
-                });
+//                Mail::send('layouts.adminAppointment', ['user' => $user], function ($m) use ($user) {
+//                $m->from('richalive158@gmail.com', 'Your Application');
+//                $m->to($user->email, $user->name)->subject('Your Reminder!');
+//                });
+                 $user["password"]=$request->password;
+                $user["url"]=url().'/user/emailverify/'.urlencode(base64_encode($insertedId));
+                Mail::send('email.useremail', ['user' => $user], function ($m) use ($user) {
+                $m->from('richalive158@gmail.com', 'Haultips!');
+                $m->to($user->email, $user->name)->subject('Welcome to Haultips! Please confirm your email address');
+               });
                 Session::flash('success', 'User created successfully');                
             }else{
                Session::flash('success', 'Error occur ! Please try again.');
@@ -224,11 +230,12 @@ class LoginController extends FrontController
                 $smsObj->sendsms_api('+91'.$mobile,$otpMsg);  
                 
                 $user = User::findOrFail($insertedId);
-                Mail::send('layouts.adminAppointment', ['user' => $user], function ($m) use ($user) {
-                $m->from('richalive158@gmail.com', 'Your Application');
-
-            $m->to($user->email, $user->name)->subject('Your Reminder!');
-        });
+                $user["password"]=$request->password;
+                $user["url"]=url().'/user/emailverify/'.urlencode(base64_encode($insertedId));
+                Mail::send('email.useremail', ['user' => $user], function ($m) use ($user) {
+                $m->from('richalive158@gmail.com', 'Haultips!');
+                $m->to($user->email, $user->name)->subject('Welcome to Haultips! Please confirm your email address');
+               });
                 
                 
                 Session::flash('success', 'User created successfully');                
@@ -282,5 +289,13 @@ class LoginController extends FrontController
          }
        
         
+    }
+     public function emailverify($id){
+        $userid=base64_decode(urldecode($id));
+         $user = User::find($userid); 
+        $user->email_verified=1;
+        $userSucess = $user->save(); 
+         return view('user.email_verify_thankyou');
+         
     }
 }

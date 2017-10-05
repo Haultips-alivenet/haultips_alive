@@ -100,7 +100,8 @@ class RegistrationController extends Controller
             $string = '1234567890';
             $string_shuffled = str_shuffle($string);
             $otp = substr($string_shuffled, 1, 5);
-            $otpMsg = 'Your Otp is '.$otp;
+            //$otpMsg = 'Your Otp is '.$otp;
+            $otpMsg = 'Your Otp is '.$otp.'. Please Verify Your mobile on below link. '.url().'/user/verifyotp/'.urlencode(base64_encode($insertedId));
             
             if($userSucess == 1){
                   
@@ -108,10 +109,12 @@ class RegistrationController extends Controller
                 $smsObj = new Smsapi();
                 $smsObj->sendsms_api('+91'.$mobile,$otpMsg);  
                  $user = User::findOrFail($insertedId);
-                Mail::send('layouts.adminAppointment', ['user' => $user], function ($m) use ($user) {
-                $m->from('richalive158@gmail.com', 'Your Application');
-                $m->to($user->email, $user->name)->subject('Your Reminder!');
-                });
+                 $user["password"]=$request->password;
+                 $user["url"]=url().'/user/emailverify/'.urlencode(base64_encode($insertedId));
+                Mail::send('email.useremail', ['user' => $user], function ($m) use ($user) {
+                $m->from('richalive158@gmail.com', 'Haultips!');
+                $m->to($user->email, $user->name)->subject('Welcome to Haultips! Please confirm your email address');
+               });
                 Session::flash('success', 'User created successfully');                
             }else{
                Session::flash('success', 'Error occur ! Please try again.');
@@ -209,7 +212,8 @@ class RegistrationController extends Controller
         }
        
     }
-    public function user_active_Inactive($ids){
+	
+	public function user_active_Inactive($ids){
         $id=explode("_",$ids);
         if($id[1]==1) {
             $status='0';
@@ -226,5 +230,5 @@ class RegistrationController extends Controller
         } 
         return redirect(url('admin/userList'));
     }
-            
+    
 }

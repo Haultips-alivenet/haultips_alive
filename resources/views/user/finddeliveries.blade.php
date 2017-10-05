@@ -269,10 +269,10 @@
                                 <td><span>{{$value["pickupAddress"]}}</span></td>
                                 <td><span>{{$value["deliveryAddress"]}}</span></td>
                                 <td><span class="_wet">{{$value["distance"]}}</span></td>
-                                <td class="text-center"><span class="_date">{{date('m-d-Y',strtotime($value["deliveryDate"]))}}</span>
+                                <td class="text-center"><span class="_date">{{date('d-m-Y',strtotime($value["pickupDate"]))}}</span>
                                     <br>
                                   <span class="text-danger" style="font-weight: bold;">
-                                    @if($value["deliveryDate"] < date('Y-m-d')) Expired @endif 
+                                    @if($value["pickupDate"] < date('Y-m-d')) Expired @endif 
                                   </span>
                                 </td>
                             </tr>

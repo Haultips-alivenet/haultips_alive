@@ -135,6 +135,8 @@ Route::get('admin/mobileCheck', 'RegistrationController@mobileCheck');
 Route::get('admin/userList', 'RegistrationController@index');
 Route::get('admin/users/{id}/delete', 'RegistrationController@destroy');
 Route::get('admin/user/status/{id}', 'RegistrationController@user_active_Inactive');
+//Route::get('email/user/emailverify/{id}', 'RegistrationController@emailverify');
+Route::get('user/emailverify/{id}', 'Front\LoginController@emailverify');
 Route::resource('admin/users', 'RegistrationController');
 
 //support
@@ -172,6 +174,7 @@ Route::get('admin/partner/{id}/delete', 'PartnerRegistrationController@destroy')
 Route::get('admin/partner/{id}/approve', 'PartnerRegistrationController@approve');
 Route::post('admin/partnerDocumentsUpload', 'PartnerRegistrationController@DocumentsUpload');
 Route::get('admin/partner/status/{id}', 'PartnerRegistrationController@partner_active_Inactive');
+Route::get('admin/partner/emailverify/{id}', 'PartnerRegistrationController@emailverify');
 
 # Truck Length
 Route::resource('admin/trucklength', 'TruckLengthController');
@@ -213,7 +216,7 @@ Route::get('shipment/BidsReport/{id}', 'ShipmentReportController@bids_report');
 Route::get('shipment/codPayments/{id}', 'ShipmentReportController@cod_payments');
 Route::get('shipment/cod/payment/{id}', 'ShipmentReportController@cod_payments_save');
 Route::resource('shipment/{id}/report', 'ShipmentReportController');
-Route::get('shipment/reportList/{id}', 'ShipmentReportController@index');
+Route::post('shipment/reportList/{id}', 'ShipmentReportController@index');
 
 
 
