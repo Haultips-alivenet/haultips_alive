@@ -273,6 +273,7 @@ India - 201007</address>
      {!! Html::script('https://maps.googleapis.com/maps/api/js?key=AIzaSyDr-iGaiLmD2zCzCvl11pPRKgeFHxY8b7I&libraries=places') !!}
      <!-- {!! Html::script('public/admin/js/bootstrap-select.min.js') !!} -->
      {!! Html::script('public/user/js/custome.js') !!}
+     {!! Html::script('public/user/js/pusher.min.js') !!} 
      <script type="text/javascript">
         jQuery.validator.addMethod("noEmptyValue", function(value, element) {
             return this.optional(element) || ($.trim(value) != '');

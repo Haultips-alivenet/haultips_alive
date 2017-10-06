@@ -44,7 +44,10 @@ class SupportDashboardController extends Controller
                             ->orderBy('c.id',"asc")
                             ->select('c.id','u.first_name','c.created_at','c.message','ud.image','c.user_type_id')
                             ->get();
+        $data["channel_id"]=$id;
         return view('support.chatdetails',$data);
     }
     
 }
+
+

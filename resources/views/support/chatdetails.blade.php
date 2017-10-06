@@ -32,6 +32,7 @@
                         <div class="clearfix"> </div>
                     </div>
                     <?php } ?>
+                    <input type="hidden" name="hidden_profile" id="hidden_profile" value="{{asset('public/uploads/userimages/'.$value->image)}}">
                     <?php } ?>    
                     
                     <div class="" id="chatmsg">
@@ -39,6 +40,8 @@
                     </div>
                 </div>
               <form method="post" id="chatform">
+                    
+                    <input type="hidden" name="hidden_channel_id" id="hidden_channel_id" value="{{$channel_id}}">
                     <input type="text" name="chat_message" id="chat_message" value="Enter your text" onfocus="this.value = '';" onblur="if (this.value == '') {this.value = 'Enter your text';}" required="">
                     <input type="submit" value="Send" required="">
                 </form>
@@ -58,7 +61,27 @@
                     })
     var channel = pusher.subscribe('support-channel');
     channel.bind('my-event', function(data) {
-      $('#chatmsg').append('<h5>' + data.message + '(' + data.fname + ')</h5>');
+        var current_time = new Date().toLocaleTimeString();  
+      //$('#chatmsg').append('<h5>' + data.message + '(' + data.fname + ')</h5>');
+      //push to user
+      var a='<div class="activity-row activity-row1">'+
+        '<div class="col-xs-3 col-md-3 activity-img">'+
+            '<img src="'+data.profile_pic+'" class="img-responsive" width="60px" height="80px" alt=""><span>'+current_time+'</span></div>'+
+        '<div class="col-xs-8 col-md-8 activity-img1">'+
+            '<div class="activity-desc-sub">'+
+                '<h5>'+data.fname+'</h5>'+
+                '<p>'+data.message+'</p>'+
+            '</div>'+
+        '</div>'+
+        '<div class="col-xs-4 activity-desc1"></div>'+
+        '<div class="clearfix"> </div>'+
+    '</div>';
+    var user_id = $('#hidden_channel_id').val();
+    if(user_id==data.user_id) {
+    $('#chatmsg').append(a);
+    }
+    var objDiv = document.getElementById("style-2");
+        objDiv.scrollTop = objDiv.scrollHeight;
     });
 
 $(document).ready(function() {
@@ -71,7 +94,7 @@ $(document).ready(function() {
 
     $(document).on('submit', '#chatform', function(e) {
         e.preventDefault();
-        var ajax_url = "{{ url('send-message-s') }}";
+        var ajax_url = "{{ url('send_message_by_support') }}";
         var pusher = new Pusher("{{env("PUSHER_KEY")}}", {
                       cluster: "{{env("PUSHER_CLUSTER")}}",
                     })
@@ -85,6 +108,8 @@ $(document).ready(function() {
                 cache: false,
                 data: {
                   chat_message: $('#chat_message').val(),
+                  profile_pic: $('#hidden_profile').val(),
+                  channel_id: $('#hidden_channel_id').val(),
                   socket_id: socketId // pass socket_id parameter to be used by server
                 },
                 dataType: "html",

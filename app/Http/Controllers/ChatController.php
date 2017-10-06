@@ -9,28 +9,55 @@ use App\Http\Requests;
 use App\Http\Controllers\Controller;
 use Auth;
 use App\UserDetail;
+use App\SupportChat;
 use Session;
 use DB;
 
 class ChatController extends Controller
 {
     
-    public function sendMessageU(Request $request){
+//    public function sendMessageU(Request $request){
+//        $pusher = App::make('pusher');
+//        return ($pusher->trigger( 'support-channel',
+//                          'my-event', 
+//                          array('message' => $request->chat_message, 'fname' => Auth::user()->first_name), $request->socket_id)) ? 1 : 0;
+//
+//    }
+//
+//    public function sendMessageS(Request $request){
+//        $pusher = App::make('pusher');
+//        return ($pusher->trigger( 'my-channel-2',
+//                          'my-event', 
+//                          array('message' => $request->chat_message, 'fname' => Auth::user()->first_name), $request->socket_id)) ? 1 : 0;
+//
+//    }
+    public function send_message_by_user(Request $request){
+        
+        $chat = new SupportChat;
+        $chat->support_id=0;
+        $chat->user_id=Auth::User()->id;
+        $chat->message=$request->chat_message;
+        $chat->user_type_id=Auth::User()->user_type_id;
+        $Sucess = $chat->save(); 
         $pusher = App::make('pusher');
         return ($pusher->trigger( 'support-channel',
                           'my-event', 
-                          array('message' => $request->chat_message, 'fname' => Auth::user()->first_name), $request->socket_id)) ? 1 : 0;
+                          array('message' => $request->chat_message, 'user_id' => $request->user_id,'profile_pic'=> $request->profile_pic ,'fname' => Auth::user()->first_name), $request->socket_id)) ? 1 : 0;
 
     }
-
-    public function sendMessageS(Request $request){
+    public function send_message_by_support(Request $request){
+        $chat = new SupportChat;
+        $chat->support_id=Auth::User()->id;
+        $chat->user_id=$request->channel_id;
+        $chat->message=$request->chat_message;
+        $chat->user_type_id=Auth::User()->user_type_id;
+        $Sucess = $chat->save(); 
         $pusher = App::make('pusher');
-        return ($pusher->trigger( 'my-channel-2',
+        return ($pusher->trigger( 'my-channel-'.$request->channel_id,
                           'my-event', 
-                          array('message' => $request->chat_message, 'fname' => Auth::user()->first_name), $request->socket_id)) ? 1 : 0;
+                          array('message' => $request->chat_message,'user_id' => Auth::User()->id,'profile_pic'=> $request->profile_pic, 'fname' => Auth::user()->first_name), $request->socket_id)) ? 1 : 0;
 
     }
-
     public function chatBoxU(){
     	return view('user.chatbox');
     }
@@ -40,16 +67,17 @@ class ChatController extends Controller
     }
     public function user_support(){
         
-        $tempArr = Session::get('currentUser');
-        $data["profile_pic"] = DB::table('user_details')->where('user_id',$tempArr["id"])->select('image')->first();
+        
+       
         $data["chatdetails"] =   DB::table('support_chats as c')
                             ->leftjoin('users as u','c.user_id','=','u.id')
-                            ->leftjoin('user_details as ud','ud.user_id','=','u.id')
-                            ->where('c.user_id',$id)
+                            ->leftjoin('user_details as ud','ud.user_id','=','c.support_id')
+                            ->where('c.user_id',Auth::User()->id)
                             ->orderBy('c.id',"asc")
                             ->select('c.id','u.first_name','c.created_at','c.message','ud.image','c.user_type_id')
                             ->get();
         $user_detail = UserDetail::where('user_id', Auth::User()->id)->first();
+        $data["name"]= Auth::User()->first_name;
         $data['profile_pic'] = $this->setDefaultImage('public/uploads/userimages/', ($user_detail) ? $user_detail->image : '', 'u');
         return view('user.support_chat_details',$data);
     }
