@@ -136,6 +136,7 @@
 
                     </li>
                     <li><a href="{{url('user/faq')}}"><span><i class="fa fa-info-circle" aria-hidden="true"></i></span>Faq</a></li>
+                    <li><a href="{{url('user/support')}}"><span><i class="fa fa-info-circle" aria-hidden="true"></i></span>Support</a></li>
                     <li><a href="{{url('auth/logout')}}"><span><i class="fa fa-power-off" aria-hidden="true"></i></span>Logout</a></li>
                 </ul>  
             </div>   
@@ -262,7 +263,7 @@ India - 201007</address>
     {!! Html::script('public/user/js/bootstrap.min.js') !!}
      {!! Html::script('public/admin/js/jquery.validate.min.js') !!}
      {!! Html::script('public/user/js/wow_main.js') !!}
-     {!! Html::script('public/user/js/custome.js') !!}
+     
      {!! Html::script('public/user/js/bootstrap-slider.js') !!}
      {!! Html::script('public/admin/js/additional-methods.min.js') !!}
      {!! Html::script('public/admin/js/jquery.nicescroll.js') !!}
@@ -271,10 +272,12 @@ India - 201007</address>
      {!! Html::script('public/user/js/select2.js') !!}
      {!! Html::script('https://maps.googleapis.com/maps/api/js?key=AIzaSyDr-iGaiLmD2zCzCvl11pPRKgeFHxY8b7I&libraries=places') !!}
      <!-- {!! Html::script('public/admin/js/bootstrap-select.min.js') !!} -->
+     {!! Html::script('public/user/js/custome.js') !!}
      <script type="text/javascript">
         jQuery.validator.addMethod("noEmptyValue", function(value, element) {
             return this.optional(element) || ($.trim(value) != '');
         }, "Empty value not allowed");
+
      </script>
 
     @yield('script')

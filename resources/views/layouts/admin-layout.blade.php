@@ -4,6 +4,7 @@ Author URL: http://w3layouts.com
 License: Creative Commons Attribution 3.0 Unported
 License URL: http://creativecommons.org/licenses/by/3.0/
 -->
+  <meta name="csrf-token" content="{{ csrf_token() }}">
 <!DOCTYPE HTML>
 <html>
     <head>
@@ -203,6 +204,7 @@ License URL: http://creativecommons.org/licenses/by/3.0/
     {!! HTML::script('public/admin/js/bootstrap.min.js')!!}
      {!! Html::script('public/admin/js/jquery.validate.min.js') !!}
     {!! Html::script('public/admin/js/additional-methods.min.js') !!} 
+    {!! Html::script('public/user/js/pusher.min.js') !!} 
    
     @yield('script')
  </body>

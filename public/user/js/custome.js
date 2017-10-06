@@ -1,17 +1,3 @@
-$(document).on('click', '.panel-heading span.clickable', function(e){
-    var $this = $(this);
-	if(!$this.hasClass('panel-collapsed')) {
-		$this.parents('.panel').find('.panel-body').slideUp();
-		$this.addClass('panel-collapsed');
-		$this.find('i').removeClass('glyphicon-minus').addClass('glyphicon-plus');
-	} else {
-		$this.parents('.panel').find('.panel-body').slideDown();
-		$this.removeClass('panel-collapsed');
-		$this.find('i').removeClass('glyphicon-plus').addClass('glyphicon-minus');
-	}
-});
-
-
 function initialize() {
     var myLatlng = new google.maps.LatLng(53.3333,-3.08333),
     mapOptions = {
@@ -45,11 +31,24 @@ google.maps.event.addDomListener(window, "resize", function() {
 google.maps.event.addDomListener(window, 'load', initialize);
 
 
+$(document).on('click', '.panel-heading span.clickable', function(e){
+    var $this = $(this);
+	if(!$this.hasClass('panel-collapsed')) {
+		$this.parents('.panel').find('.panel-body').slideUp();
+		$this.addClass('panel-collapsed');
+		$this.find('i').removeClass('glyphicon-minus').addClass('glyphicon-plus');
+	} else {
+		$this.parents('.panel').find('.panel-body').slideDown();
+		$this.removeClass('panel-collapsed');
+		$this.find('i').removeClass('glyphicon-plus').addClass('glyphicon-minus');
+	}
+});
 
 
 
 
-
+function list_toggle(val)
+ {$('.test-dwn'+val).slideToggle(); }
 
 /* Truck booking*/
 
@@ -60,14 +59,14 @@ google.maps.event.addDomListener(window, 'load', initialize);
 
 
 function add(value){
-    var currentVal = parseInt($("#qty" + value).val());    
+    var currentVal = parseInt($("#qty" + value).val());
     if (!isNaN(currentVal)) {
         $("#qty" + value).val(currentVal + 1);
     }
 };
 
 function minus(value){
-    var currentVal = parseInt($("#qty" + value).val());    
+    var currentVal = parseInt($("#qty" + value).val());
     if (!isNaN(currentVal)) {
         $("#qty" + value).val(currentVal - 1);
     }
@@ -80,7 +79,7 @@ function closeOver(f, value){
 }
 
 $(function () {
-    var numButtons = 2;    
+    var numButtons = 2;
     for (var i = 1; i <= numButtons; i++) {
         $("#add" + i).click(closeOver(add, i));
         $("#minus" + i).click(closeOver(minus, i));
@@ -88,13 +87,13 @@ $(function () {
 });
 $(document).ready(function(){
     $(".scrollbar").niceScroll();
-
+  $(".height_bx").niceScroll();
 });
 function increaseValue(id)
 {
-   
+
     var val=$("#"+id).val();
-    $("#"+id).val(parseInt(val)+1);  
+    $("#"+id).val(parseInt(val)+1);
 }
 
 function decreaseValue(id)
@@ -124,7 +123,7 @@ function decreaseValue(id)
             $('html').height(Math.max(height1,height3,height2));
             $('body').height(Math.max(height1,height3,height2));
         }
-        
+
     }
     $(document).ready(function () {
         htmlbodyHeightUpdate()
@@ -135,9 +134,13 @@ function decreaseValue(id)
             height2 = $('.main').height()
             htmlbodyHeightUpdate()
         });
+
     });
 
     function toggle(val){
         $('.ulist'+val).slideToggle();
     }
-    
+    $('.edit_btn').click(function(){
+            $('._me_dis').toggle();
+            $('._me_input').toggle();
+    });

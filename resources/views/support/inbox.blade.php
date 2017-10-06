@@ -79,222 +79,22 @@
                 </div>
                 <table class="table table-fhr">
                     <tbody>
+                        <?php foreach($chatdetails as $value) { ?>
                         <tr class="unread checked">
                             <td class="hidden-xs">
                                 <input type="checkbox" class="checkbox">
                             </td>
-                            <td class="hidden-xs">
-                                <i class="fa fa-star icon-state-warning"></i>
-                            </td>
-                            <td class="hidden-xs">
-                                Google
-                            </td>
                             <td>
-                                Nullam quis risus eget urna mollis ornare vel eu leo
+                              <a href="{{url('support/user/chatdetails/'.$value->user_id)}}">{{$value->first_name}}</a>
                             </td>
                             <td>
                             </td>
                             <td>
-                                12 march
+                                {{date('d-M',strtotime($value->created_at))}}
                             </td>
                         </tr>
-                        <tr class="unread checked">
-                            <td class="hidden-xs">
-                                <input type="checkbox" class="checkbox">
-                            </td>
-                            <td class="hidden-xs">
-                                <i class="fa fa-star icon-state-warning"></i>
-                            </td>
-                            <td class="hidden-xs">
-                                Dropbox
-                            </td>
-                            <td>
-                                Lorem ipsum dolor sit amet, consectetuer adipiscing elit
-                            </td>
-                            <td>
-                            </td>
-                            <td>
-                                02 march
-                            </td>
-                        </tr>
-                        <tr class="unread checked">
-                            <td class="hidden-xs">
-                                <input type="checkbox" class="checkbox">
-                            </td>
-                            <td class="hidden-xs">
-                                <i class="fa fa-star icon-state-warning"></i>
-                            </td>
-                            <td class="hidden-xs">
-                                Adobe
-                            </td>
-                            <td>
-                                Nullam quis risus eget urna mollis ornare vel eu leo
-                            </td>
-                            <td>
-                                <i class="fa fa-paperclip"></i>
-                            </td>
-                            <td>
-                                8 march
-                            </td>
-                        </tr>
-                        <tr class="unread checked">
-                            <td class="hidden-xs">
-                                <input type="checkbox" class="checkbox">
-                            </td>
-                            <td class="hidden-xs">
-                                <i class="fa fa-star icon-state-warning"></i>
-                            </td>
-                            <td class="hidden-xs">
-                                Apple
-                            </td>
-                            <td>
-                                Lorem ipsum dolor sit amet, consectetuer adipiscing elit
-                            </td>
-                            <td>
-                                <i class="fa fa-paperclip"></i>
-                            </td>
-                            <td>
-                                4 march
-                            </td>
-                        </tr>
-                        <tr class="read checked">
-                            <td class="hidden-xs">
-                                <input type="checkbox" class="checkbox">
-                            </td>
-                            <td class="hidden-xs">
-                                <i class="fa fa-star"></i>
-                            </td>
-                            <td class="hidden-xs">
-                                Microsoft
-                            </td>
-                            <td>
-                                Nullam quis risus eget urna mollis ornare vel eu leo
-                            </td>
-                            <td>
-                                <i class="fa fa-paperclip"></i>
-                            </td>
-                            <td>
-                                1 march
-                            </td>
-                        </tr>
-                        <tr class="read checked">
-                            <td class="hidden-xs">
-                                <input type="checkbox" class="checkbox">
-                            </td>
-                            <td class="hidden-xs">
-                                <i class="fa fa-star"></i>
-                            </td>
-                            <td class="hidden-xs">
-                                Microsoft
-                            </td>
-                            <td>
-                                Lorem ipsum dolor sit amet, consectetuer adipiscing elit
-                            </td>
-                            <td>
-                                <i class="fa fa-paperclip"></i>
-                            </td>
-                            <td>
-                                15 march
-                            </td>
-                        </tr>
-                        <tr class="read checked">
-                            <td class="hidden-xs">
-                                <input type="checkbox" class="checkbox">
-                            </td>
-                            <td class="hidden-xs">
-                                <i class="fa fa-star"></i>
-                            </td>
-                            <td class="hidden-xs">
-                                Microsoft
-                            </td>
-                            <td>
-                                Nullam quis risus eget urna mollis ornare vel eu leo
-                            </td>
-                            <td>
-                            </td>
-                            <td>
-                                16 march
-                            </td>
-                        </tr>
-                        <tr class="read checked">
-                            <td class="hidden-xs">
-                                <input type="checkbox" class="checkbox">
-                            </td>
-                            <td class="hidden-xs">
-                                <i class="fa fa-star"></i>
-                            </td>
-                            <td class="hidden-xs">
-                                Microsoft
-                            </td>
-                            <td>
-                                Lorem ipsum dolor sit amet, consectetuer adipiscing elit
-                            </td>
-                            <td>
-                                <i class="fa fa-paperclip"></i>
-                            </td>
-                            <td>
-                                9 march
-                            </td>
-                        </tr>
-                        <tr class="read checked">
-                            <td class="hidden-xs">
-                                <input type="checkbox" class="checkbox">
-                            </td>
-                            <td class="hidden-xs">
-                                <i class="fa fa-star icon-state-warning"></i>
-                            </td>
-                            <td class="hidden-xs">
-                                Microsoft
-                            </td>
-                            <td>
-                                Lorem ipsum dolor sit amet, consectetuer adipiscing elit
-                            </td>
-                            <td>
-                                <i class="fa fa-paperclip"></i>
-                            </td>
-                            <td>
-                                16 march
-                            </td>
-                        </tr>
-                        <tr class="read checked">
-                            <td class="hidden-xs">
-                                <input type="checkbox" class="checkbox">
-                            </td>
-                            <td class="hidden-xs">
-                                <i class="fa fa-star icon-state-warning"></i>
-                            </td>
-                            <td class="hidden-xs">
-                                Dropbox
-                            </td>
-                            <td>
-                                Nullam quis risus eget urna mollis ornare vel eu leo
-                            </td>
-                            <td>
-                            </td>
-                            <td>
-                                10 march
-                            </td>
-                        </tr>
-                        <tr class="read checked">
-                            <td class="hidden-xs">
-                                <input type="checkbox" class="checkbox">
-                            </td>
-                            <td class="hidden-xs">
-                                <i class="fa fa-star"></i>
-                            </td>
-                            <td class="hidden-xs">
-                                Dropbox
-                            </td>
-                            <td>
-                                Lorem ipsum dolor sit amet, consectetuer adipiscing elit
-                            </td>
-                            <td>
-                                <i class="fa fa-paperclip"></i>
-                            </td>
-                            <td>
-                                14 march
-                            </td>
-                        </tr>
+                        <?php } ?>    
+                        
                     </tbody>
                 </table>
             </div>

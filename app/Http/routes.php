@@ -25,6 +25,7 @@ Route::post('send-message-s', 'ChatController@sendMessageS');
 Route::post('send-message-u', 'ChatController@sendMessageU');
 Route::get('chatboxs', 'ChatController@chatBoxS');
 Route::get('chatboxu', 'ChatController@chatBoxU');
+Route::get('user/support', 'ChatController@user_support');
 
 // User login panel 
 Route::get('user/profile', 'Front\UserController@profile');
@@ -115,6 +116,10 @@ Route::post('bid/offer/save/{id}', 'Front\FindDeliveriesController@bidoffersave'
 Route::post('partner/question/save', 'Front\FindDeliveriesController@partner_question_save');
 //sds
 
+//support
+Route::get('support/dashboard', 'SupportDashboardController@index');
+Route::get('support/inbox', 'SupportDashboardController@inbox');
+Route::get('support/user/chatdetails/{id}', 'SupportDashboardController@chatdetails');
 
 #Admin
 Route::get('/admin/login', function () {
