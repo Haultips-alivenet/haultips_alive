@@ -263,17 +263,17 @@
 
                         <tbody style="display: table-row-group;">
                             <?php foreach($diliveries as $value) { ?>
-                            <tr>
+                            <tr onclick="window.location.href='{{URL :: asset('user/find/deliveries/details/'.$value["shippingId"])}}'">
                                 <td> <span class="_quote"><a href="{{URL :: asset('user/find/deliveries/details/'.$value["shippingId"])}}">{{$value["title"]}}</a></span></td>
                                 <td><span class="_quote"> INR {{$value["minimumBid"]}}</span> </td>
                                 <td><span>{{$value["pickupAddress"]}}</span></td>
                                 <td><span>{{$value["deliveryAddress"]}}</span></td>
                                 <td><span class="_wet">{{$value["distance"]}}</span></td>
-                                <td class="text-center"><span class="_date">{{date('d-m-Y',strtotime($value["pickupDate"]))}}</span>
+                                <td class="text-center"><span class="_date">{{date('d/m/Y',strtotime($value["pickupDate"]))}}</span>
                                     <br>
-                                  <span class="text-danger" style="font-weight: bold;">
+                                 <!-- <span class="text-danger" style="font-weight: bold;">
                                     @if($value["pickupDate"] < date('Y-m-d')) Expired @endif 
-                                  </span>
+                                  </span>-->
                                 </td>
                             </tr>
                             <?php } ?>

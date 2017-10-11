@@ -33,7 +33,7 @@
                            {!! Form::open(array('url'=>'/auth/login','id'=>'login-form')) !!}
                             <div class="form-group ">
                                
-                                  {!! Form :: text('email','',['placeholder'=>'Enter your username or email address','class'=>'user form-control','id'=>'user']) !!}
+                                  {!! Form :: text('email','',['placeholder'=>'Email address / Mobile Number','class'=>'user form-control','id'=>'user']) !!}
                                   {!! Form :: hidden('user','user',['id'=>'user']) !!}
                             </div>
                             <div class="form-group">

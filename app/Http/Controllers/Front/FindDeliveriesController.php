@@ -73,6 +73,7 @@ class FindDeliveriesController extends FrontController
             $shippingData = $shippingData->whereIn('shipping_details.category_id', $catType);
             $shippingData = $shippingData->where('shipping_details.status', 1);
             $shippingData = $shippingData->where('shipping_details.quote_status', 0);
+            $shippingData = $shippingData->where('spd.pickup_date','>=',date('Y-m-d'));
             $shippingData = $shippingData->paginate(10);
            $msg["pagess"]=$shippingData;
             //('carrier_id',$userId)->where line no 54

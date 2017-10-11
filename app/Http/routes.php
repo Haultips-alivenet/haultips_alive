@@ -298,4 +298,7 @@ Route::post('webservices/paymentSucess', 'AndroidController@paymentSucess');
 Route::post('webservices/paymentFailure', 'AndroidController@paymentFailure');
 Route::post('webservices/paymentByCod', 'AndroidController@paymentByCod');
 Route::post('webservices/createHashForPay', 'AndroidController@createHashForPay');
+Route::post('webservices/demoPaymentSucess', 'AndroidController@demoPaymentSucess');
+Route::post('webservices/customerPaymentDetail', 'AndroidController@customerPaymentDetail');
+Route::post('webservices/partnerPaymentDetail', 'AndroidController@partnerPaymentDetail');
 Route::post('webservices/conjob', 'AndroidController@conjob');

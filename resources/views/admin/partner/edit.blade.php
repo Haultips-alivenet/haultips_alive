@@ -34,6 +34,9 @@
     <div id="page-wrapper">
         <div class="graphs">
             <h3 class="blank1">Update Partner</h3>
+            <hr> 
+            <div class="grid_3 fulldiv">
+            <div class="col-md-8">
                 <div class="tab-content">
                     {{--    Error Display--}}
                         @if($errors->any())
@@ -65,7 +68,7 @@
                              <div class="form-group">
                                 <label for="name" class="col-sm-2 control-label">Mobile</label>
                                 <div class="col-sm-8">
-                                    {!! Form :: text('mobile',$user->mobile_number,['class'=>'form-control1', 'id'=>'mobile'])  !!}
+                                    {!! Form :: text('mobile',$user->mobile_number,['class'=>'form-control1', 'id'=>'mobile','readonly'])  !!}
                                 </div>                                
                             </div>
                             <div class="form-group">
@@ -77,13 +80,25 @@
                              <div class="form-group">
                                 <label class="col-sm-2 control-label">State</label>
                                 <div class="col-sm-8">
-                                    {!! Form :: text('state',$user->state,['class'=>'form-control1', 'id'=>'state'])  !!}
+                                    
+                                    <select name="state" id="state" class="form-control" onchange="getCityByStateId(this.value, 'city')">
+                                    <option value="">Select a state</option>
+                                        @foreach($states as $state)
+                                        <option value="{{ $state->id }}" <?php if($user->state==$state->id) { echo "selected"; } ?>>{{ $state->name }}</option>
+                                        @endforeach
+                                </select>
                                 </div>
                             </div>
                              <div class="form-group">
                                 <label class="col-sm-2 control-label">City</label>
                                 <div class="col-sm-8">
-                                    {!! Form :: text('city',$user->city,['class'=>'form-control1', 'id'=>'city'])  !!}
+                                   
+                                    <select name="city" id="city" class="form-control" >
+                                    <option value="">Select a city</option>
+                                      @foreach($city as $city)
+                                        <option value="{{ $city->id }}" <?php if($user->city==$city->id) { echo "selected"; } ?>>{{ $city->name }}</option>
+                                        @endforeach
+                                   </select>
                                 </div>
                             </div>
                              <div class="form-group">
@@ -103,15 +118,22 @@
                              <div class="form-group">
                                 <label class="col-sm-2 control-label"></label>
                                 <?php $i=1; foreach($carrier_types as $types) {?>
-                                <div class="col-sm-1">
-                                    <input type="checkbox" name="carrer_type<?php echo $i; ?>" id="carrer_type<?php echo $i; ?>"  value="{{$types->id}}" <?php if($user->carrier_type_id==3) { echo "checked"; } else if($user->carrier_type_id==$types->id) { echo "checked"; }?>>
+                                    <div class="col-sm-3">
+									<!--check-bottom-->
+                                <div class="">
+                                    <input type="checkbox" class="carrer_group" name="carrer_type<?php echo $i; ?>" id="carrer_type<?php echo $i; ?>"  value="{{$types->id}}" <?php if($user->carrier_type_id==3) { echo "checked"; } else if($user->carrier_type_id==$types->id) { echo "checked"; }?>>
+
+                            <label for="carrer_type<?php echo $i; ?>"><span></span>{{$types->carrier_type}}</label>
                                 </div>
-                                 <div class="col-sm-2">
-                                 {{$types->carrier_type}}
+
+                                
+                                 
                                 </div>
                                 <?php $i++; } ?>
                             </div>
-                            <div id="transport_div" <?php if($user->carrier_type_id==1) { ?>style="display: none" <?php } ?>>                
+                            <div class="col-sm-2"></div>
+                            <div class="col-sm-8">
+                                <div id="transport_div" class="checkbox_align" <?php if($user->carrier_type_id==1) { ?>style="display: none" <?php } ?>>                
                                <?php foreach($categoryname as $types) { ?>                
                                 <div class="checkbox">
                                <label><input type="checkbox" name="trucktype[]" id="trucktype" onclick="gettrucklength({{$types->id}});" value="{{$types->id}}" >  {{$types->category_name}}</label>
@@ -119,6 +141,8 @@
                                 <div class="_box {{$types->id}}" id="trucklength_div{{$types->id}}"></div>
                               <?php } ?>
                             </div>  
+                            </div>
+                            <div class="clearfix"></div>
                             <div class="col-sm-8 col-sm-offset-2">
                             {!! Form :: submit("Update Partner",["class"=>"btn-success btn",'id'=>'user']) !!}
                             </div>
@@ -126,6 +150,8 @@
 					
                     </div>
                 </div>
+        </div>
+        </div>
         </div>
     </div>
 @endsection
@@ -172,12 +198,12 @@ $('#newUser').validate({
                     required : true
                 },
                 state:{
-                    required : true,
-                    minlength:2
+                    required : true
+                    
                 },
                  city:{
-                    required : true,
-                    minlength:2
+                    required : true
+                    
                 },
                  total_vehicle:{
                     required : true,
@@ -189,7 +215,7 @@ $('#newUser').validate({
                     minlength:1,
                     number:true
                 },
-                 carrer_type1: {
+				 carrer_type1: {
                     require_from_group: [1, ".carrer_group"]
                   },
                   carrer_type2: {
@@ -261,7 +287,7 @@ $('#newUser').validate({
            
            _options +='<div class="inner">';
                _options +='<div class="checkbox">';
-               _options +='<label><input type="checkbox" name="trucklength_'+id+'[]" id="trucklength'+ data.truck_lengths[i].id+'" onclick="gettruckcapacity('+ data.truck_lengths[i].id+');" value="'+ data.truck_lengths[i].id+'"> '+ data.truck_lengths[i].truck_length +'</label>';
+               _options +='<label><input type="checkbox" name="trucklength_'+id+'[]" id="trucklength'+ data.truck_lengths[i].id+'" onclick="gettruckcapacity('+ data.truck_lengths[i].id+');" value="'+ data.truck_lengths[i].id+'"> '+ '<button class="btn alert-success">'+data.truck_lengths[i].truck_length+'</button>' +'</label>';
               _options +='</div>';
                _options +='<div class="inner_box '+data.truck_lengths[i].id+'" id="truckcapacity_div'+ data.truck_lengths[i].id+'">';
               
@@ -289,7 +315,7 @@ $('#newUser').validate({
         success: function(data) {
        var _options='';
        for(i=0; i<data.truck_capacity.length; i++){
-                 _options +='<label><input type="checkbox" name="truckcapacity_'+id+'[]" id="truckcapacity'+ data.truck_capacity[i].id+'" value="'+ data.truck_capacity[i].id+'"> '+ data.truck_capacity[i].truck_capacity +'</label>';
+                 _options +='<label><input type="checkbox" name="truckcapacity_'+id+'[]" id="truckcapacity'+ data.truck_capacity[i].id+'" value="'+ data.truck_capacity[i].id+'"> '+ '<button class="btn alert-info">'+data.truck_capacity[i].truck_capacity+ '</button>'+'</label>';
               
              
        }
@@ -300,6 +326,24 @@ $('#newUser').validate({
 
    });
     }        
-        
+    function getCityByStateId(state_id, elm){
+  var ajax_url = "{{ url('geo-location/city') }}/" + state_id;
+  $.ajax({
+      url: ajax_url,
+      dataType: "json",
+      success: function(msg) {
+        var dt = '<option value="">Select a city</option>';
+        var obj = JSON.parse(JSON.stringify(msg));
+        $.each(obj, function(key, value) {
+          dt += '<option value="' + value.id + '">' + value.name + '</option>';
+        }); 
+    
+        $('#' + elm).html(dt);
+      },
+      error : function(msg, status) {
+          alert(msg+status);
+      }
+  });
+}     
 </script>
 @endsection

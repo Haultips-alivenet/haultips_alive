@@ -15,6 +15,7 @@ use App\CarrierTypes;
 use App\VehicleCategorie;
 use App\UserVehicleDetails;
 use App\PartnerKyc;
+use App\GeoLocation;
 use App\library\Smsapi;
 use DB;
 
@@ -70,6 +71,7 @@ class PartnerRegistrationController extends Controller
                             ->select('category_name','id')
                             ->get();
        $data["carrier_types"] =   DB::table('carrier_types')->select('*')->get();
+        $data['states'] = GeoLocation::getState();
        return view('admin.partner.create',$data);
     }
 
@@ -89,8 +91,8 @@ class PartnerRegistrationController extends Controller
                'mobile' => 'required|min:10|max:10|Regex: /^[0-9]{1,45}$/',
                'password' => 'required|min:6|max:12',
                'cpassword' => 'required|min:6|same:password',
-               'state' => 'required|min:2|max:255|Regex:/^[a-z-.]+( [a-z-.]+)*$/i',
-               'city' => 'required|min:2|max:255|Regex:/^[a-z-.]+( [a-z-.]+)*$/i',
+               'state' => 'required',
+               'city' => 'required',
                'total_vehicle' => 'required',
                'attached_vehicle' => 'required',
                //'carrer_type2' => 'required'
@@ -236,6 +238,12 @@ class PartnerRegistrationController extends Controller
         $data["categoryname"] =   DB::table('vehicle_categories')
                             ->where('parent_id',1)
                             ->select('category_name','id')
+                            ->get();
+        //echo $data["user"]->state;die;
+        $data['states'] = GeoLocation::getState();
+         $data["city"] =   DB::table('geo_locations')
+                            ->where('parent_id',$data["user"]->state)
+                            ->select('name','id')
                             ->get();
        return view('admin/partner/edit',$data);
     }

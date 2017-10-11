@@ -54,62 +54,69 @@
                             </div>
                             <div class="form-group">
                                 <label for="name" class="col-sm-2 control-label">First Name</label>
-                                <div class="col-sm-8">
+                                <div class="col-sm-5">
                                      {!! Form :: text('firstName','',['class'=>'form-control1', 'id'=>'firstname'])  !!}
                                 </div>                                
                             </div>
                             <div class="form-group">
                                 <label for="name" class="col-sm-2 control-label">Last Name</label>
-                                <div class="col-sm-8">
+                                <div class="col-sm-5">
                                     {!! Form :: text('lastName','',['class'=>'form-control1', 'id'=>'lastname'])  !!}
                                 </div>                                
                             </div>
                              <div class="form-group">
                                 <label for="name" class="col-sm-2 control-label">Mobile</label>
-                                <div class="col-sm-8">
+                                <div class="col-sm-5">
                                     {!! Form :: text('mobile','',['class'=>'form-control1', 'id'=>'mobile'])  !!}
                                 </div>                                
                             </div>
                             <div class="form-group">
 				<label class="col-sm-2 control-label">Email</label>
-				<div class="col-sm-8">	
+				<div class="col-sm-5">	
                                      {!! Form :: text('email','',['class'=>'form-control1', 'id'=>'email'])  !!}
 				</div>
                             </div>                            
                             <div class="form-group">
                                 <label class="col-sm-2 control-label">Password</label>
-                                <div class="col-sm-8">
+                                <div class="col-sm-5">
                                     {!! Form :: password('password',['placeholder'=>'Minimum 6 characters','class'=>'form-control1'])  !!}
                                 </div>
                             </div>
                             <div class="form-group">
                                 <label class="col-sm-2 control-label">Confirm Password</label>
-                                <div class="col-sm-8">
+                                <div class="col-sm-5">
                                     {!! Form :: password('cpassword',['placeholder'=>'Minimum 6 characters | Same as Password','class'=>'form-control1'])  !!}
                                 </div>
                             </div>
                              <div class="form-group">
                                 <label class="col-sm-2 control-label">State</label>
-                                <div class="col-sm-8">
-                                    {!! Form :: text('state','',['class'=>'form-control1', 'id'=>'state'])  !!}
+                                <div class="col-sm-5">
+                                  <select name="state" id="state" class="form-control" onchange="getCityByStateId(this.value, 'city')">
+                                    <option value="">Select a state</option>
+                                        @foreach($states as $state)
+                                        <option value="{{ $state->id }}">{{ $state->name }}</option>
+                                        @endforeach
+                                </select>
                                 </div>
                             </div>
                              <div class="form-group">
                                 <label class="col-sm-2 control-label">City</label>
-                                <div class="col-sm-8">
-                                    {!! Form :: text('city','',['class'=>'form-control1', 'id'=>'city'])  !!}
+                                <div class="col-sm-5">
+                                    <select name="city" id="city" class="form-control" >
+                                    <option value="">Select a city</option>
+                                   </select>
                                 </div>
                             </div>
                              <div class="form-group">
                                 <label class="col-sm-2 control-label">Total Vehicle</label>
-                                <div class="col-sm-8">
+                                <div class="col-sm-5">
                                     
                                     {!! Form :: text('total_vehicle','',['class'=>'form-control1', 'id'=>'total_vehicle'])  !!}
                                 </div>
                             </div>
                              <div class="form-group">
                                 <label class="col-sm-2 control-label">Attached Vehicle</label>
-                                <div class="col-sm-8">
+                                <div class="col-sm-5">
                                     
                                      {!! Form :: text('attached_vehicle','',['class'=>'form-control1', 'id'=>'attached_vehicle'])  !!}
                                 </div>
@@ -126,7 +133,7 @@
                             </div>
                             <div class="form-group">
                             <label class="col-sm-2 control-label"></label>
-                            <div class="col-sm-8 checkbox_align" id="transport_div" style="display: none">                
+                            <div class="col-sm-6 checkbox_align" id="transport_div" style="display: none">                
                                <?php foreach($categoryname as $types) { ?>                
                                 <div class="checkbox">
                                      <label><input type="checkbox" name="trucktype[]" id="trucktype" onclick="gettrucklength({{$types->id}});" value="{{$types->id}}">  {{$types->category_name}}</label>
@@ -137,7 +144,7 @@
                             </div>              
                             
                             
-                            <div class="col-sm-8 col-sm-offset-2">
+                            <div class="col-sm-6 col-sm-offset-2">
                             {!! Form :: submit("Save User",["class"=>"btn-success btn",'id'=>'user']) !!}
                             </div>
                         {!! Form::close() !!}
@@ -159,11 +166,33 @@ $(document).ready(function(){
         $("."+ inputValue).toggle();
     });
 });
+
 $('#carrer_type2').click(function(){
    
 this.checked?$('#transport_div').show():$('#transport_div').hide(); //time for show
 });
 
+$.validator.addMethod("uniqueMobile", function(value, element) {
+         var isSuccess = false;
+            $.ajax({
+                type: "GET",
+                url: '{{url('admin/mobileCheck')}}',
+                data: "checkMobile="+value,
+                async: false,
+                //dataType:"html",
+                success: function(msg)
+                { //alert(msg);
+                    //If username exists, set response to true
+                    //response = (msg === 'true') ? true : false;
+                    isSuccess = msg === "false" ? true : false;
+                    
+                }
+             });
+            return isSuccess;
+        },
+        "Mobile is Already Taken"
+    );
+  
 $('#newUser').validate({
 
             rules: {
@@ -183,7 +212,8 @@ $('#newUser').validate({
                 mobile:{
                     required : true,
                     minlength:10,
-                    number:true
+                    number:true,
+		    uniqueMobile: true
                 },
 
                 password:{
@@ -194,12 +224,12 @@ $('#newUser').validate({
                     required : true
                 },
                  state:{
-                    required : true,
-                    minlength:2
+                    required : true
+                    
                 },
                  city:{
-                    required : true,
-                    minlength:2
+                    required : true
+                    
                 },
                  total_vehicle:{
                     required : true,
@@ -245,11 +275,11 @@ $('#newUser').validate({
                     required : "Enter your Confirm Password",
                 },
                 state :{
-                    required : "Enter your State",
+                    required : "Select your State",
                     minlength : 'State should be 2 digits'
                 },
                 city :{
-                    required : "Enter your City",
+                    required : "Select your City",
                     minlength : 'City should be 2 digits'
                 },
                 total_vehicle :{
@@ -321,7 +351,25 @@ $('#newUser').validate({
 
    });
     }    
+   function getCityByStateId(state_id, elm){
+  var ajax_url = "{{ url('geo-location/city') }}/" + state_id;
+  $.ajax({
+      url: ajax_url,
+      dataType: "json",
+      success: function(msg) {
+        var dt = '<option value="">Select a city</option>';
+        var obj = JSON.parse(JSON.stringify(msg));
+        $.each(obj, function(key, value) {
+          dt += '<option value="' + value.id + '">' + value.name + '</option>';
+        }); 
     
+        $('#' + elm).html(dt);
+      },
+      error : function(msg, status) {
+          alert(msg+status);
+      }
+  });
+} 
  
 </script>
 @endsection
