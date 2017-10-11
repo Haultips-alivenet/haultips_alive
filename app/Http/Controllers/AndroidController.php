@@ -11,6 +11,7 @@ use Tymon\JWTAuth\Exceptions\JWTException;
 use Tymon\JWTAuth\Facades\JWTAuth;
 use Session;
 use Input;
+use Mail;
 use App\library\Smsapi;
 use App\User;
 use App\UserVerification;
@@ -47,7 +48,9 @@ use App\TblAnswer;
 use App\TblQuestion;
 use App\TblQuesMaster;
 use App\PartnerKyc;
+use App\PaymentDetail;
 use App\Notification;
+use Indipay;
 use DB;
 use Hash;
 
@@ -3161,19 +3164,42 @@ class AndroidController extends AppController
     }
     
     public function test(){
+
+//        $push = new PushNotification('fcm');
+//        $response =  $push->setMessage([
+//                'notification' => [
+//                        'title'=>'This is the title',
+//                        'body'=>'background',
+//                        'sound' => 'default'
+//                        ]
+//                ])
+//           //  ->setApiKey('AAAAZLnw4BA:APA91bEt7-Hts8J2v8yecvCwOtscsEZLW9p92Ew0E6dxF-QNandDuY_Qde0OPP1m4aCXqgD4EXjaqlXIBpK2bGWBodjXsW8Lh8VUJnXbbFFZPa0ij4VWvjy9dO4QCaPejBuqBY_0HfUZ')
+//             ->setDevicesToken('eoXQObvvoNU:APA91bF0HF1lK0qwGWm_lssH6zEqm3GA-kAPPAq6M0RlAH5E3HwsbAOqGrP4qNM6APHebLdD7WW7KjttBviXKpBKIUjg2N5QmPxlwJVja3MJFmfDLZFQgqz-ItJnrbKRAVSxmj4EK17s')
+//             ->send();
+//      print_r($response); die;
         
-        $push = new PushNotification('fcm');
-        $response =  $push->setMessage([
-                'notification' => [
-                        'title'=>'This is the title',
-                        'body'=>'background',
-                        'sound' => 'default'
-                        ]
-                ])
-           //  ->setApiKey('AAAAZLnw4BA:APA91bEt7-Hts8J2v8yecvCwOtscsEZLW9p92Ew0E6dxF-QNandDuY_Qde0OPP1m4aCXqgD4EXjaqlXIBpK2bGWBodjXsW8Lh8VUJnXbbFFZPa0ij4VWvjy9dO4QCaPejBuqBY_0HfUZ')
-             ->setDevicesToken('eoXQObvvoNU:APA91bF0HF1lK0qwGWm_lssH6zEqm3GA-kAPPAq6M0RlAH5E3HwsbAOqGrP4qNM6APHebLdD7WW7KjttBviXKpBKIUjg2N5QmPxlwJVja3MJFmfDLZFQgqz-ItJnrbKRAVSxmj4EK17s')
-             ->send();
-      print_r($response); die;
+        $carrierData = ShippingQuote::select('u.id','u.device_token','u.mobile_number','u.first_name','u.last_name','u.email')
+                            ->leftJoin('users as u','u.id','=','shipping_quotes.carrier_id')
+                            ->where('shipping_quotes.id',33)->first();        
+            
+        $userData = ShippingDetail::select('u.id','u.device_token','u.mobile_number','u.first_name','u.last_name','u.email')
+                    ->leftJoin('users as u','u.id','=','shipping_details.user_id')
+                    ->where('shipping_details.id', 73)->first();
+        
+        $msg = 'Your Offer has been accepted by the '.$userData->first_name.' '.$userData->last_name.'. You can contct him on +91'.$userData->mobile_number.' Or '.$userData->email;
+        $smsObj = new Smsapi();
+        $smsObj->sendsms_api('+918750148020',$msg);
+
+       Mail::send('email.partnerEmailForOfferAccept', ['msg' => $msg], function ($m) use ($carrierData) {
+            $m->from('richalive158@gmail.com', 'Haultips!');
+            $m->to('anjalirai.alivenetsolution@gmail.com')->subject('Haultips Offer Acceptance.');
+        });
+        $msg= array();
+        $msg['responseCode'] = "200";
+        $msg['responseMessage'] = "Data saved successfully";    
+        
+            $result = json_encode($msg);
+            echo $result;
     }
     
     public function partnerProfileEdit(){
@@ -3356,7 +3382,8 @@ class AndroidController extends AppController
                         ]);
                 
                 $msg['responseCode'] = "200";
-                $msg['responseMessage'] = "Kyc updated successfully";    
+                $msg['responseMessage'] = "Kyc updated successfully";   
+                $msg['kycStatus'] = "Not verified";   
                 }
         }catch(\Exception $e) {
             $msg['responseCode'] = "0";
@@ -3390,14 +3417,17 @@ class AndroidController extends AppController
             }else{   
                
                 $kycDetails = PartnerKyc::where('user_id',$userId)->first();
-               
+                $userKycStatus = User::where('id',$userId)->select('documents_status')->first();
+                
                 if($kycDetails){
                     $msg['responseCode'] = "200";
                     $msg['responseMessage'] = "Kyc Data get successfully";
+                    $msg['kycStatus'] = ($userKycStatus->documents_status == 0) ? 'Not verified' : 'Verified';
                     $msg['data'] = $kycDetails;
                 }else{
                     $msg['responseCode'] = "200";
                     $msg['responseMessage'] = "Kyc Data get successfully";
+                    $msg['kycStatus'] = 'Not Uploaded';
                     $msg['data'] = "No Data found.";
                 }
                 
@@ -3470,9 +3500,10 @@ class AndroidController extends AppController
         }
     }
     
-    public function paymentSucess(){
+    public function paymentSucess(Request $request){
         // For default Gateway
-      $response = Indipay::response($request);
+        $response = Indipay::response($request);  
+        
        if($response['status'] == 'success'){
             $quot_id = $response['udf1'];
             $shipping_quote = ShippingQuote::where('id', $quot_id);
@@ -3487,7 +3518,7 @@ class AndroidController extends AppController
             $shipping_quote->update(['quote_status' => 1]);
 
             // Update shipping details
-            ShippingDetail::where('id', $sq->shipping_id)->update(['payment_method_id' => 2, 'shipping_price' => $response['amount'],'payments_status' => 1, 'quote_status'=>1]);
+            ShippingDetail::where('id', $sq->shipping_id)->update(['payment_method_id' => 2, 'shipping_price' => $response['amount'],'payments_status' => 1]);
 
             // insert payment details
             $pay_det = new PaymentDetail;
@@ -3504,9 +3535,13 @@ class AndroidController extends AppController
             $pay_det->save();
 
            #Accept offer Notification
-            $carrierData = ShippingQuote::select('u.id','u.device_token','u.mobile_number','u.first_name','u.last_name')
+            $carrierData = ShippingQuote::select('u.id','u.device_token','u.mobile_number','u.first_name','u.last_name','u.email')
                             ->leftJoin('users as u','u.id','=','shipping_quotes.carrier_id')
-                            ->where('shipping_quotes.id',$quot_id)->first();                
+                            ->where('shipping_quotes.id',$quot_id)->first();        
+            
+            $userData = ShippingDetail::select('u.id','u.device_token','u.mobile_number','u.first_name','u.last_name','u.email')
+                        ->leftJoin('users as u','u.id','=','shipping_details.user_id')
+                        ->where('shipping_details.id', $sq->shipping_id)->first();
                 
             $message=array();
             $currentTime = strtotime(date("Y-m-d H:i:s"));
@@ -3514,7 +3549,7 @@ class AndroidController extends AppController
                                                 'shippingId' => $sq->shipping_id,
                                                 'title'=>'Offer Accepted', 
                                                 'type'=>'Accept Offer', 
-                                                'message'=>'Your Offer has been accepted by the '.$carrierData->first_name.' '.$carrierData->last_name, 
+                                                'message'=>'Your Offer has been accepted by the '.$userData->first_name.' '.$userData->last_name, 
                                                 'is_background'=>'true',
                                                 'payload'=>'dataPayload', 
                                                 'imageUrl'=>'', 
@@ -3528,7 +3563,7 @@ class AndroidController extends AppController
             $response =  $push->setMessage([
                     'notification' => [
                             'title'=>'Offer Accepted',
-                            'body'=>'Your Offer has been accepted by the '.$carrierData->first_name.' '.$carrierData->last_name,
+                            'body'=>'Your Offer has been accepted by the '.$userData->first_name.' '.$userData->last_name,
                             'sound' => 'default'
                             ],
                     'data'=>$message
@@ -3536,7 +3571,25 @@ class AndroidController extends AppController
                  ->setDevicesToken($carrierData->device_token)                     
                  ->send();
                 
-                
+                # Send Sms and email to partner for offer acceptance
+                    $msg = 'Your Offer has been accepted by the '.$userData->first_name.' '.$userData->last_name.'. You can contct him on +91'.$userData->mobile_number.' Or '.$userData->email;
+                    $smsObj = new Smsapi();
+                    $smsObj->sendsms_api('+91'.$carrierData->mobile_number,$msg);
+                    
+                    Mail::send('email.partnerEmailForOfferAccept', ['msg' => $msg], function ($m) use ($carrierData) {
+                        $m->from('richalive158@gmail.com', 'Haultips!');
+                        $m->to($carrierData->email, $carrierData->name)->subject('Haultips Offer Acceptance.');
+                    });
+                    
+                 # Send Sms and email to User after offer acceptance
+                    $userMsg = 'Your booking has been sucessfully placed to'.$carrierData->first_name.' '.$carrierData->last_name.'. You can contct him on +91'.$carrierData->mobile_number.' Or '.$carrierData->email;
+                    $smsObj = new Smsapi();
+                    $smsObj->sendsms_api('+91'.$userData->mobile_number,$userMsg);
+                    
+                    Mail::send('email.userEmailForOfferAccept', ['userMsg' => $userMsg], function ($m) use ($userData) {
+                        $m->from('richalive158@gmail.com', 'Haultips!');
+                        $m->to($userData->email, $userData->name)->subject('Haultips Shipment Confirmation.');
+                    });
                 
                 #Reject offer Notification
                 $rejectUsers = ShippingQuote::select('u.id','u.device_token','u.first_name','u.last_name')
@@ -3603,12 +3656,16 @@ class AndroidController extends AppController
         $sts_updt = $shipping_quote->update(['quote_status' => 1]);
 
         # Update shipping details
-        ShippingDetail::where('id', $sq->shipping_id)->update(['payment_method_id' => 1, 'shipping_price' => $sq->quote_price, 'payments_status' => 0, 'quote_status'=>1]);
+        ShippingDetail::where('id', $sq->shipping_id)->update(['payment_method_id' => 1, 'shipping_price' => $sq->quote_price, 'payments_status' => 0]);
 
         #Accept offer Notification
-            $carrierData = ShippingQuote::select('u.id','u.device_token','u.mobile_number','u.first_name','u.last_name')
+            $carrierData = ShippingQuote::select('u.id','u.device_token','u.mobile_number','u.first_name','u.last_name','u.email')
                             ->leftJoin('users as u','u.id','=','shipping_quotes.carrier_id')
-                            ->where('shipping_quotes.id',$quot_id)->first();                
+                            ->where('shipping_quotes.id',$quot_id)->first();          
+            
+            $userData = ShippingDetail::select('u.id','u.device_token','u.mobile_number','u.first_name','u.last_name','u.email')
+                        ->leftJoin('users as u','u.id','=','shipping_details.user_id')
+                        ->where('shipping_details.id', $sq->shipping_id)->first();
                 
             $message=array();
             $currentTime = strtotime(date("Y-m-d H:i:s"));
@@ -3616,7 +3673,7 @@ class AndroidController extends AppController
                                                 'shippingId' => $sq->shipping_id,
                                                 'title'=>'Offer Accepted', 
                                                 'type'=>'Accept Offer', 
-                                                'message'=>'Your Offer has been accepted by the '.$carrierData->first_name.' '.$carrierData->last_name, 
+                                                'message'=>'Your Offer has been accepted by the '.$userData->first_name.' '.$userData->last_name, 
                                                 'is_background'=>'true',
                                                 'payload'=>'dataPayload', 
                                                 'imageUrl'=>'', 
@@ -3630,7 +3687,7 @@ class AndroidController extends AppController
             $response =  $push->setMessage([
                     'notification' => [
                             'title'=>'Offer Accepted',
-                            'body'=>'Your Offer has been accepted by the '.$carrierData->first_name.' '.$carrierData->last_name,
+                            'body'=>'Your Offer has been accepted by the '.$userData->first_name.' '.$userData->last_name,
                             'sound' => 'default'
                             ],
                     'data'=>$message
@@ -3638,7 +3695,25 @@ class AndroidController extends AppController
                  ->setDevicesToken($carrierData->device_token)                     
                  ->send();
                 
-                
+                 # Send Sms and email to partner for offer acceptance
+                    $msg = 'Your Offer has been accepted by the '.$userData->first_name.' '.$userData->last_name.'. You can contct him on +91'.$userData->mobile_number.' Or '.$userData->email;
+                    $smsObj = new Smsapi();
+                    $smsObj->sendsms_api('+91'.$carrierData->mobile_number,$msg);
+                    
+                    Mail::send('email.partnerEmailForOfferAccept', ['msg' => $msg], function ($m) use ($carrierData) {
+                        $m->from('richalive158@gmail.com', 'Haultips!');
+                        $m->to($carrierData->email, $carrierData->name)->subject('Haultips Offer Acceptance.');
+                    });
+                    
+                 # Send Sms and email to User after offer acceptance
+                    $userMsg = 'Your booking has been sucessfully placed to'.$carrierData->first_name.' '.$carrierData->last_name.'. You can contct him on +91'.$carrierData->mobile_number.' Or '.$carrierData->email;
+                    $smsObj = new Smsapi();
+                    $smsObj->sendsms_api('+91'.$userData->mobile_number,$userMsg);
+                    
+                    Mail::send('email.userEmailForOfferAccept', ['userMsg' => $userMsg], function ($m) use ($userData) {
+                        $m->from('richalive158@gmail.com', 'Haultips!');
+                        $m->to($userData->email, $userData->name)->subject('Haultips Shipment Confirmation.');
+                    });
                 
                 #Reject offer Notification
                 $rejectUsers = ShippingQuote::select('u.id','u.device_token','u.first_name','u.last_name')
@@ -3689,6 +3764,275 @@ class AndroidController extends AppController
       }
       $result = json_encode($msg);
             echo $result; 
+    }
+    
+    public function createHashForPay(Request $request) {
+        $hashVarsSeq['key'] = $_POST['key'];
+        $hashVarsSeq['txnid'] = $_POST['txnid'];
+        $hashVarsSeq['amount'] = $_POST['amount'];
+        $hashVarsSeq['productinfo'] = $_POST['productinfo'];
+        $hashVarsSeq['firstname'] = $_POST['firstname'];
+        $hashVarsSeq['email'] = $_POST['email'];
+        $hashVarsSeq['udf1'] = $_POST['udf1'];
+        $hashVarsSeq['udf2'] = $_POST['udf2'];
+        $hashVarsSeq['udf3'] = $_POST['udf3'];
+        $hashVarsSeq['udf4'] = $_POST['udf4'];
+        $hashVarsSeq['udf5'] = $_POST['udf5'];
+        
+       $hash = '';
+//        $hashSequence = "key|txnid|amount|productinfo|firstname|email|udf1|udf2|udf3|udf4|udf5|udf6|udf7|udf8|udf9|udf10";
+//        $hashVarsSeq = explode('|', $hashSequence);
+        $hash_string = '';
+
+        foreach($hashVarsSeq as $hash_var) {
+            $hash_string .= isset($this->parameters[$hash_var]) ? $this->parameters[$hash_var] : '';
+            $hash_string .= '|';
+        }
+
+        $hash_string .= 'e5iIg1jwi8';
+        $hash = strtolower(hash('sha512', $hash_string));
+        $msg['responseCode'] = "200";
+        $msg['responseMessage'] = "Hash generated successfully!"; 
+        $msg['hashKey'] = $hash; 
+        $result = json_encode($msg);
+            echo $result; 
+    }
+    
+    public function demoPaymentSucess(Request $request){
+        // For default Gateway
+              $msg = array();
+       if($_POST['status'] == 'success'){
+            $quot_id = $_POST['udf1'];
+            $shipping_quote = ShippingQuote::where('id', $quot_id);
+
+            // check shipping id belongs to logged in user
+            $sq = $shipping_quote->first();
+            
+            // reject other quotes
+            $rejectOther = ShippingQuote::where('shipping_id', $sq->shipping_id)->update(['quote_status'=>2]);
+
+            // Update shipping quotes status
+            $shipping_quote->update(['quote_status' => 1]);
+
+            // Update shipping details
+            ShippingDetail::where('id', $sq->shipping_id)->update(['payment_method_id' => 2, 'shipping_price' => $_POST['amount'],'payments_status' => 1]);
+
+            // insert payment details
+            $pay_det = new PaymentDetail;
+            $pay_det->shipping_id = $sq->shipping_id;
+            $pay_det->transaction_id = $_POST['txnid'];
+            $pay_det->amount = $_POST['amount'];
+            $pay_det->card_type = '';
+            $pay_det->name_on_card = $_POST['name_on_card'];
+            $pay_det->card_number = $_POST['cardnum'];
+            $pay_det->expiry_date = '';
+            $pay_det->account_number = '';
+            $pay_det->status = $_POST['status'];
+            $pay_det->created_at = $_POST['addedon'];
+            $pay_det->save();
+
+           #Accept offer Notification
+            $carrierData = ShippingQuote::select('u.id','u.device_token','u.mobile_number','u.first_name','u.last_name','u.email')
+                            ->leftJoin('users as u','u.id','=','shipping_quotes.carrier_id')
+                            ->where('shipping_quotes.id',$quot_id)->first();            
+            
+            $userData = ShippingDetail::select('u.id','u.device_token','u.mobile_number','u.first_name','u.last_name','u.email')
+                        ->leftJoin('users as u','u.id','=','shipping_details.user_id')
+                        ->where('shipping_details.id', $sq->shipping_id)->first();
+                
+            $message=array();
+            $currentTime = strtotime(date("Y-m-d H:i:s"));
+            $message['data']=json_encode(array('quoteId' => $quot_id,
+                                                'shippingId' => $sq->shipping_id,
+                                                'title'=>'Offer Accepted', 
+                                                'type'=>'Accept Offer', 
+                                                'message'=>'Your Offer has been accepted by the '.$userData->first_name.' '.$userData->last_name, 
+                                                'is_background'=>'true',
+                                                'payload'=>'dataPayload', 
+                                                'imageUrl'=>'', 
+                                                'timestamp'=>$currentTime));
+            $newData = new Notification;
+            $newData->user_id = $carrierData->id;
+            $newData->data = $message['data'];
+            $newData->save();
+                
+            $push = new PushNotification('fcm');
+            $response =  $push->setMessage([
+                    'notification' => [
+                            'title'=>'Offer Accepted',
+                            'body'=>'Your Offer has been accepted by the '.$userData->first_name.' '.$userData->last_name,
+                            'sound' => 'default'
+                            ],
+                    'data'=>$message
+                    ])                            
+                 ->setDevicesToken($carrierData->device_token)                     
+                 ->send();
+                
+                # Send Sms and email to partner for offer acceptance
+                    $msg = 'Your Offer has been accepted by the '.$userData->first_name.' '.$userData->last_name.'. You can contct him on +91'.$userData->mobile_number.' Or '.$userData->email;
+                    $smsObj = new Smsapi();
+                    $smsObj->sendsms_api('+91'.$carrierData->mobile_number,$msg);
+                    
+                    Mail::send('email.partnerEmailForOfferAccept', ['msg' => $msg], function ($m) use ($carrierData) {
+                        $m->from('richalive158@gmail.com', 'Haultips!');
+                        $m->to($carrierData->email, $carrierData->name)->subject('Haultips Offer Acceptance.');
+                    });
+                    
+                 # Send Sms and email to User after offer acceptance
+                    $userMsg = 'Your booking has been sucessfully placed to'.$carrierData->first_name.' '.$carrierData->last_name.'. You can contct him on +91'.$carrierData->mobile_number.' Or '.$carrierData->email;
+                    $smsObj = new Smsapi();
+                    $smsObj->sendsms_api('+91'.$userData->mobile_number,$userMsg);
+                    
+                    Mail::send('email.userEmailForOfferAccept', ['userMsg' => $userMsg], function ($m) use ($userData) {
+                        $m->from('richalive158@gmail.com', 'Haultips!');
+                        $m->to($userData->email, $userData->name)->subject('Haultips Shipment Confirmation.');
+                    });
+                
+                
+                #Reject offer Notification
+                $rejectUsers = ShippingQuote::select('u.id','u.device_token','u.first_name','u.last_name')
+                                ->leftJoin('users as u','u.id','=','shipping_quotes.carrier_id')
+                                ->where('shipping_quotes.shipping_id',$sq->shipping_id)
+                                ->where('shipping_quotes.id','!=',$quot_id)->get();
+               $rejectArray = $rejectUsers->toArray();
+                
+                if(count($rejectArray) > 0){
+                    $message=array();
+                    foreach($rejectUsers as $rejectData){
+                    $message['data']=json_encode(array('quoteId' => $quot_id,
+                                                        'shippingId' => $sq->shipping_id,
+                                                        'title'=>'Offer Rejected', 
+                                                        'type'=>'Reject Offer', 
+                                                        'message'=>'Your Offer has been rejected by the '.$rejectData->first_name.' '.$rejectData->last_name, 
+                                                        'is_background'=>'true',
+                                                        'payload'=>'dataPayload', 
+                                                        'imageUrl'=>'', 
+                                                        'timestamp'=>$currentTime));
+                
+                
+                    
+                    $newRejectData = new Notification;
+                    $newRejectData->user_id = $rejectData->id;
+                    $newRejectData->data = $message['data'];
+                    $newRejectData->save();
+                    
+                    $response =  $push->setMessage([
+                        'notification' => [
+                                'title'=>'Offer Rejected',
+                                'body'=>'Your Offer has been rejected by the '.$rejectData->first_name.' '.$rejectData->last_name,
+                                'sound' => 'default'
+                                ],
+                        'data'=>$message
+                        ])                            
+                     ->setDevicesToken($rejectData->device_token)
+                     ->send();
+                }
+                
+                }
+                $msg = array();
+                $msg['responseCode'] = "200";
+                $msg['responseMessage'] = "Payment successfull!"; 
+      }else{
+           $msg['responseCode'] = "200";
+            $msg['responseMessage'] = "Payment failure!"; 
+      }
+      $result = json_encode($msg);
+            echo $result; 
+    }
+    
+    public function customerPaymentDetail(){
+        $orderId = $_POST['orderId'];
+        $msg = array();
+        $data = array();
+        $details= ShippingDetail::select('shipping_details.id','shipping_details.payment_method_id','u.first_name','u.last_name','u.email','pm.method','sq.quote_price','shipping_details.order_id','shipping_details.payments_status','vc.category_name as category', 'vsc.category_name as subCategory','shipping_details.table_name','pd.pickup_address','dd.delivery_address')
+                //->leftJoin('payment_details as pd','pd.shipping_id','=','shipping_details.id')
+                ->leftJoin('shipping_quotes as sq','sq.shipping_id','=','shipping_details.id')
+                ->leftJoin('payment_methods as pm','pm.id','=','shipping_details.payment_method_id')
+                ->leftJoin('users as u','u.id','=','sq.carrier_id')
+                ->leftJoin('vehicle_categories as vc','vc.id','=','shipping_details.category_id')
+                ->leftJoin('vehicle_categories as vsc','vsc.id','=','shipping_details.subcategory_id')
+                ->leftJoin('shipping_pickup_details as pd','pd.shipping_id','=','shipping_details.id')
+                ->leftJoin('shipping_delivery_details as dd','dd.shipping_id','=','shipping_details.id')
+                ->where('sq.quote_status', 1)
+                ->where('shipping_details.order_id',$orderId)->first();
+                $msg['responseCode'] = "200";
+                $msg['responseMessage'] = "Details get successfully"; 
+        if($details){
+            $shippingData = DB::table($details->table_name)->select('delivery_title')->where('shipping_id',$details->id)->first();
+                       
+            $data['carrierName'] = $details->first_name.' '.$details->last_name;
+            $data['email'] = $details->email;
+            $data['payed'] = ($details->payment_method_id == 2)? $details->quote_price : '';
+            $data['due'] = ($details->payment_method_id != 2)? $details->quote_price : '';
+            $data['paymentMode'] = $details->method;
+            if($details->payment_method_id == 2){
+                $paymentStatus = DB::table('payment_details')->select('created_at')->where('shipping_id',$details->id)->first();
+                $data['transactionDate'] = $paymentStatus->created_at;                
+            } else{
+                 $data['transactionDate'] = 'N/A'; 
+            }
+            $data['orderId'] = $details->order_id;
+            $data['status'] = ($details->payments_status == 1)? 'Sucess' : 'Not Done';
+            $data['categoryName'] = $details->category;
+            $data['subCategory'] = $details->subCategory;
+            $data['parcelNo'] = 'Haultips'.$details->order_id;
+            $data['title'] = $shippingData->delivery_title;
+            $data['pickupAddres'] = $details->pickup_address;
+            $data['deliveryAddress'] = $details->delivery_address;
+             $msg['data'] = $data; 
+        }else{
+            $msg['data'] = $data; 
+        }
+        $result = json_encode($msg);
+        echo $result; 
+    }
+    
+    public function partnerPaymentDetail(){
+        $orderId = $_POST['orderId'];
+        $msg = array();
+        $data = array();
+        $details= ShippingDetail::select('shipping_details.id','shipping_details.payment_method_id','u.first_name','u.last_name','u.email','pm.method','sq.quote_price','shipping_details.order_id','shipping_details.payments_status','vc.category_name as category', 'vsc.category_name as subCategory','shipping_details.table_name','pd.pickup_address','dd.delivery_address')
+                //->leftJoin('payment_details as pd','pd.shipping_id','=','shipping_details.id')
+                ->leftJoin('shipping_quotes as sq','sq.shipping_id','=','shipping_details.id')
+                ->leftJoin('payment_methods as pm','pm.id','=','shipping_details.payment_method_id')
+                ->leftJoin('users as u','u.id','=','shipping_details.user_id')
+                ->leftJoin('vehicle_categories as vc','vc.id','=','shipping_details.category_id')
+                ->leftJoin('vehicle_categories as vsc','vsc.id','=','shipping_details.subcategory_id')
+                ->leftJoin('shipping_pickup_details as pd','pd.shipping_id','=','shipping_details.id')
+                ->leftJoin('shipping_delivery_details as dd','dd.shipping_id','=','shipping_details.id')
+                ->where('sq.quote_status', 1)
+                ->where('shipping_details.order_id',$orderId)->first();
+        $msg['responseCode'] = "200";
+        $msg['responseMessage'] = "Details get successfully"; 
+        if($details){
+            $shippingData = DB::table($details->table_name)->select('delivery_title')->where('shipping_id',$details->id)->first();
+                       
+            $data['carrierName'] = $details->first_name.' '.$details->last_name;
+            $data['email'] = $details->email;
+            $data['payed'] = ($details->payment_method_id == 2)? $details->quote_price : '';
+            $data['due'] = ($details->payment_method_id != 2)? $details->quote_price : '';
+            $data['paymentMode'] = $details->method;
+            if($details->payment_method_id == 2){
+                $paymentStatus = DB::table('payment_details')->select('created_at')->where('shipping_id',$details->id)->first();
+                $data['transactionDate'] = $paymentStatus->created_at;                
+            } else{
+                 $data['transactionDate'] = 'N/A'; 
+            }
+            $data['orderId'] = $details->order_id;
+            $data['status'] = ($details->payments_status == 1)? 'Sucess' : 'Not Done';
+            $data['categoryName'] = $details->category;
+            $data['subCategory'] = $details->subCategory;
+            $data['parcelNo'] = 'Haultips'.$details->order_id;
+            $data['title'] = $shippingData->delivery_title;
+            $data['pickupAddres'] = $details->pickup_address;
+            $data['deliveryAddress'] = $details->delivery_address;
+            $msg['data'] = $data; 
+        }else{
+            $msg['data'] = $data; 
+        }
+        $result = json_encode($msg);
+        echo $result; 
+        
     }
 }
     
