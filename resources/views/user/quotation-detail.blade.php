@@ -23,6 +23,16 @@
             <br>
             <p class="text-center">Price information</p>
 
+            <h4>Partner Information</h4>
+            <ul>
+                <li class="_w60">Partner Name :</li>
+                <li class="_w40">{{ $offerData->first_name.' '.$offerData->last_name }}</li>
+                <li class="_w60">Partner Mobile :</li>
+                <li class="_w40">{{ $offerData->mobile_number }}</li>
+                <li class="_w60">Partner Email :</li>
+                <li class="_w40">{{ $offerData->email }}</li>
+            </ul>
+            
             <h4>Other Information</h4>
             <ul>
                 <li class="_w60">The offer is vailid till :</li>

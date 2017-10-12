@@ -37,7 +37,7 @@
                <label for="">Category</label>
             </div>
             <div class="col-md-8">
-                INR {{ $shippingDetail->category_name }}
+                 {{ $shippingDetail->category_name }}
             </div>
         </div>
 
@@ -46,7 +46,7 @@
                <label for="">Subcategory</label>
             </div>
             <div class="col-md-8">
-                INR {{ $shippingDetail->subcat_name }}
+                 {{ $shippingDetail->subcat_name }}
             </div>
         </div>
 

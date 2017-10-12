@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\User;
+use App\UserLoginDetails;
 use App\UserDetail;
 use Validator;
 use App\Http\Controllers\Controller;
@@ -41,9 +42,19 @@ class AuthController extends Controller
 
         // Attempt to log the user in 
         if(Auth::attempt(['email' => $request->email, 'password' => $request->password], $request->remember)){
-        	
-            $user = Auth::user();
-
+        	date_default_timezone_set('Asia/Calcutta'); 
+                $user = Auth::user();
+                $logindetails = new UserLoginDetails();
+                $logindetails->user_id = $user->id;
+                $logindetails->login_time = date('Y-m-d H:i:s');
+                $logindetails->ip_address = $_SERVER['REMOTE_ADDR'];
+                $Sucess = $logindetails->save();  
+                $insertedId = $logindetails->id;
+                
+                $userActive = User::find($user->id); 
+                $userActive->isActive = 1;
+                $userSucess = $userActive->save(); 
+                
         	if($user->status == '1' && $user->is_deleted == '0'){
         		$user_detail = UserDetail::select('image')->where('user_id', $user->id)->first();
 

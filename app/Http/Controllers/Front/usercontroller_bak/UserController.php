@@ -29,7 +29,6 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Input;
 use App\library\Smsapi;
 use Indipay;
-use Mail;
 use Response;
 use DB;
 use Helper;
@@ -283,9 +282,8 @@ class UserController extends FrontController
       if(Auth::user()->user_type_id <> 3) return redirect('/');
 
       $data = array();
-      $offerData = ShippingQuote::select('shipping_quotes.quote_status','sd.created_at','sd.id as shippingId','spd.pickup_date','shipping_quotes.quote_price','u.first_name','u.last_name','u.email','u.mobile_number')
+      $offerData = ShippingQuote::select('shipping_quotes.quote_status','sd.created_at','sd.id as shippingId','spd.pickup_date','shipping_quotes.quote_price')
                   ->leftJoin('shipping_details as sd','sd.id','=','shipping_quotes.shipping_id')
-                 ->leftJoin('users as u','u.id','=','shipping_quotes.carrier_id')
                   ->leftJoin('shipping_pickup_details as spd','spd.shipping_id','=','shipping_quotes.shipping_id')
                   ->where('shipping_quotes.id', $quoteId)->first();
       
@@ -390,33 +388,14 @@ class UserController extends FrontController
         ShippingDetail::where('id', $sq->shipping_id)->update(['payment_method_id' => 1, 'shipping_price' => $sq->quote_price, 'payments_status' => 0, 'quote_status' => 1]);
 
         #Accept offer Notification
-        $carrierData = ShippingQuote::select('u.device_token','u.first_name','u.last_name','u.mobile_number','u.email')
+        $carrierData = ShippingQuote::select('u.device_token','u.first_name','u.last_name','u.mobile_number')
                         ->leftJoin('users as u','u.id','=','shipping_quotes.carrier_id')
                         ->where('shipping_quotes.id', $quot_id)->first();
-      
-        $userData = ShippingDetail::select('u.id','u.device_token','u.mobile_number','u.first_name','u.last_name','u.email')
-                        ->leftJoin('users as u','u.id','=','shipping_details.user_id')
-                        ->where('shipping_details.id', $sq->shipping_id)->first();
-       
-        # Send Sms and email to partner for offer acceptance
-        $msg = 'Your Offer has been accepted by the '.$userData->first_name.' '.$userData->last_name.'. You can contct him on +91'.$userData->mobile_number.' Or '.$userData->email;
+        $otpMsg = 'Your Offer has been accepted by the '.$carrierData->first_name.' '.$carrierData->last_name;                           
+        
+        // Send message functionality   
         $smsObj = new Smsapi();
-        $smsObj->sendsms_api('+91'.$carrierData->mobile_number,$msg);
-
-        Mail::send('email.partnerEmailForOfferAccept', ['msg' => $msg], function ($m) use ($carrierData) {
-            $m->from('richalive158@gmail.com', 'Haultips!');
-            $m->to($carrierData->email, $carrierData->name)->subject('Haultips Offer Acceptance.');
-        });
-
-       # Send Sms and email to User after offer acceptance
-        $userMsg = 'Your booking has been sucessfully placed to'.$carrierData->first_name.' '.$carrierData->last_name.'. You can contct him on +91'.$carrierData->mobile_number.' Or '.$carrierData->email;
-        $smsObj = new Smsapi();
-        $smsObj->sendsms_api('+91'.$userData->mobile_number,$userMsg);
-
-        Mail::send('email.userEmailForOfferAccept', ['userMsg' => $userMsg], function ($m) use ($userData) {
-            $m->from('richalive158@gmail.com', 'Haultips!');
-            $m->to($userData->email, $userData->name)->subject('Haultips Shipment Confirmation.');
-        });
+        $smsObj->sendsms_api('+91'.$carrierData->mobile_number, $otpMsg);                  
 
         #Reject offer Notification
         $rejectUsers = ShippingQuote::select('u.device_token','u.first_name','u.last_name','u.mobile_number')
@@ -913,33 +892,14 @@ class UserController extends FrontController
           $pay_det->save();
 
           #Accept offer Notification
-          $carrierData = ShippingQuote::select('u.device_token','u.first_name','u.last_name','u.mobile_number','u.email')
+          $carrierData = ShippingQuote::select('u.device_token','u.first_name','u.last_name','u.mobile_number')
                           ->leftJoin('users as u','u.id','=','shipping_quotes.carrier_id')
                           ->where('shipping_quotes.id', $quot_id)->first();
+          $otpMsg = 'Your Offer has been accepted by the '.$carrierData->first_name.' '.$carrierData->last_name;                           
           
-          $userData = ShippingDetail::select('u.id','u.device_token','u.mobile_number','u.first_name','u.last_name','u.email')
-                        ->leftJoin('users as u','u.id','=','shipping_details.user_id')
-                        ->where('shipping_details.id', $sq->shipping_id)->first();
-          
-          # Send Sms and email to partner for offer acceptance
-            $msg = 'Your Offer has been accepted by the '.$userData->first_name.' '.$userData->last_name.'. You can contct him on +91'.$userData->mobile_number.' Or '.$userData->email;
-            $smsObj = new Smsapi();
-            $smsObj->sendsms_api('+91'.$carrierData->mobile_number,$msg);
-
-            Mail::send('email.partnerEmailForOfferAccept', ['msg' => $msg], function ($m) use ($carrierData) {
-                $m->from('richalive158@gmail.com', 'Haultips!');
-                $m->to($carrierData->email, $carrierData->name)->subject('Haultips Offer Acceptance.');
-            });
-
-         # Send Sms and email to User after offer acceptance
-            $userMsg = 'Your booking has been sucessfully placed to'.$carrierData->first_name.' '.$carrierData->last_name.'. You can contct him on +91'.$carrierData->mobile_number.' Or '.$carrierData->email;
-            $smsObj = new Smsapi();
-            $smsObj->sendsms_api('+91'.$userData->mobile_number,$userMsg);
-
-            Mail::send('email.userEmailForOfferAccept', ['userMsg' => $userMsg], function ($m) use ($userData) {
-                $m->from('richalive158@gmail.com', 'Haultips!');
-                $m->to($userData->email, $userData->name)->subject('Haultips Shipment Confirmation.');
-            });
+          // Send message functionality   
+          $smsObj = new Smsapi();
+          $smsObj->sendsms_api('+91'.$carrierData->mobile_number, $otpMsg);                  
 
           #Reject offer Notification
           $rejectUsers = ShippingQuote::select('u.device_token','u.first_name','u.last_name','u.mobile_number')

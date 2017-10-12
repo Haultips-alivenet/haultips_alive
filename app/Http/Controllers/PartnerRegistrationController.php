@@ -216,7 +216,12 @@ class PartnerRegistrationController extends Controller
     public function show($id)
     {
         
-        $user = User::find($id);
+       // $user = User::find($id);
+        $user =DB::table('users')->select('users.*','g.name as state','g1.name as city')
+                                ->leftjoin('geo_locations as g','users.state','=','g.id')
+                                ->leftjoin('geo_locations as g1','users.city','=','g1.id')
+                                    ->where('users.id',$id)
+                                    ->first();
         return view('admin/partner/view')->with([
                     'user' => $user,
                 ]);
@@ -477,12 +482,23 @@ class PartnerRegistrationController extends Controller
 	public function changesttus($ids){
         
        $id=explode("_",$ids);
+       $user = User::find($id[0]); 
+       //echo $user->mobile_number;die;
        if($id[1]==1){
          $status=0;  
        } else {
-         $status=1;  
+          $status=1; 
+          //sms
+            $otpMsg="Your Kyc is approved. thank you, Team Haultips.";
+            $smsObj = new Smsapi();
+            $smsObj->sendsms_api('+91'.$user->mobile_number,$otpMsg);  
+          //mail
+            Mail::send('email.kycmail', ['user' => $user], function ($m) use ($user) {
+            $m->from('richalive158@gmail.com', 'Haultips!');
+            $m->to($user->email, $user->first_name)->subject('Welcome to Haultips! confirmation email for Kyc Approved');
+           });
        }
-       $user = User::find($id[0]); 
+       
        $user->documents_status = $status;
        $statusupdate = $user->save(); 
         if($statusupdate == 1){
