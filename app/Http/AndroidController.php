@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\App;
+
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
 use Edujugon\PushNotification\PushNotification;
@@ -50,7 +50,6 @@ use App\TblQuesMaster;
 use App\PartnerKyc;
 use App\PaymentDetail;
 use App\Notification;
-use App\SupportChat;
 use Indipay;
 use DB;
 use Hash;
@@ -256,8 +255,7 @@ class AndroidController extends AppController
                             $msg['firstName'] = $getUserData->first_name;
                             $msg['lastName'] = $getUserData->last_name;
                             $msg['email'] = $getUserData->email;
-                            $msg['mobileNumber'] = $getUserData->mobile_number; 
-                            $msg['user_type_id'] = $getUserData->user_type_id; 
+                            $msg['mobileNumber'] = $getUserData->mobile_number;  
                             $msg['userImage'] = ($userImage)?$userImage->image : 'user_icon.png';
                         } 
                   }else{
@@ -364,7 +362,6 @@ class AndroidController extends AppController
                             $msg['lastName'] = $getUserData->last_name;
                             $msg['email'] = $getUserData->email;
                             $msg['mobileNumber'] = $getUserData->mobile_number;
-                            $msg['user_type_id'] = $getUserData->user_type_id;
                             $msg['userImage'] = ($userImage)?$userImage->image : 'user_icon.png';
                         } 
                   }else{
@@ -1452,7 +1449,7 @@ class AndroidController extends AppController
             $shippingDetails = array();
             $i = 0;
             $userId = $_POST['userId'];
-            $shiipings = ShippingDetail::where('user_id',$userId)->orderBy('id','DESC')->where('status','!=',2)->get();
+            $shiipings = ShippingDetail::where('user_id',$userId)->where('status','!=',2)->get();
             $shipArray = $shiipings->toArray();
             if(count($shipArray) > 0){
                foreach($shiipings as $shipping){
@@ -1993,9 +1990,8 @@ class AndroidController extends AppController
                 $msg['responseCode'] = "0";
                 $msg['responseMessage'] = "userId required.";
             }else{           
-                    $userdetails = User::select('carrier_type_id','documents_status')->where('id',$userId)->first();        
+                    $userdetails = User::select('carrier_type_id')->where('id',$userId)->first();        
                     $userType = $userdetails->carrier_type_id; 
-                    $documents_status = $userdetails->documents_status; 
                     $catType = array('1','2','3','4');
                     if($userType == 1){
                         $catType = array('2','3');
@@ -2027,7 +2023,7 @@ class AndroidController extends AppController
                     }elseif($orderBy == 'destination desc'){
                         $shippingData = $shippingData->orderBy('sdd.delivery_address', 'DESC');
                     }
-                    $shippingData = $shippingData->orderBy('shipping_details.id', 'DESC');
+                    
                     $shippingData = $shippingData->whereIn('shipping_details.category_id', $catType);
                     $shippingData = $shippingData->where('shipping_details.status', 1);
                     $shippingData = $shippingData->where('shipping_details.quote_status', 0);
@@ -2060,7 +2056,6 @@ class AndroidController extends AppController
                         $msg['responseCode'] = "200";
                         $msg['responseMessage'] = "Information get successfully"; 
                         $msg['diliveries'] = $data; 
-                        $msg['kycStatus'] = ($documents_status == 0) ? 'Not verified' : 'Verified';
                     }else{
                         $msg['responseCode'] = "200";
                         $msg['responseMessage'] = "Information get successfully";  
@@ -2162,7 +2157,6 @@ class AndroidController extends AppController
                      else if($shippingData->table_name == 'shipment_listing_vehicle_shifings'){                        
                          $data['deliveryTitle'] = $shippingDetail->delivery_title;
                          $data['itemImage'] = $shippingDetail->item_image;
-                         $data['vehicleName'] = $shippingDetail->vehicle_name;
                      }
                      else if($shippingData->table_name == 'shipment_listing_materials'){      
                          $data['material'] = (empty($shippingDetail->material_id)) ? 'N/A' : ShippingDetail::getCategoryName($shippingDetail->material_id, 'id', 'name','materials');
@@ -3582,7 +3576,7 @@ class AndroidController extends AppController
                     $smsObj = new Smsapi();
                     $smsObj->sendsms_api('+91'.$carrierData->mobile_number,$msg);
                     
-                    Mail::send('email.partnerEmailForOfferAccept', ['user' => $userData,'carrier'=>$carrierData], function ($m) use ($carrierData) {
+                    Mail::send('email.partnerEmailForOfferAccept', ['msg' => $msg], function ($m) use ($carrierData) {
                         $m->from('richalive158@gmail.com', 'Haultips!');
                         $m->to($carrierData->email, $carrierData->name)->subject('Haultips Offer Acceptance.');
                     });
@@ -3592,7 +3586,7 @@ class AndroidController extends AppController
                     $smsObj = new Smsapi();
                     $smsObj->sendsms_api('+91'.$userData->mobile_number,$userMsg);
                     
-                    Mail::send('email.userEmailForOfferAccept', ['user' => $userData,'carrier'=>$carrierData], function ($m) use ($userData) {
+                    Mail::send('email.userEmailForOfferAccept', ['userMsg' => $userMsg], function ($m) use ($userData) {
                         $m->from('richalive158@gmail.com', 'Haultips!');
                         $m->to($userData->email, $userData->name)->subject('Haultips Shipment Confirmation.');
                     });
@@ -3706,7 +3700,7 @@ class AndroidController extends AppController
                     $smsObj = new Smsapi();
                     $smsObj->sendsms_api('+91'.$carrierData->mobile_number,$msg);
                     
-                    Mail::send('email.partnerEmailForOfferAccept', ['user' => $userData,'carrier'=>$carrierData], function ($m) use ($carrierData) {
+                    Mail::send('email.partnerEmailForOfferAccept', ['msg' => $msg], function ($m) use ($carrierData) {
                         $m->from('richalive158@gmail.com', 'Haultips!');
                         $m->to($carrierData->email, $carrierData->name)->subject('Haultips Offer Acceptance.');
                     });
@@ -3716,7 +3710,7 @@ class AndroidController extends AppController
                     $smsObj = new Smsapi();
                     $smsObj->sendsms_api('+91'.$userData->mobile_number,$userMsg);
                     
-                    Mail::send('email.userEmailForOfferAccept', ['user' => $userData,'carrier'=>$carrierData], function ($m) use ($userData) {
+                    Mail::send('email.userEmailForOfferAccept', ['userMsg' => $userMsg], function ($m) use ($userData) {
                         $m->from('richalive158@gmail.com', 'Haultips!');
                         $m->to($userData->email, $userData->name)->subject('Haultips Shipment Confirmation.');
                     });
@@ -4039,140 +4033,6 @@ class AndroidController extends AppController
         $result = json_encode($msg);
         echo $result; 
         
-    }
-    
-    public function sendMsgByUser(){
-        
-         try{
-            $msg = array();
-            $i = 0;
-            $userId = $_POST['userId'];
-            $userMsg = $_POST['userMsg'];
-            $userType = $_POST['userType'];
-            
-            if(empty($userId)) {
-                $msg['responseCode'] = "0";
-                $msg['responseMessage'] = "userId required.";
-            }else{        
-         $support_data =   DB::table('support_chats')
-                            ->where('user_id',$userId)
-                            ->select('support_id')
-                            ->first();
-         if($support_data) {
-            $support_id = $support_data->support_id;
-         } else {
-             $support_data_in_user =   User::orderByRaw("RAND()")->where('user_type_id',4)->select('id')->first();
-                             
-                           
-             $support_id = $support_data_in_user->id;
-         }
-         $user_data =   DB::table('users')
-                            ->leftjoin('user_details as d','users.id','=','d.user_id')
-                            ->where('users.id',$userId)
-                            ->select('users.first_name','d.image')
-                            ->first();
-        $chat = new SupportChat;
-        $chat->support_id=$support_id;
-        $chat->user_id=$userId;
-        $chat->message=$userMsg;
-        $chat->user_type_id=$userType;
-        $Sucess = $chat->save(); 
-        $pusher = App::make('pusher');
-         ($pusher->trigger( 'support-channel'.$support_id,
-                          'my-event', 
-                          array('message' => $userMsg, 'support_id'=>$support_id ,'user_id' => $userId,'profile_pic'=> $user_data->image ,'fname' => $user_data->first_name))) ? 1 : 0;
-
-            if($Sucess){
-                $msg['responseCode'] = "200";
-                $msg['responseMessage'] = "Information get successfully"; 
-            } else {
-                $msg['responseCode'] = "0";
-                $msg['responseMessage'] = "Error Occur! Please try again"; 
-            }
-        
-        } 
-            
-        }catch(\Exception $e) {
-            $msg['responseCode'] = "0";
-            $msg['responseMessage'] =$e->getMessage();
-        }
-        finally {
-            $result = json_encode($msg);
-            echo $result;
-        }
-        
-    }
-    
-    public function ReceiveMsgByUser(){
-        $msg = array();
-         try{
-            $userId = $_POST['userId'];
-            $userType = $_POST['userType'];
-            
-            if(empty($userId)) {
-                $msg['responseCode'] = "0";
-                $msg['responseMessage'] = "userId required.";
-            }else{        
-            
-             $chatdetails =   DB::table('support_chats as c')
-                            ->leftjoin('users as u','c.user_id','=','u.id')
-                            ->leftjoin('users as u1','c.support_id','=','u1.id')
-                            ->where('c.user_id',$userId)
-                            ->orderBy('c.id',"asc")
-                            ->select('c.id','u.first_name as user_name','u1.first_name as support_name','c.created_at','c.message','c.user_type_id')
-                            ->get();
-            $msg['responseCode'] = "200";
-            $msg['responseMessage'] = "Chat data get successfully";
-            $msg['chatData'] = $chatdetails;   
-         }
-        }catch(\Exception $e) {
-            $msg['responseCode'] = "0";
-            $msg['responseMessage'] =$e->getMessage();
-        }
-        return $msg;
-    }
-    public function privacyPolicy() {
-        
-        return view('user.privacy_policy_for_app');
-    }
-    
-    public function generate_hash_code(){
-        $msg = array();
-         try{
-            $amount = $_POST['amount'];
-            $firstname = $_POST['firstname'];
-            $lastname = $_POST['lastname'];
-            $email = $_POST['email'];
-            $phone = $_POST['phone'];
-            $udf1 = $_POST['udf1'];
-            
-            if(empty($amount) && empty($firstname) && empty($lastname) && empty($email) && empty($phone) && empty($udf1)) {
-                $msg['responseCode'] = "0";
-                $msg['responseMessage'] = "required Field Error.";
-            }else{     
-        $parameters = [
-        'amount' => $amount, 
-        'firstname' => $firstname,
-        'lastname' => $lastname,
-        'email' => $email,
-        'phone' => $phone,
-        'productinfo' => 'Offer',
-        'udf1' => $udf1,
-        'allow_repeated_payments' => false
-      ];
-      
-        $order = Indipay::prepare($parameters);
-        $msg['responseCode'] = "200";
-        $msg['responseMessage'] = "Chat data get successfully";
-        $msg['hashData'] = $order;   
-      }
-        }catch(\Exception $e) {
-            $msg['responseCode'] = "0";
-            $msg['responseMessage'] =$e->getMessage();
-        }
-        print_r($order);
-        //$result = json_encode($msg);
-        //echo $result;
     }
 }
     

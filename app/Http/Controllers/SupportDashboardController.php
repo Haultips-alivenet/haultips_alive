@@ -23,14 +23,19 @@ class SupportDashboardController extends Controller
     public function inbox()
     {
         $tempArr = Session::get('currentUser');
-        $data["chatdetails"] =   DB::table('support_chats as c')
-                            ->leftjoin('users as u','c.user_id','=','u.id')
-                            ->where('c.support_id',$tempArr["id"])
-                            ->groupBy('u.id')
-                            ->orderBy('c.created_at',"desc")
-                            ->select('c.id','u.first_name','c.created_at','c.user_id')
-                            ->paginate(10);
+//            $data["chatdetails"] =   DB::table('support_chats as c')
+//                                ->leftjoin('users as u','c.user_id','=','u.id')
+//                                ->where('c.support_id',$tempArr["id"])
+//                                ->groupBy('c.user_id')
+//                                ->orderBy('c.created_at',"desc")
+//                                ->select('c.id','c.message','u.first_name','c.created_at','c.user_id')
+//                                ->paginate(10);
+         $data["chatdetails"] =  DB::select(DB::raw('select m.id,m.message,m.first_name,m.created_at,m.user_id from (select c.id,c.message,u.first_name,c.created_at,c.user_id from support_chats as c left join users as u on c.user_id=u.id where c.support_id='.$tempArr["id"].' order by c.id desc) m group by m.user_id desc  order by m.id desc'));
         return view('support.inbox',$data);
+        
+     
+        
+        
     }
     
     public function chatdetails($id){

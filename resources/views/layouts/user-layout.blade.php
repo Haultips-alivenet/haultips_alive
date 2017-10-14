@@ -151,7 +151,7 @@
                      <ul>
 
                         <li><span><img src="{{asset('public/user/img/arrow.png')}}" alt=""></span>Citywise Packers</li>
-                        <li><span><img src="{{asset('public/user/img/arrow.png')}}" alt=""></span>Privacy Policy</li>
+                        <li><span><img src="{{asset('public/user/img/arrow.png')}}" alt=""></span><a href="{{url('privacy/policy')}}">Privacy Policy</a></li>
                         <li><span><img src="{{asset('public/user/img/arrow.png')}}" alt=""></span>Terms & Conditions</li>
                         <li><span><img src="{{asset('public/user/img/arrow.png')}}" alt=""></span>Sitemap</li>
                         <li><span><img src="{{asset('public/user/img/arrow.png')}}" alt=""></span>Email Login</li>

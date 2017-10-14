@@ -80,21 +80,21 @@
                 <table class="table table-fhr">
                     <tbody>
                         <?php foreach($chatdetails as $value) { ?>
-                        <tr class="unread checked">
-                            <td class="hidden-xs">
+                        <tr class="unread checked" onclick="window.location.href='{{url('support/user/chatdetails/'.$value->user_id)}}'">
+                            <!--<td class="hidden-xs" style="width:10%;">
                                 <input type="checkbox" class="checkbox">
-                            </td>
-                            <td>
+                            </td> -->
+                            <td style="width:15%;">
                               <a href="{{url('support/user/chatdetails/'.$value->user_id)}}">{{$value->first_name}}</a>
                             </td>
-                            <td>
+                            <td style="width:75%;">{{$value->message}}
                             </td>
-                            <td>
-                                {{date('d-M',strtotime($value->created_at))}}
+                            <td style="width:10%;">
+                                {{date('d-M-y',strtotime($value->created_at))}}
                             </td>
                         </tr>
-                        <?php } ?>    
-                        
+                        <?php } ?>
+
                     </tbody>
                 </table>
             </div>

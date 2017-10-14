@@ -67,7 +67,7 @@
                     <?php  $tempArr = Session::get('currentUser'); foreach($chatdetails as $value) { if($value->user_type_id==4) { ?>
                     <div class="message-feed media">
                         <div class="pull-left">
-                            <img src="{{asset('public/uploads/userimages/'.$value->image)}}" alt="" class="img-avatar">
+                            <img src="{{asset('public/uploads/userimages/'.$value->image)}}" alt="" class="img-avatar" width="60px" height="80px">
                         </div>
                         <div class="media-body">
                             <div class="mf-content">
@@ -79,7 +79,7 @@
                     <?php } if($value->user_type_id!=4) { ?>
                     <div class="message-feed right">
                         <div class="pull-right">
-                            <img src="{{$profile_pic}}" alt="" class="img-avatar">
+                            <img src="{{$profile_pic}}" alt="" class="img-avatar" width="60px" height="80px">
                         </div>
                         <div class="media-body">
                             <div class="mf-content">

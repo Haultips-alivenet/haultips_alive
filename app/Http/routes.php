@@ -122,6 +122,9 @@ Route::get('support/dashboard', 'SupportDashboardController@index');
 Route::get('support/inbox', 'SupportDashboardController@inbox');
 Route::get('support/user/chatdetails/{id}', 'SupportDashboardController@chatdetails');
 
+// footer
+Route::get('privacy/policy', 'Front\UserHomeController@privacy_policy');
+
 #Admin
 Route::get('/admin/login', function () {
     if(Auth::check()){return Redirect::to('admin/dashboard');}
@@ -302,3 +305,7 @@ Route::post('webservices/demoPaymentSucess', 'AndroidController@demoPaymentSuces
 Route::post('webservices/customerPaymentDetail', 'AndroidController@customerPaymentDetail');
 Route::post('webservices/partnerPaymentDetail', 'AndroidController@partnerPaymentDetail');
 Route::post('webservices/conjob', 'AndroidController@conjob');
+Route::post('webservices/sendMsgByUser', 'AndroidController@sendMsgByUser');
+Route::post('webservices/ReceiveMsgByUser', 'AndroidController@ReceiveMsgByUser');
+Route::get('webservices/privacyPolicy', 'AndroidController@privacyPolicy');
+Route::post('webservices/generateHashCode', 'AndroidController@generate_hash_code');

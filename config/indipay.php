@@ -16,7 +16,7 @@ return [
 
     'gateway' => 'PayUMoney',                // Replace with the name of default gateway you want to use
 
-    'testMode'  => true,                   // True for Testing the Gateway [For production false]
+    'testMode'  => false,                   // True for Testing the Gateway [For production false]
 
     'ccavenue' => [                         // CCAvenue Parameters
         'merchantId'  => env('INDIPAY_MERCHANT_ID', ''),
@@ -32,8 +32,8 @@ return [
     ],
 
     'payumoney' => [                         // PayUMoney Parameters
-        'merchantKey'  => env('INDIPAY_MERCHANT_KEY', 'rjQUPktU'),
-        'salt'  => env('INDIPAY_SALT', 'e5iIg1jwi8'),
+        'merchantKey'  => env('INDIPAY_MERCHANT_KEY', 'r9EF9Wav'),
+        'salt'  => env('INDIPAY_SALT', '8m8Xn27DvO'),
         'workingKey' => env('INDIPAY_WORKING_KEY', ''),
 
         // Should be route address for url() function

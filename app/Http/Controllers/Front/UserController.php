@@ -403,17 +403,17 @@ class UserController extends FrontController
         $smsObj = new Smsapi();
         $smsObj->sendsms_api('+91'.$carrierData->mobile_number,$msg);
 
-        Mail::send('email.partnerEmailForOfferAccept', ['msg' => $msg], function ($m) use ($carrierData) {
+        Mail::send('email.partnerEmailForOfferAccept', ['user' => $userData,'carrier'=>$carrierData], function ($m) use ($carrierData) {
             $m->from('richalive158@gmail.com', 'Haultips!');
             $m->to($carrierData->email, $carrierData->name)->subject('Haultips Offer Acceptance.');
         });
 
        # Send Sms and email to User after offer acceptance
-        $userMsg = 'Your booking has been sucessfully placed to'.$carrierData->first_name.' '.$carrierData->last_name.'. You can contct him on +91'.$carrierData->mobile_number.' Or '.$carrierData->email;
+        $userMsg = 'Your booking has been sucessfully placed to '.$carrierData->first_name.' '.$carrierData->last_name.'. You can contct him on +91'.$carrierData->mobile_number.' Or '.$carrierData->email;
         $smsObj = new Smsapi();
         $smsObj->sendsms_api('+91'.$userData->mobile_number,$userMsg);
 
-        Mail::send('email.userEmailForOfferAccept', ['userMsg' => $userMsg], function ($m) use ($userData) {
+        Mail::send('email.userEmailForOfferAccept', ['user' => $userData,'carrier'=>$carrierData], function ($m) use ($userData) {
             $m->from('richalive158@gmail.com', 'Haultips!');
             $m->to($userData->email, $userData->name)->subject('Haultips Shipment Confirmation.');
         });
@@ -869,8 +869,10 @@ class UserController extends FrontController
         'udf1' => $request->quot_id,
         'allow_repeated_payments' => false
       ];
+     // print_r($parameters);die;
       $request->session()->put('pay_process', 1);
       $order = Indipay::prepare($parameters);
+     // print_r($order);die;
       return Indipay::process($order);
     }
 

@@ -177,9 +177,11 @@
                                                         <div class="contentEditableContainer contentTextEditable">
                                                             <div class="contentEditable" align='left'>
 
-                                                                    <p style="color:#0E6159; font-style:italic"><?php echo $msg; ?></p>
+                                                                <p>Hello {{ $carrier->first_name }},
+                                                                    </p>
+                                                                    <p style="color:#0E6159; font-style:italic">Your Offer has been accepted.</p>
+                                                                <p>If You have any query, You can contact on below Details:</p><br>
                                                                 
-
                                                             </div>
                                                         </div>
                                                     </td>
@@ -188,16 +190,21 @@
                                                 <tr>
 								<td width="100">&nbsp;</td>
 								<td width="480" align="left">
+									<p style="border-bottom: 1px solid #ddd"><span style="display: block; color: rgb(44, 159, 28); font-weight: bold;">FullName</span>{{ $user->first_name }}</p>
+									<p style="border-bottom: 1px solid #ddd"><span style="display: block; color: rgb(44, 159, 28); font-weight: bold;">Email Address</span>{{ $user->email }}</p>
+									<p style="border-bottom: 1px solid #ddd"><span style="display: block; color: rgb(44, 159, 28); font-weight: bold;">Phone Number</span>+91{{ $user->mobile_number }}</p>
 									
 
 								</td>
 								<td width="100">&nbsp;</td>
 							</tr>
+                                                        <p>Thank you </p>
+                                                                <p>Team Haultips !</p>
                                                         <tr>
                                                             <td width="100">&nbsp;</td>
                                                           <td width="480" align="left">
 
-                                                            <a href="#" style="display:block; text-align:center; background:#0E6159; color:#fff; padding:10px; text-decoration:none;">Click Here</a>
+                                                          
 
                                                           </td>
                                                               <td width="100">&nbsp;</td>

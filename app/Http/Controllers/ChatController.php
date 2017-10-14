@@ -11,6 +11,7 @@ use Auth;
 use App\UserDetail;
 use App\SupportChat;
 use Session;
+use App\User;
 use DB;
 
 class ChatController extends Controller
@@ -33,16 +34,28 @@ class ChatController extends Controller
 //    }
     public function send_message_by_user(Request $request){
         
+         $support_data =   DB::table('support_chats')
+                            ->where('user_id',Auth::User()->id)
+                            ->select('support_id')
+                            ->first();
+         if($support_data) {
+            $support_id = $support_data->support_id;
+         } else {
+             $support_data_in_user =   User::orderByRaw("RAND()")->where('user_type_id',4)->select('id')->first();
+                             
+                           
+             $support_id = $support_data_in_user->id;
+         }
         $chat = new SupportChat;
-        $chat->support_id=0;
+        $chat->support_id=$support_id;
         $chat->user_id=Auth::User()->id;
         $chat->message=$request->chat_message;
         $chat->user_type_id=Auth::User()->user_type_id;
         $Sucess = $chat->save(); 
         $pusher = App::make('pusher');
-        return ($pusher->trigger( 'support-channel',
+        return ($pusher->trigger( 'support-channel'.$support_id,
                           'my-event', 
-                          array('message' => $request->chat_message, 'user_id' => $request->user_id,'profile_pic'=> $request->profile_pic ,'fname' => Auth::user()->first_name), $request->socket_id)) ? 1 : 0;
+                          array('message' => $request->chat_message, 'support_id'=>$support_id ,'user_id' => $request->user_id,'profile_pic'=> $request->profile_pic ,'fname' => Auth::user()->first_name), $request->socket_id)) ? 1 : 0;
 
     }
     public function send_message_by_support(Request $request){
